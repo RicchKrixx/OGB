@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Working Shopping Cart</title>
+  <style>
+  
+h1 {
+  margin-bottom: 30px;
+}
+
+.cart {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+
+.quantity {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.quantity button {
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  border: none;
+  background: #1976d2;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.quantity span {
+  font-size: 18px;
+}
+
+.grand-total {
+
+  font-size: 22px;
+  font-weight: bold;
+}
+  </style>
+</head>
+<body>
+
+  <h1>Shopping Cart</h1>
+
+  <div class="cart">
+
+    <div class="item" data-price="50">
+      <img src="https://via.placeholder.com/150" alt="Sneakers">
+      <h3>Sneakers</h3>
+      <p>Price: $50</p>
+      <div class="quantity">
+        <button onclick="updateQuantity(this, -1)">−</button>
+        <span class="count">0</span>
+        <button onclick="updateQuantity(this, 1)">+</button>
+      </div>
+    </div>
+
+    <div class="item" data-price="30">
+      <img src="https://via.placeholder.com/150" alt="Backpack">
+      <h3>Backpack</h3>
+      <p>Price: $30</p>
+      <div class="quantity">
+        <button onclick="updateQuantity(this, -1)">−</button>
+        <span class="count">0</span>
+        <button onclick="updateQuantity(this, 1)">+</button>
+      </div>
+    </div>
+
+    <div class="item" data-price="20">
+      <img src="https://via.placeholder.com/150" alt="Watch">
+      <h3>Watch</h3>
+      <p>Price: $20</p>
+      <div class="quantity">
+        <button onclick="updateQuantity(this, -1)">−</button>
+        <span class="count">0</span>
+        <button onclick="updateQuantity(this, 1)">+</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="grand-total">
+    <h2>Grand Total: $<span id="grand-total">0.00</span></h2>
+  </div>
+
+  <script>function updateQuantity(button, change) {
+  const item = button.closest('.item');
+  const countSpan = item.querySelector('.count');
+  let count = parseInt(countSpan.textContent);
+
+  count += change;
+  if (count < 0) count = 0;
+
+  countSpan.textContent = count;
+
+  updateGrandTotal();
+}
+
+function updateGrandTotal() {
+  let total = 0;
+  const items = document.querySelectorAll('.item');
+
+  items.forEach(item => {
+    const count = parseInt(item.querySelector('.count').textContent);
+    const price = parseFloat(item.getAttribute('data-price'));
+    total += count * price;
+  });
+
+  document.getElementById('grand-total').textContent = total.toFixed(2);
+}</script>
+</body>
+</html>
