@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Orders - On God Bend Mini Mart</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding:20px; background:#f7f7f9; }
+    h1 { margin-bottom:20px; }
+    .order { background:#fff; padding:16px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom:16px; }
+    .order h2 { margin:0 0 10px; font-size:18px; color:#333; }
+    .items { margin:10px 0; }
+    .items p { margin:2px 0; }
+    .total { font-weight:bold; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <h1>Received Orders</h1>
+  <div id="ordersContainer"></div>
+
+  <script>
+    function loadOrders() {
+      let orders = JSON.parse(localStorage.getItem("orders")) || {};
+      let container = document.getElementById("ordersContainer");
+      container.innerHTML = "";
+
+      if (Object.keys(orders).length === 0) {
+        container.innerHTML = "<p>No orders yet.</p>";
+        return;
+      }
+
+      for (let id in orders) {
+        let o = orders[id];
+        let div = document.createElement("div");
+        div.className = "order";
+        div.innerHTML = `
+          <h2>Order ${id}</h2>
+          <p><b>Name:</b> ${o.name}</p>
+          <p><b>Phone:</b> ${o.phone}</p>
+          <p><b>Address:</b> ${o.address}</p>
+          <p><b>Date:</b> ${o.date}</p>
+          <div class="items">
+            <b>Items:</b>
+            ${o.items.map(i => `<p>${i.name} x${i.quantity} — GHS ${i.price * i.quantity}</p>`).join("")}
+          </div>
+          <p class="total">Total: GHS ${o.total}</p>
+        `;
+        container.appendChild(div);
+      }
+    }
+    loadOrders();
+  </script>
+</body>
+</html>
