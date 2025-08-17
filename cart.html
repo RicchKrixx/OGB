@@ -26,73 +26,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 .checkout-btn{width:100%;background:var(--brand);color:#fff;border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer;}
 footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top:26px;}
 
- /* Hamburger icon */
-  .hamburger {
-    display: block;
-    width: 30px;
-    height: 25px;
-    margin: 20px;
-    position: relative;
-    cursor: pointer;
-    z-index: 1001;
-  }
-
-  .hamburger span {
-    position: absolute;
-    height: 4px;
-    width: 100%;
-    background: #333;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-  }
-
-  .hamburger span:nth-child(1) { top: 0; }
-  .hamburger span:nth-child(2) { top: 10px; }
-  .hamburger span:nth-child(3) { top: 20px; }
-
-  /* Popup menu */
-  .menu {
-    position: fixed;
-    top: 0;
-    right: -250px; /* hidden by default */
-    width: 250px;
-    height: 100%;
-    background: #f1f1f1;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.3);
-    transition: right 0.3s ease;
-    padding-top: 60px;
-  }
-
-  .menu a {
-    display: block;
-    padding: 15px 25px;
-    text-decoration: none;
-    color: #333;
-    font-size: 18px;
-  }
-
-  .menu a:hover {
-    background: #ddd;
-  }
-
-  /* Active menu */
-  .menu.active {
-    right: 0;
-  }
-
-  /* Optional: animate hamburger to X */
-  .hamburger.active span:nth-child(1) {
-    transform: rotate(45deg);
-    top: 10px;
-  }
-  .hamburger.active span:nth-child(2) {
-    opacity: 0;
-  }
-  .hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg);
-    top: 10px;
-  }
-</style>
+ 
 </style>
 </head>
 <body>
@@ -105,19 +39,6 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
     <a href="cart.html" class="cart-btn">🛒<span class="badge" id="cartCount">0</span></a>
   </nav>
 </header>
-
-<div class="hamburger" id="hamburger">
-  <span></span>
-  <span></span>
-  <span></span>
-</div>
-
-<div class="menu" id="menu">
-  <a href="#">Home</a>
-  <a href="#">Shop</a>
-  <a href="#">About</a>
-  <a href="#">Contact</a>
-</div>
 
 <section class="cart-section">
   <header><strong>🛒 Your Cart</strong></header>
@@ -177,14 +98,6 @@ function removeItem(i){ let cart=getCart(); cart.splice(i,1); saveCart(cart); }
 renderCart();
 updateBadge();
 </script>
-<script>
-  const hamburger = document.getElementById('hamburger');
-  const menu = document.getElementById('menu');
 
-  hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    menu.classList.toggle('active');
-  });
-</script>
 </body>
 </html>
