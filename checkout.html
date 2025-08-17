@@ -79,7 +79,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // Render cart
-const cart = JSON.parse(localStorage.getItem("cart")) || [];
+const cart = JSON.parse(localStorage.getItem("items")) || [];
 const summaryEl = document.getElementById("orderSummary");
 let total = 0;
 if(cart.length === 0) summaryEl.innerHTML = "<p>Your cart is empty.</p>";
