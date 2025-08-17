@@ -72,16 +72,15 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
   /* Popup menu */
   .menu {
     position: fixed;
+    top: -250px;
+    right: 50px; /* hidden by default */
     width: 250px;
-    opacity: 0;  
-    pointer-events: none;
+    height: auto;
     background: #f1f1f1;
-    padding: 10px;
-    margin: 20px;
-    border: 1px solid #ccc;
-    transition: opacity 0.5s ease;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+    transition: right 0.3s ease;
+    padding-top: 60px;
   }
-
 
   .menu a {
     display: block;
@@ -250,13 +249,6 @@ updateBadge();
     menu.classList.toggle('active');
   });
 </script>
-<script>
-  const hamburger = document.getElementById('hamburger');
-  const menu = document.getElementById('menu');
 
-  hamburger.addEventListener('click', () => {
-    menu.classList.toggle('active'); // toggle gentle fade
-  });
-</script>
 </body>
 </html>
