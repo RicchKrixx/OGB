@@ -1,418 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>On God Bend Mini Mart • Wine & Liquor</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>On God Bend Mini Mart • Wine & Liquor</title>
+  <style>
+    :root {
+      --brand: #b8860b; /* gold accent */
+      --brand-dark: #8b6508;
+      --ink: #1f1f1f;
+      --bg: #f7f7f9;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: var(--bg); color: var(--ink); }
+    a { color: inherit; text-decoration: none; }
 
-<!-- Paystack (only needed if you’ll enable online pay now) -->
-<script src="https://js.paystack.co/v1/inline.js"></script>
+    /* Header */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; background: #111; color: #fff;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand img { height: 44px; width: auto; border-radius: 6px; }
+    .brand-title { line-height: 1; }
+    .brand-title b { display: block; font-size: 18px; }
+    .brand-title small { opacity: .8; font-size: 12px; }
+    .nav { display: flex; gap: 14px; }
+    .nav a { padding: 8px 10px; border-radius: 8px; }
+    .nav a:hover { background: rgba(255, 255, 255, .08); }
+    .cart-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--brand); color: #fff; border: 0; border-radius: 10px;
+      padding: 8px 12px; font-weight: 600; cursor: pointer;
+    }
+    .badge { background: #111; color: #fff; border-radius: 999px; padding: 2px 8px; font-size: 12px; }
 
-<style>
-  :root{
-    --brand:#b8860b;      /* gold accent */
-    --brand-dark:#8b6508;
-    --ink:#1f1f1f;
-    --bg:#f7f7f9;
-    --card:#ffffff;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
-  a{color:inherit;text-decoration:none}
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #3a3a3a 0%, #161616 100%);
+      color: #fff; padding: 44px 16px; text-align: center;
+    }
+    .hero h1 { margin: 0 0 8px; font-size: 28px; }
+    .hero p { margin: 0 0 16px; opacity: .9; }
+    .cta { display: inline-block; background: var(--brand); color: #fff; padding: 12px 18px; border-radius: 12px; font-weight: 700; }
+    .cta:hover { background: var(--brand-dark); }
 
-  /* Header */
-  header{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 16px;background:#111;color:#fff;
-  }
-  .brand{display:flex;align-items:center;gap:10px}
-  .brand img{height:44px;width:auto;border-radius:6px}
-  .brand-title{line-height:1}
-  .brand-title b{display:block;font-size:18px}
-  .brand-title small{opacity:.8;font-size:12px}
-  .nav{display:flex;gap:14px}
-  .nav a{padding:8px 10px;border-radius:8px}
-  .nav a:hover{background:rgba(255,255,255,.08)}
-  .cart-btn{
-    display:inline-flex;align-items:center;gap:8px;
-    background:var(--brand);color:#fff;border:0;border-radius:10px;
-    padding:8px 12px;font-weight:600;cursor:pointer;
-  }
-  .badge{background:#111;color:#fff;border-radius:999px;padding:2px 8px;font-size:12px}
+    /* Sections */
+    .section { padding: 26px 16px; max-width: 1100px; margin: 0 auto; }
+    .section h2 { margin: 0 0 14px; color: #333; }
+    .grid {
+      display: grid; gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    .card {
+      background: var(--card); border-radius: 14px; padding: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, .06);
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    .card img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; }
+    .card h3 { font-size: 16px; margin: 8px 0 2px; }
+    .price { font-weight: 700; color: #222; }
+    .add { margin-top: 8px; border: 0; background: #111; color: #fff; padding: 8px 10px; border-radius: 10px; cursor: pointer; }
+    .add:hover { opacity: .9; }
 
-  /* Hero */
-  .hero{
-    background:linear-gradient(135deg, #3a3a3a 0%, #161616 100%);
-    color:#fff;padding:44px 16px;text-align:center;
-  }
-  .hero h1{margin:0 0 8px;font-size:28px}
-  .hero p{margin:0 0 16px;opacity:.9}
-  .cta{display:inline-block;background:var(--brand);color:#fff;padding:12px 18px;border-radius:12px;font-weight:700}
-  .cta:hover{background:var(--brand-dark)}
+    /* About / Contact */
+    .info { background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 6px 18px rgba(0, 0, 0, .06); }
 
-  /* Sections */
-  .section{padding:26px 16px;max-width:1100px;margin:0 auto}
-  .section h2{margin:0 0 14px;color:#333}
-  .grid{
-    display:grid;gap:14px;
-    grid-template-columns:repeat(auto-fill, minmax(160px,1fr));
-  }
-  .card{
-    background:var(--card);border-radius:14px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.06);
-    display:flex;flex-direction:column;align-items:center;text-align:center
-  }
-  .card img{width:100%;height:130px;object-fit:cover;border-radius:10px}
-  .card h3{font-size:16px;margin:8px 0 2px}
-  .price{font-weight:700;color:#222}
-  .add{margin-top:8px;border:0;background:#111;color:#fff;padding:8px 10px;border-radius:10px;cursor:pointer}
-  .add:hover{opacity:.9}
-
-  /* About / Contact */
-  .info{background:#fff;border-radius:16px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
-
-  /* Footer */
-  footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top:26px}
-
-  /* Cart drawer */
-  .drawer{
-    position:fixed;top:0;right:-400px;width:360px;max-width:90vw;height:100vh;background:#fff;box-shadow:-10px 0 24px rgba(0,0,0,.2);
-    transition:right .28s ease;z-index:50;display:flex;flex-direction:column;
-  }
-  .drawer.open{right:0}
-  .drawer header{background:#fff;color:#111;border-bottom:1px solid #eee}
-  .cart-list{padding:12px;flex:1;overflow:auto}
-  .cart-item{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;margin-bottom:10px}
-  .cart-item img{width:48px;height:48px;object-fit:cover;border-radius:8px}
-  .qty{display:inline-flex;align-items:center;border:1px solid #ddd;border-radius:10px;overflow:hidden}
-  .qty button{background:#f4f4f4;border:0;padding:4px 8px;cursor:pointer}
-  .qty span{min-width:30px;text-align:center}
-  .cart-footer{padding:12px;border-top:1px solid #eee}
-  .cart-footer .total{display:flex;justify-content:space-between;font-weight:800;margin-bottom:10px}
-  .checkout-btn{width:100%;background:var(--brand);color:#fff;border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}
-
-  /* Checkout section */
-  #checkout{padding:26px 16px;max-width:900px;margin:0 auto 26px}
-  form.checkout{background:#fff;border-radius:16px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
-  .fields{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-  input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd}
-  .order-summary{margin-top:16px;background:#fafafa;border-radius:12px;padding:12px}
-  .pay-row{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
-  .place{background:#111;color:#fff;border:0;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer}
-  .note{font-size:12px;color:#666}
-
-  /* Success box */
-  .success{background:#e9ffe9;border:1px solid #a7e7a7;color:#0a5d0a;padding:12px;border-radius:12px;margin-top:12px;display:none}
-</style>
+    /* Footer */
+    footer { padding: 24px 16px; text-align: center; background: #111; color: #bbb; margin-top: 26px; }
+  </style>
+  <script src="cart.js"></script>
 </head>
 <body>
-
-<!-- HEADER -->
-<header>
-  <div class="brand">
-    <img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="On God Bend Logo"/>
-  </div>
-  <nav class="nav">
-    <a href="#products">Shop</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-    <button class="cart-btn" id="openCart">🛒 Cart <span class="badge" id="cartCount">0</span></button>
-  </nav>
-</header>
-
-<!-- HERO -->
-<section class="hero">
-  <h1>Premium Wines, Liquors & Everyday Essentials</h1>
-  <p>Quality you trust • Prices you love • Fast local delivery</p>
-  <a href="#products" class="cta">Shop Now</a>
-</section>
-
-<!-- PRODUCTS (all sections on the homepage) -->
-<section class="section" id="products">
-  <h2>Wines</h2>
-  <div class="grid" id="grid-wines">
-    <!-- sample items -->
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1514361892635-6b07e31e75f9?q=80&w=800&auto=format&fit=crop" alt="Cabernet Sauvignon">
-      <h3>Cabernet Sauvignon</h3>
-      <div class="price">GHS 150</div>
-      <button class="add" onclick="addToCart('Cabernet Sauvignon',150,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
-    </div>
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?q=80&w=800&auto=format&fit=crop" alt="White Wine">
-      <h3>Chardonnay</h3>
-      <div class="price">GHS 135</div>
-      <button class="add" onclick="addToCart('Chardonnay',135,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
-    </div>
-  </div>
-</section>
-
-<section class="section">
-  <h2>Liquor</h2>
-  <div class="grid">
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1582106242691-3d20f2f2f2a2?q=80&w=800&auto=format&fit=crop" alt="Whiskey">
-      <h3>Premium Whiskey</h3>
-      <div class="price">GHS 300</div>
-      <button class="add" onclick="addToCart('Premium Whiskey',300,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
-    </div>
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1541976076758-347942db1979?q=80&w=800&auto=format&fit=crop" alt="Vodka">
-      <h3>Classic Vodka</h3>
-      <div class="price">GHS 220</div>
-      <button class="add" onclick="addToCart('Classic Vodka',220,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
-    </div>
-  </div>
-</section>
-
-<section class="section">
-  <h2>Mini Mart Essentials</h2>
-  <div class="grid">
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1593253787226-567eda4ad32d?q=80&w=800&auto=format&fit=crop" alt="Rice 5kg">
-      <h3>Rice 5kg</h3>
-      <div class="price">GHS 95</div>
-      <button class="add" onclick="addToCart('Rice 5kg',95,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
-    </div>
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1604908553994-0434a2a0c4d8?q=80&w=800&auto=format&fit=crop" alt="Sunflower Oil 1L">
-      <h3>Sunflower Oil 1L</h3>
-      <div class="price">GHS 48</div>
-      <button class="add" onclick="addToCart('Sunflower Oil 1L',48,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT -->
-<section class="section" id="about">
-  <h2>About Us</h2>
-  <div class="info">
-    We are your neighborhood source for premium wines and spirits plus everyday mini-mart staples.
-    Visit in-store or order online for fast local delivery. Quality products, honest pricing, friendly service — always.
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section class="section" id="contact">
-  <h2>Contact</h2>
-  <div class="info">
-    📍 Accra, Ghana<br/>
-    📞 +233 54 123 4567<br/>
-    ✉️ info@ongodbend.com<br/>
-    <p class="note">Tip: add a WhatsApp link like <b>https://wa.me/233541234567</b></p>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  © <span id="year"></span> On God Bend Mini Mart, Wine & Liquor — All Rights Reserved.
-</footer>
-
-<!-- CART DRAWER -->
-<aside class="drawer" id="drawer">
+  <!-- HEADER -->
   <header>
     <div class="brand">
-      <strong>🛒 Your Cart</strong>
+      <img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="On God Bend Logo"/>
     </div>
-    <button class="nav" style="background:none;border:0;color:#111;font-weight:700;cursor:pointer" onclick="toggleCart(false)">✕ Close</button>
+    <nav class="nav">
+      <a href="#products">Shop</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="cart.html" class="cart-btn">🛒 Cart <span class="badge" id="cartCount">0</span></a>
+    </nav>
   </header>
-  <div class="cart-list" id="cartList"></div>
-  <div class="cart-footer">
-    <div class="total"><span>Subtotal</span><span id="subtotal">GHS 0</span></div>
-    <button class="checkout-btn" onclick="goToCheckout()">Proceed to Checkout</button>
-  </div>
-</aside>
 
-<!-- CHECKOUT (in-page) -->
-<section id="checkout" class="section" style="display:none;">
-  <h2>Checkout</h2>
-  <form class="checkout" onsubmit="return submitOrder(event)">
-    <div class="fields">
-      <div>
-        <label>Full Name</label>
-        <input id="name" required />
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Premium Wines, Liquors & Everyday Essentials</h1>
+    <p>Quality you trust • Prices you love • Fast local delivery</p>
+    <a href="#products" class="cta">Shop Now</a>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="section" id="products">
+    <h2>Wines</h2>
+    <div class="grid" id="grid-wines">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1514361892635-6b07e31e75f9?q=80&w=800&auto=format&fit=crop" alt="Cabernet Sauvignon">
+        <h3>Cabernet Sauvignon</h3>
+        <div class="price">GHS 150</div>
+        <button class="add" onclick="addToCart('Cabernet Sauvignon',150,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
       </div>
-      <div>
-        <label>Phone</label>
-        <input id="phone" required />
-      </div>
-      <div>
-        <label>Email</label>
-        <input id="email" type="email" placeholder="(optional)" />
-      </div>
-      <div style="grid-column:1/-1">
-        <label>Delivery Address</label>
-        <input id="address" required />
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?q=80&w=800&auto=format&fit=crop" alt="White Wine">
+        <h3>Chardonnay</h3>
+        <div class="price">GHS 135</div>
+        <button class="add" onclick="addToCart('Chardonnay',135,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
       </div>
     </div>
+  </section>
 
-    <div class="order-summary" id="orderSummary"></div>
-
-    <div class="pay-row">
-      <label><input type="radio" name="pay" value="pod" checked /> Pay on Delivery</label>
-      <label><input type="radio" name="pay" value="paystack" /> Pay with Paystack</label>
+  <section class="section">
+    <h2>Liquor</h2>
+    <div class="grid">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1582106242691-3d20f2f2f2a2?q=80&w=800&auto=format&fit=crop" alt="Whiskey">
+        <h3>Premium Whiskey</h3>
+        <div class="price">GHS 300</div>
+        <button class="add" onclick="addToCart('Premium Whiskey',300,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1541976076758-347942db1979?q=80&w=800&auto=format&fit=crop" alt="Vodka">
+        <h3>Classic Vodka</h3>
+        <div class="price">GHS 220</div>
+        <button class="add" onclick="addToCart('Classic Vodka',220,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
+      </div>
     </div>
+  </section>
 
-    <button class="place" type="submit">Place Order</button>
-    <div class="note">Online payment uses Paystack. Configure your public key in the script below.</div>
-    <div class="success" id="successBox"></div>
-  </form>
-</section>
+  <section class="section">
+    <h2>Mini Mart Essentials</h2>
+    <div class="grid">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1593253787226-567eda4ad32d?q=80&w=800&auto=format&fit=crop" alt="Rice 5kg">
+        <h3>Rice 5kg</h3>
+        <div class="price">GHS 95</div>
+        <button class="add" onclick="addToCart('Rice 5kg',95,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1604908553994-0434a2a0c4d8?q=80&w=800&auto=format&fit=crop" alt="Sunflower Oil 1L">
+        <h3>Sunflower Oil 1L</h3>
+        <div class="price">GHS 48</div>
+        <button class="add" onclick="addToCart('Sunflower Oil 1L',48,this.previousElementSibling.previousElementSibling.src)">Add to Cart</button>
+      </div>
+    </div>
+  </section>
 
-<script>
-  /* ====== Utilities ====== */
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => document.querySelectorAll(sel);
-  const CART_KEY = "ogb_cart_v1";
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <h2>About Us</h2>
+    <div class="info">
+      We are your neighborhood source for premium wines and spirits plus everyday mini-mart staples.
+      Visit in-store or order online for fast local delivery. Quality products, honest pricing, friendly service — always.
+    </div>
+  </section>
 
-  const money = n => "GHS " + Number(n).toFixed(2);
-  const yearEl = document.getElementById("year"); yearEl.textContent = new Date().getFullYear();
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <h2>Contact</h2>
+    <div class="info">
+      📍 Accra, Ghana<br/>
+      📞 +233 54 123 4567<br/>
+      ✉️ info@ongodbend.com<br/>
+      <p class="note">Tip: add a WhatsApp link like <b>https://wa.me/233541234567</b></p>
+    </div>
+  </section>
 
-  /* ====== Cart State ====== */
-  function loadCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } }
-  function saveCart(items){ localStorage.setItem(CART_KEY, JSON.stringify(items)); renderCartBadge(); }
-  function renderCartBadge(){
-    const count = loadCart().reduce((a,i)=>a+i.qty,0);
-    document.getElementById("cartCount").textContent = count;
-  }
+  <!-- FOOTER -->
+  <footer>
+    © <span id="year"></span> On God Bend Mini Mart, Wine & Liquor — All Rights Reserved.
+  </footer>
 
-  function addToCart(name, price, img){
-    const items = loadCart();
-    const idx = items.findIndex(i => i.name === name);
-    if(idx>-1){ items[idx].qty += 1; }
-    else { items.push({name, price, img, qty:1}); }
-    saveCart(items);
-    // little toast
-    const btn = event.currentTarget;
-    btn.textContent = "Added ✓"; setTimeout(()=>btn.textContent="Add to Cart", 900);
-  }
-
-  function toggleCart(open=true){
-    const dr = document.getElementById("drawer");
-    dr.classList.toggle("open", open);
-    if(open) renderCartList();
-  }
-
-  function renderCartList(){
-    const box = document.getElementById("cartList");
-    const items = loadCart();
-    if(items.length === 0){ box.innerHTML = "<p>Your cart is empty.</p>"; document.getElementById("subtotal").textContent = money(0); return; }
-    box.innerHTML = "";
-    let total = 0;
-    items.forEach((it, i)=>{
-      total += it.price * it.qty;
-      const row = document.createElement("div");
-      row.className = "cart-item";
-      row.innerHTML = `
-        <img src="${it.img}" alt="">
-        <div>
-          <div style="font-weight:700">${it.name}</div>
-          <div class="price">${money(it.price)}</div>
-        </div>
-        <div>
-          <div class="qty">
-            <button onclick="chgQty(${i},-1)">−</button>
-            <span>${it.qty}</span>
-            <button onclick="chgQty(${i},1)">+</button>
-          </div>
-          <div style="text-align:right;margin-top:6px;"><a href="#" onclick="rmItem(${i});return false;">Remove</a></div>
-        </div>`;
-      box.appendChild(row);
-    });
-    document.getElementById("subtotal").textContent = money(total);
-  }
-  function chgQty(index, delta){
-    const items = loadCart();
-    items[index].qty += delta;
-    if(items[index].qty<=0) items.splice(index,1);
-    saveCart(items); renderCartList();
-  }
-  function rmItem(index){
-    const items = loadCart(); items.splice(index,1); saveCart(items); renderCartList();
-  }
-
-  document.getElementById("openCart").addEventListener("click",()=>toggleCart(true));
-  renderCartBadge();
-
-  /* ====== Checkout Flow (in-page) ====== */
-  function goToCheckout(){
-    toggleCart(false);
-    const section = document.getElementById("checkout");
-    section.style.display = "block";
-    window.location.hash = "#checkout";
-    renderOrderSummary();
-  }
-
-  function renderOrderSummary(){
-    const items = loadCart();
-    const box = document.getElementById("orderSummary");
-    if(items.length===0){ box.innerHTML = "<b>No items in cart.</b>"; return; }
-    let total = 0;
-    let html = "<b>Order Summary</b><ul style='margin:8px 0;padding-left:18px'>";
-    items.forEach(it=>{
-      const line = it.price * it.qty; total += line;
-      html += `<li>${it.name} × ${it.qty} — ${money(line)}</li>`;
-    });
-    html += `</ul><div style="display:flex;justify-content:space-between;font-weight:800">
-              <span>Total</span><span>${money(total)}</span></div>`;
-    box.innerHTML = html;
-  }
-
-  /* ====== Place Order ====== */
-  async function submitOrder(e){
-    e.preventDefault();
-    const items = loadCart();
-    if(items.length===0){ alert("Your cart is empty."); return false; }
-
-    const order = {
-      id: "OGB" + Date.now(),
-      name: $("#name").value.trim(),
-      phone: $("#phone").value.trim(),
-      email: $("#email").value.trim(),
-      address: $("#address").value.trim(),
-      items,
-      total: items.reduce((a,i)=>a+i.price*i.qty,0),
-      payMethod: document.querySelector('input[name="pay"]:checked').value,
-      status: "pending",
-      createdAt: new Date().toISOString(),
-    };
-
-    if(order.payMethod === "paystack"){
-      payWithPaystack(order);
-    } else {
-      completeOrder(order); // Pay on delivery
-    }
-    return false;
-  }
-
-  function completeOrder(order){
-    // TODO: send to Firebase here if you want (replace with your Firestore call)
-    // Example Firestore usage (pseudo):
-    // await db.collection("orders").doc(order.id).set(order);
-
-    localStorage.removeItem(CART_KEY);
-    renderCartBadge();
-    $("#successBox").style.display = "block";
-    $("#successBox").innerHTML = `✅ Order placed!<br>Order ID: <b>${order.id}</b><br>Status: <b>${order.status}</b>`;
-    renderOrderSummary(); // refresh summary to reflect cleared cart
-  }
-
-  function payWithPaystack(order){
-    const handler = PaystackPop.setup({
-      key: "YOUR_PAYSTACK_PUBLIC_KEY_HERE", // ← replace with your Paystack public key
-      email: order.email || "noemail@ongodbend.com",
-      amount: Math.round(order.total * 100), // pesewas
-      currency: "GHS",
-      ref: order.id,
-      callback: function (response) {
-        order.status = "paid";
-        completeOrder(order);
-      },
-      onClose: function () {
-        alert("Payment cancelled.");
-      }
-    });
-    handler.openIframe();
-  }
-</script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
