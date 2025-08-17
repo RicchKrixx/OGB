@@ -1,78 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Orders - On God Bend Mini Mart</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding:20px; background:#f7f7f9; }
-    h1 { margin-bottom:20px; }
-    .order { background:#fff; padding:16px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom:16px; }
-    .order h2 { margin:0 0 10px; font-size:18px; color:#333; }
-    .items { margin:10px 0; }
-    .items p { margin:2px 0; }
-    .total { font-weight:bold; margin-top:8px; }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Orders • On God Bend Mini Mart</title>
+<style>
+body{font-family:Arial,sans-serif;padding:20px;background:#f7f7f9;}
+h1{margin-bottom:20px;color:#111;}
+.order{background:#fff;padding:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);margin-bottom:16px;}
+.order h2{margin:0 0 10px;font-size:18px;color:#333;}
+.items p{margin:2px 0;}
+.total{font-weight:bold;margin-top:8px;}
+.status{font-weight:bold;margin-top:4px;}
+</style>
 </head>
 <body>
-  <h1>Received Orders</h1>
-  <div id="ordersContainer"></div>
+<h1>Received Orders</h1>
+<div id="ordersContainer"></div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+  authDomain: "ongod-5073e.firebaseapp.com",
+  projectId: "ongod-5073e",
+  storageBucket: "ongod-5073e.firebasestorage.app",
+  messagingSenderId: "439687837026",
+  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+  measurementId: "G-1TVP0X3J62"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-  <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
-      authDomain: "ongod-5073e.firebaseapp.com",
-      projectId: "ongod-5073e",
-      storageBucket: "ongod-5073e.firebasestorage.app",
-      messagingSenderId: "439687837026",
-      appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
-      measurementId: "G-1TVP0X3J62"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+const container = document.getElementById("ordersContainer");
 
-    const container = document.getElementById("ordersContainer");
+// Render single order
+function renderOrder(doc){
+  const o = doc.data();
+  const div = document.createElement("div");
+  div.className = "order";
+  const itemsHTML = o.items.map(i=>`<p>${i.name} x${i.qty||i.quantity} — GHS ${i.price*(i.qty||i.quantity)}</p>`).join("");
+  div.innerHTML = `
+    <h2>Order ID: ${doc.id}</h2>
+    <p><b>Name:</b> ${o.name}</p>
+    <p><b>Phone:</b> ${o.phone}</p>
+    <p><b>Email:</b> ${o.email || "N/A"}</p>
+    <p><b>Address:</b> ${o.address}</p>
+    <p><b>Date:</b> ${o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString() : o.createdAt}</p>
+    <div class="items"><b>Items:</b>${itemsHTML}</div>
+    <p class="total">Total: GHS ${o.total}</p>
+    <p class="status"><b>Payment:</b> ${o.payMethod} | <b>Status:</b> ${o.status}</p>
+  `;
+  container.prepend(div);
+}
 
-    function renderOrder(doc) {
-      const o = doc.data();
-      const div = document.createElement("div");
-      div.className = "order";
-      div.innerHTML = `
-        <h2>Order ${doc.id}</h2>
-        <p><b>Name:</b> ${o.name}</p>
-        <p><b>Phone:</b> ${o.phone}</p>
-        <p><b>Address:</b> ${o.address}</p>
-        <p><b>Date:</b> ${o.date || o.createdAt}</p>
-        <div class="items">
-          <b>Items:</b>
-          ${o.items.map(i => `<p>${i.name} x${i.qty || i.quantity} — GHS ${i.price * (i.qty || i.quantity)}</p>`).join("")}
-        </div>
-        <p class="total">Total: GHS ${o.total}</p>
-        <p><b>Payment:</b> ${o.payMethod}</p>
-        <p><b>Status:</b> ${o.status}</p>
-      `;
-      container.prepend(div);
+// Real-time listener
+db.collection("orders")
+  .orderBy("createdAt","desc")
+  .onSnapshot(snapshot=>{
+    container.innerHTML="";
+    if(snapshot.empty){
+      container.innerHTML="<p>No orders yet.</p>";
+      return;
     }
-
-    // Real-time listener
-    db.collection("orders")
-      .orderBy("createdAt", "desc")
-      .onSnapshot(snapshot => {
-        container.innerHTML = "";
-        if (snapshot.empty) {
-          container.innerHTML = "<p>No orders yet.</p>";
-          return;
-        }
-        snapshot.forEach(doc => renderOrder(doc));
-      }, err => {
-        console.error(err);
-        container.innerHTML = "<p>Failed to load orders.</p>";
-      });
-  </script>
+    snapshot.forEach(doc=>renderOrder(doc));
+  },err=>{
+    console.error(err);
+    container.innerHTML="<p>Failed to load orders.</p>";
+  });
+</script>
 </body>
 </html>
