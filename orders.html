@@ -18,37 +18,61 @@
   <h1>Received Orders</h1>
   <div id="ordersContainer"></div>
 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
   <script>
-    function loadOrders() {
-      let orders = JSON.parse(localStorage.getItem("orders")) || {};
-      let container = document.getElementById("ordersContainer");
-      container.innerHTML = "";
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+      authDomain: "ongod-5073e.firebaseapp.com",
+      projectId: "ongod-5073e",
+      storageBucket: "ongod-5073e.firebasestorage.app",
+      messagingSenderId: "439687837026",
+      appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+      measurementId: "G-1TVP0X3J62"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-      if (Object.keys(orders).length === 0) {
-        container.innerHTML = "<p>No orders yet.</p>";
-        return;
-      }
+    const container = document.getElementById("ordersContainer");
 
-      for (let id in orders) {
-        let o = orders[id];
-        let div = document.createElement("div");
-        div.className = "order";
-        div.innerHTML = `
-          <h2>Order ${id}</h2>
-          <p><b>Name:</b> ${o.name}</p>
-          <p><b>Phone:</b> ${o.phone}</p>
-          <p><b>Address:</b> ${o.address}</p>
-          <p><b>Date:</b> ${o.date}</p>
-          <div class="items">
-            <b>Items:</b>
-            ${o.items.map(i => `<p>${i.name} x${i.quantity} — GHS ${i.price * i.quantity}</p>`).join("")}
-          </div>
-          <p class="total">Total: GHS ${o.total}</p>
-        `;
-        container.appendChild(div);
-      }
+    function renderOrder(doc) {
+      const o = doc.data();
+      const div = document.createElement("div");
+      div.className = "order";
+      div.innerHTML = `
+        <h2>Order ${doc.id}</h2>
+        <p><b>Name:</b> ${o.name}</p>
+        <p><b>Phone:</b> ${o.phone}</p>
+        <p><b>Address:</b> ${o.address}</p>
+        <p><b>Date:</b> ${o.date || o.createdAt}</p>
+        <div class="items">
+          <b>Items:</b>
+          ${o.items.map(i => `<p>${i.name} x${i.qty || i.quantity} — GHS ${i.price * (i.qty || i.quantity)}</p>`).join("")}
+        </div>
+        <p class="total">Total: GHS ${o.total}</p>
+        <p><b>Payment:</b> ${o.payMethod}</p>
+        <p><b>Status:</b> ${o.status}</p>
+      `;
+      container.prepend(div);
     }
-    loadOrders();
+
+    // Real-time listener
+    db.collection("orders")
+      .orderBy("createdAt", "desc")
+      .onSnapshot(snapshot => {
+        container.innerHTML = "";
+        if (snapshot.empty) {
+          container.innerHTML = "<p>No orders yet.</p>";
+          return;
+        }
+        snapshot.forEach(doc => renderOrder(doc));
+      }, err => {
+        console.error(err);
+        container.innerHTML = "<p>Failed to load orders.</p>";
+      });
   </script>
 </body>
 </html>
