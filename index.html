@@ -2,175 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>On God Bend Mart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <!-- Paystack -->
-  <script src="https://js.paystack.co/v1/inline.js"></script>
-
+  <title>On God Bend Mini Mart</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background:#f5f5f5; }
-    h2 { margin-top: 30px; }
-    .section { background:#fff; padding:20px; margin:10px 0; border-radius:8px; }
-    input, button { padding:10px; margin:5px 0; width:100%; }
-    button { background:#008cff; color:#fff; border:none; border-radius:5px; cursor:pointer; }
-    #cartItems li { margin:5px 0; }
-    #receipt, #trackResult { white-space: pre-wrap; background:#fafafa; padding:10px; border:1px solid #ccc; border-radius:5px; }
+    * {margin: 0; padding: 0; box-sizing: border-box;}
+    body {font-family: Arial, sans-serif; background: #f9f9f9; color: #222;}
+    header {background: #222; color: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center;}
+    header h1 {font-size: 20px;}
+    nav a {color: #fff; margin: 0 10px; text-decoration: none; font-size: 14px;}
+    .hero {text-align: center; padding: 40px 20px; background: linear-gradient(to right, #6a11cb, #2575fc); color: #fff;}
+    .hero h2 {font-size: 28px; margin-bottom: 10px;}
+    .categories, .products {padding: 20px;}
+    h3 {margin-bottom: 15px;}
+    .grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;}
+    .card {background: #fff; border-radius: 8px; padding: 10px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);}
+    .card img {max-width: 100%; border-radius: 6px;}
+    .card button {margin-top: 10px; padding: 8px 12px; border: none; background: #2575fc; color: #fff; border-radius: 6px; cursor: pointer;}
+    .card button:hover {background: #1b5cd6;}
+    footer {background: #222; color: #fff; text-align: center; padding: 15px; margin-top: 20px;}
   </style>
 </head>
 <body>
 
-  <h1>🛒 On God Bend Mini Mart</h1>
+  <!-- Header -->
+  <header>
+    <h1>On God Bend Mini Mart</h1>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Products</a>
+      <a href="cart.html">Cart 🛒</a>
+    </nav>
+  </header>
 
-  <!-- Products -->
-  <div class="section">
-    <h2>Products</h2>
-    <button onclick="addToCart({name:'Red Wine', price:50})">Add Red Wine (₵50)</button>
-    <button onclick="addToCart({name:'Milo Tin', price:25})">Add Milo (₵25)</button>
-  </div>
+  <!-- Hero Section -->
+  <section class="hero">
+    <h2>Welcome to On God Bend Mini Mart</h2>
+    <p>Your one-stop shop for Wines, Liquors & Groceries</p>
+  </section>
 
-  <!-- Cart -->
-  <div class="section">
-    <h2>Cart</h2>
-    <ul id="cartItems"></ul>
-    <p><b>Total:</b> ₵<span id="cartTotal">0</span></p>
-  </div>
+  <!-- Categories -->
+  <section class="categories">
+    <h3>Shop by Category</h3>
+    <div class="grid">
+      <div class="card"><img src="https://via.placeholder.com/150" alt="Wine"><p>Wines</p></div>
+      <div class="card"><img src="https://via.placeholder.com/150" alt="Liquor"><p>Liquors</p></div>
+      <div class="card"><img src="https://via.placeholder.com/150" alt="Groceries"><p>Groceries</p></div>
+      <div class="card"><img src="https://via.placeholder.com/150" alt="Drinks"><p>Drinks</p></div>
+    </div>
+  </section>
 
-  <!-- Checkout -->
-  <div class="section">
-    <h2>Checkout</h2>
-    <input id="name" placeholder="Full Name">
-    <input id="phone" placeholder="Phone">
-    <input id="email" placeholder="Email">
-    <input id="address" placeholder="Address">
-    <label><input type="radio" name="payment" value="Pay on Delivery" checked> Pay on Delivery</label>
-    <label><input type="radio" name="payment" value="Paystack"> Pay with Paystack</label>
-    <button onclick="placeOrder()">Place Order</button>
-  </div>
+  <!-- Featured Products -->
+  <section class="products">
+    <h3>Featured Products</h3>
+    <div class="grid">
+      <div class="card">
+        <img src="https://via.placeholder.com/150" alt="Product">
+        <p>Red Wine</p>
+        <p><b>₵120</b></p>
+        <button>Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://via.placeholder.com/150" alt="Product">
+        <p>Whiskey</p>
+        <p><b>₵300</b></p>
+        <button>Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="https://via.placeholder.com/150" alt="Product">
+        <p>Soda Pack</p>
+        <p><b>₵40</b></p>
+        <button>Add to Cart</button>
+      </div>
+    </div>
+  </section>
 
-  <!-- Thank You & Receipt -->
-  <div class="section" id="thankyou" style="display:none;">
-    <h2>✅ Order Placed</h2>
-    <p>Your Order ID: <b id="orderIdText"></b></p>
-    <h3>Receipt</h3>
-    <div id="receipt"></div>
-  </div>
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 On God Bend Mini Mart | All Rights Reserved</p>
+  </footer>
 
-  <!-- Order Tracking -->
-  <div class="section">
-    <h2>Track Order</h2>
-    <input id="trackId" placeholder="Enter Order ID">
-    <button onclick="trackOrder()">Track</button>
-    <div id="trackResult"></div>
-  </div>
-
-<script>
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
-    authDomain: "ongod-5073e.firebaseapp.com",
-    projectId: "ongod-5073e",
-    storageBucket: "ongod-5073e.firebasestorage.app",
-    messagingSenderId: "439687837026",
-    appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
-    measurementId: "G-1TVP0X3J62"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  // ------------------- Cart -------------------
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  function updateCart() {
-    let cartList = document.getElementById("cartItems");
-    cartList.innerHTML = "";
-    let total = 0;
-    cart.forEach(item => {
-      total += item.price;
-      cartList.innerHTML += `<li>${item.name} - ₵${item.price}</li>`;
-    });
-    document.getElementById("cartTotal").innerText = total;
-    localStorage.setItem("cart", JSON.stringify(cart));
-    localStorage.setItem("cartTotal", total);
-  }
-  function addToCart(product) {
-    cart.push(product);
-    updateCart();
-  }
-  updateCart();
-
-  // ------------------- Place Order -------------------
-  async function placeOrder() {
-    let name = document.getElementById("name").value;
-    let phone = document.getElementById("phone").value;
-    let email = document.getElementById("email").value;
-    let address = document.getElementById("address").value;
-    let paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-    let total = localStorage.getItem("cartTotal") || 0;
-    let orderId = "ORD" + Date.now();
-
-    let orderData = {
-      orderId, customerName: name, phone, email, address,
-      items: cart, totalAmount: total,
-      paymentMethod, status: paymentMethod==="Paystack" ? "paid" : "pending",
-      createdAt: new Date().toISOString()
-    };
-
-    if (paymentMethod === "Paystack") {
-      payWithPaystack(email, total, orderData);
-    } else {
-      await saveOrder(orderData);
-    }
-  }
-
-  // ------------------- Save Order to Firestore -------------------
-  async function saveOrder(orderData) {
-    await db.collection("orders").doc(orderData.orderId).set(orderData);
-    showThankYou(orderData);
-    cart = [];
-    updateCart();
-  }
-
-  // ------------------- Paystack -------------------
-  function payWithPaystack(email, total, orderData) {
-    let handler = PaystackPop.setup({
-      key: "YOUR_PUBLIC_KEY", // Replace with your Paystack public key
-      email: email,
-      amount: total * 100, // Convert to pesewas
-      currency: "GHS",
-      callback: function(response) {
-        orderData.status = "paid";
-        saveOrder(orderData);
-      },
-      onClose: function() {
-        alert("Payment cancelled");
-      }
-    });
-    handler.openIframe();
-  }
-
-  // ------------------- Thank You & Receipt -------------------
-  function showThankYou(order) {
-    document.getElementById("thankyou").style.display = "block";
-    document.getElementById("orderIdText").innerText = order.orderId;
-    document.getElementById("receipt").innerText = JSON.stringify(order, null, 2);
-  }
-
-  // ------------------- Tracking -------------------
-  async function trackOrder() {
-    let trackId = document.getElementById("trackId").value.trim();
-    if (!trackId) return alert("Enter Order ID");
-    let doc = await db.collection("orders").doc(trackId).get();
-    if (doc.exists) {
-      document.getElementById("trackResult").innerText = JSON.stringify(doc.data(), null, 2);
-    } else {
-      document.getElementById("trackResult").innerText = "No order found.";
-    }
-  }
-</script>
 </body>
 </html>
