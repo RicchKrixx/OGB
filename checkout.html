@@ -79,7 +79,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // Render cart
-const cart = JSON.parse(localStorage.getItem("items")) || [];
+const cart = JSON.parse(localStorage.getItem("CART-KEY")) || [];
 const summaryEl = document.getElementById("orderSummary");
 let total = 0;
 if(cart.length === 0) summaryEl.innerHTML = "<p>Your cart is empty.</p>";
@@ -125,14 +125,14 @@ async function submitOrder(e){
         callback: function(response){
           document.getElementById("successBox").style.display="block";
           document.getElementById("successBox").textContent="Payment successful! Order ID: "+docRef.id;
-          localStorage.removeItem("cart");
+          localStorage.removeItem("CART-KEY");
         }
       });
       handler.openIframe();
     } else {
       document.getElementById("successBox").style.display="block";
       document.getElementById("successBox").textContent="Order placed successfully! Order ID: "+docRef.id;
-      localStorage.removeItem("cart");
+      localStorage.removeItem("CART-KEY");
     }
 
   } catch(err){
