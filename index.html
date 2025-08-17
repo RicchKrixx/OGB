@@ -71,14 +71,17 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
 
   /* Popup menu */
   .menu {
-    position: fixed; /* hidden by default */
+    position: fixed;
     width: 250px;
-    height: auto;
+    opacity: 0;  
+    pointer-events: none;
     background: #f1f1f1;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.3);
-    transition: center 0.3s ease;
-    padding-top: 60px;
+    padding: 10px;
+    margin: 20px;
+    border: 1px solid #ccc;
+    transition: opacity 0.5s ease;
   }
+
 
   .menu a {
     display: block;
