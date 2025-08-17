@@ -8,24 +8,24 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <style>
-  :root { --brand:#b8860b; --brand-dark:#8b6508; --ink:#1f1f1f; --bg:#f7f7f9; --card:#ffffff; }
-  *{box-sizing:border-box;} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
-  a{color:inherit;text-decoration:none;}
-  header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#111;color:#fff;}
-  .brand{display:flex;align-items:center;gap:10px;} .brand img{height:44px;width:auto;border-radius:6px;}
-  .nav{display:flex;gap:14px;} .nav a{padding:8px 10px;border-radius:8px;} .nav a:hover{background:rgba(255,255,255,.08);}
-  .cart-btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff;border:0;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer;}
-  .badge{background:#111;color:#fff;border-radius:999px;padding:2px 8px;font-size:12px;}
-  #checkout{padding:26px 16px;max-width:900px;margin:0 auto 26px;}
-  form.checkout{background:#fff;border-radius:16px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06);}
-  .fields{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
-  input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;}
-  .order-summary{margin-top:16px;background:#fafafa;border-radius:12px;padding:12px;}
-  .pay-row{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0;}
-  .place{width:100%;background:#111;color:#fff;border:0;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer;}
-  .note{font-size:12px;color:#666;}
-  .success{background:#e9ffe9;border:1px solid #a7e7a7;color:#0a5d0a;padding:12px;border-radius:12px;margin-top:12px;display:none;}
-  footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top:26px;}
+:root { --brand:#b8860b; --brand-dark:#8b6508; --ink:#1f1f1f; --bg:#f7f7f9; --card:#ffffff; }
+*{box-sizing:border-box;} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+a{color:inherit;text-decoration:none;}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#111;color:#fff;}
+.brand{display:flex;align-items:center;gap:10px;} .brand img{height:44px;width:auto;border-radius:6px;}
+.nav{display:flex;gap:14px;} .nav a{padding:8px 10px;border-radius:8px;} .nav a:hover{background:rgba(255,255,255,.08);}
+.cart-btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff;border:0;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer;}
+.badge{background:#111;color:#fff;border-radius:999px;padding:2px 8px;font-size:12px;}
+#checkout{padding:26px 16px;max-width:900px;margin:0 auto 26px;}
+form.checkout{background:#fff;border-radius:16px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06);}
+.fields{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;}
+.order-summary{margin-top:16px;background:#fafafa;border-radius:12px;padding:12px;}
+.pay-row{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0;}
+.place{width:100%;background:#111;color:#fff;border:0;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer;}
+.note{font-size:12px;color:#666;}
+.success{background:#e9ffe9;border:1px solid #a7e7a7;color:#0a5d0a;padding:12px;border-radius:12px;margin-top:12px;display:none;}
+footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top:26px;}
 </style>
 </head>
 <body>
@@ -62,9 +62,8 @@
   © <span id="year"></span> On God Bend Mini Mart, Wine & Liquor — All Rights Reserved.
 </footer>
 
+<script src="cart.js"></script>
 <script>
-document.getElementById("year").textContent = new Date().getFullYear();
-
 // Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
@@ -78,72 +77,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Render cart
-const cart = JSON.parse(localStorage.getItem("CART-KEY")) || [];
-const summaryEl = document.getElementById("orderSummary");
-let total = 0;
-if(cart.length === 0) summaryEl.innerHTML = "<p>Your cart is empty.</p>";
-else {
-  cart.forEach(item=>{
-    const p=document.createElement("p");
-    p.textContent=`${item.name} x${item.quantity} — GHS ${item.price * item.quantity}`;
-    summaryEl.appendChild(p);
-    total += item.price * item.quantity;
-  });
-  const t=document.createElement("p");
-  t.innerHTML=`<b>Total:</b> GHS ${total}`;
-  summaryEl.appendChild(t);
-}
+document.getElementById("year").textContent = new Date().getFullYear();
 
-// Submit order
-async function submitOrder(e){
-  e.preventDefault();
-  if(cart.length===0){ alert("Your cart is empty!"); return; }
-
-  const orderData={
-    name: document.getElementById("name").value,
-    phone: document.getElementById("phone").value,
-    email: document.getElementById("email").value || "",
-    address: document.getElementById("address").value,
-    items: cart,
-    total: total,
-    date: new Date().toLocaleString(),
-    payment: document.querySelector('input[name="pay"]:checked').value
-  };
-
-  try {
-    const docRef = await db.collection("orders").add(orderData);
-
-    if(orderData.payment==="paystack"){
-      let handler = PaystackPop.setup({
-        key: 'YOUR_PAYSTACK_PUBLIC_KEY', // 🔑 Replace this
-        email: orderData.email || "customer@example.com",
-        amount: total * 100,
-        currency: "GHS",
-        ref: docRef.id,
-        onClose: function(){ alert('Payment window closed.'); },
-        callback: function(response){
-          document.getElementById("successBox").style.display="block";
-          document.getElementById("successBox").textContent="Payment successful! Order ID: "+docRef.id;
-          localStorage.removeItem("CART-KEY");
-        }
-      });
-      handler.openIframe();
-    } else {
-      document.getElementById("successBox").style.display="block";
-      document.getElementById("successBox").textContent="Order placed successfully! Order ID: "+docRef.id;
-      localStorage.removeItem("CART-KEY");
-    }
-
-  } catch(err){
-    console.error(err);
-    alert("Failed to place order. Try again.");
-  }
-  return false;
-}
-
-// Update cart badge
-document.getElementById("cartCount").textContent = cart.reduce((sum,i)=>sum+i.quantity,0);
+// Render summary on checkout page
+document.addEventListener("DOMContentLoaded", () => {
+  renderCartBadge();
+  if (window.location.pathname.includes("checkout.html")) renderOrderSummary();
+});
 </script>
 </body>
 </html>
