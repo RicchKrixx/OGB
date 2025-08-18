@@ -244,6 +244,33 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
   background: rgba(0,0,0,0.5); /* dark overlay for text readability */
   z-index: 0;
 }
+    .user-menu { position: relative; display: inline-block; }
+    .user-icon { 
+      font-size: 24px; cursor: pointer; 
+      padding:10px; border-radius:50%; background:#eee; 
+    }
+    .dropdown {
+      display: none;
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      min-width: 160px;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .dropdown a {
+      display: block;
+      padding: 10px;
+      color: #333;
+      text-decoration: none;
+    }
+    .dropdown a:hover {
+      background: #f1f1f1;
+    }
+    .show { display: block; }
 </style>
 </head>
 <body>
@@ -271,7 +298,11 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
     <span id="cartCount">0</span>
   </a>
 </div>
-    <i class="fa-solid fa-user"></i>
+<div class="user-menu">
+  <div class="user-icon" onclick="toggleDropdown()"> <i class="fa-solid fa-user"></i></div>
+  <div class="dropdown" id="userDropdown"></div>
+</div>
+   
   </nav>
 </header>
 
@@ -468,6 +499,45 @@ searchInput.addEventListener('input', () => {
     noResults.style.display = 'none';
   }
 });
+</script>
+<script>
+  function toggleDropdown() {
+    document.getElementById("userDropdown").classList.toggle("show");
+    renderDropdown();
+  }
+
+  function renderDropdown() {
+    const dropdown = document.getElementById("userDropdown");
+    dropdown.innerHTML = ""; // clear
+    
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (user) {
+      // Logged in
+      dropdown.innerHTML = `
+        <a href="#">Hello, ${user.username}</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+      `;
+    } else {
+      // Not logged in
+      dropdown.innerHTML = `
+        <a href="/login.html">Login</a>
+        <a href="/register.html">Register</a>
+      `;
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem("user");
+    renderDropdown();
+    alert("Logged out!");
+  }
+
+  // Simulate login for demo
+  if (!localStorage.getItem("user")) {
+    localStorage.setItem("user", JSON.stringify({ username: "Jasper" }));
+  }
 </script>
 </body>
 </html>
