@@ -338,16 +338,33 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
 document.getElementById("year").textContent = new Date().getFullYear();
 
 // Cart functions
-function getCart() { return JSON.parse(localStorage.getItem("cart")) || []; }
-function saveCart(cart) { localStorage.setItem("cart", JSON.stringify(cart)); updateBadge(); }
-function updateBadge() { document.getElementById("cartCount").textContent = getCart().length; }
+function getCart() { 
+  return JSON.parse(localStorage.getItem("cart")) || []; 
+}
+
+function saveCart(cart) { 
+  localStorage.setItem("cart", JSON.stringify(cart)); 
+  updateBadge(); 
+}
+
+function updateBadge() { 
+  const cart = getCart();
+  const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+  document.getElementById("cartCount").textContent = totalQty;
+}
+
 function addToCart(name, price, img) {
   let cart = getCart();
-  let existing = cart.find(i => i.name===name);
-  if(existing){ existing.qty++; } else { cart.push({name, price, qty:1, img}); }
+  let existing = cart.find(i => i.name === name);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ name, price, qty: 1, img });
+  }
   saveCart(cart);
   alert(`${name} added to cart`);
 }
+
 updateBadge();
 </script>
 <script>
