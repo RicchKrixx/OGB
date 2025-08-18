@@ -129,7 +129,7 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
     transition: right 0.3s ease;
     padding-top: 60px;
     border-radius: 8px;
-    z-index: 1;
+    z-index: 2000;
   }
 
   .menu a {
@@ -414,9 +414,19 @@ updateBadge();
   const hamburger = document.getElementById('hamburger');
   const menu = document.getElementById('menu');
 
-  hamburger.addEventListener('click', () => {
+  // Toggle menu on hamburger click
+  hamburger.addEventListener('click', (e) => {
+    e.stopPropagation(); // prevent closing immediately
     hamburger.classList.toggle('active');
     menu.classList.toggle('active');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+      menu.classList.remove('active');
+      hamburger.classList.remove('active');
+    }
   });
 </script>
 <script>
