@@ -76,8 +76,9 @@ header { display:flex; justify-content:space-between; align-items:center; paddin
 .hero { background:linear-gradient(135deg,#3a3a3a 0%,#161616 100%); color:#fff; padding:44px 16px; text-align:center; }
 .hero h1 { margin:0 0 8px; font-size:28px; }
 .hero p { margin:0 0 16px; opacity:.9; }
-.cta { display:inline-block; background:var(--brand); color:#fff; padding:12px 18px; border-radius:12px; font-weight:700; }
-.cta:hover { background:var(--brand-dark); }
+.cta {
+ color:var(--brand);
+ }
 /* Sections */
 .section { padding:26px 16px; max-width:1100px; margin:0 auto; }
 .section h2 { margin:0 0 14px; color:#333; }
@@ -248,7 +249,7 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
     .user-menu { position: relative; display: inline-block; }
     .user-icon { 
       font-size: 24px; cursor: pointer; 
-      padding:10px; border-radius:40%; background:var(--brand); 
+      padding:10px; border-radius:100%; background:var(--brand); 
     }
     .dropdown {
       display: none;
@@ -314,7 +315,7 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
     Your browser does not support the video tag.
   </video>
 <div class="hero-content">
-  <h1>Premium Wines, Liquors & Everyday Essentials</h1>
+  <h1><span class="cta">Premium</span> Wines, Liquors & Everyday Essentials</h1>
   <p>Quality you trust • Prices you love • Fast local delivery</p>
 <div class="section"> 
   <input type="text" id="searchInput" placeholder="🔍 Search products..." style="width:100%;max-width:400px;padding:10px;font-size:16px;margin-bottom:5px;border-radius:8px;border:1px solid #ccc;">
