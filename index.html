@@ -100,7 +100,7 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
     margin: 20px;
     position: relative;
     cursor: pointer;
-    z-index: 1001;
+    z-index: 2001;
     color: white;
   }
 
@@ -550,6 +550,22 @@ searchInput.addEventListener('input', () => {
     noResults.style.display = 'block';
   } else {
     noResults.style.display = 'none';
+  }
+});
+</script>
+<script>
+function toggleDropdown() {
+  const dropdown = document.getElementById("userDropdown");
+  dropdown.classList.toggle("show");
+}
+
+// Close dropdown when clicking outside
+document.addEventListener("click", function(event) {
+  const dropdown = document.getElementById("userDropdown");
+  const userIcon = document.querySelector(".user-icon");
+
+  if (!dropdown.contains(event.target) && !userIcon.contains(event.target)) {
+    dropdown.classList.remove("show");
   }
 });
 </script>
