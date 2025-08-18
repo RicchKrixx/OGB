@@ -55,7 +55,8 @@ background-color: yellow;
 }
 
 #cartCount {
-top: 0;
+position: absolute;
+top: -10px;
 right: 5px;
 background: red;
 font-size: 14px;
@@ -222,9 +223,9 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
   <a href="#">Contact</a>
 </div>
 <div class="cart-icon">
-    <span id="cartCount">0</span>
+ 
 <a href="cart.html" class="cart-btn">    
-    <i class="fas fa-shopping-bag"></i></a>
+    <i class="fas fa-shopping-bag"></i>   <span id="cartCount">0</span></a>
 </div>
     <i class="fa-solid fa-user"></i>
   </nav>
