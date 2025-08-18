@@ -448,7 +448,7 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
       dropdown.innerHTML = `
-        <a href="#">Hello, ${user.email}</a>
+        <a href="#">Hello, ${user.name}</a>
         <a href="dashboard.html">Dashboard</a>
         <a href="#" onclick="signOutUser()">Logout</a>
       `;
