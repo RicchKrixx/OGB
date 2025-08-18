@@ -23,8 +23,51 @@ header { display:flex; justify-content:space-between; align-items:center; paddin
 .nav { display:flex; gap:14px; }
 .nav a { padding:8px 10px; border-radius:8px; }
 .nav a:hover { background: rgba(255,255,255,.08); }
-.cart-btn { display:inline-flex; align-items:center; gap:5px; background:var(--brand); color:#fff; border:0; border-radius:10px; padding:8px 12px; font-weight:600; cursor:pointer; }
-.badge { background:#111; color:#fff; border-radius:999px; padding:2px 8px; font-size:12px; }
+
+.cart-btn {
+position: fixed;
+font-size: 35px;
+text-decoration: none;
+color: white;
+margin-top: 50px;
+right: 17px;
+z-index: 999;
+}
+
+#cartCount {
+position: absolute;
+top: -8px;
+right: -12px;
+background: red;
+color: white;
+font-size: 14px;
+font-weight: bold;
+border-radius: 50%;
+padding: 2px 6px;
+}
+/*
+.cart-btn { 
+display:inline-flex; 
+align-items:center; 
+gap:5px; 
+background:var(--brand); 
+color:#fff; 
+border:0; 
+border-radius:10px; 
+padding:8px 12px; 
+font-weight:600; 
+cursor:pointer;
+
+ }
+
+.badge {
+ background:#111; 
+color:#fff; 
+border-radius:999px; 
+padding:2px 8px; 
+font-size:12px;
+ }
+*/
 /* Hero */
 .hero { background:linear-gradient(135deg,#3a3a3a 0%,#161616 100%); color:#fff; padding:44px 16px; text-align:center; }
 .hero h1 { margin:0 0 8px; font-size:28px; }
@@ -183,7 +226,7 @@ footer { padding:24px 16px; text-align:center; background:#111; color:#bbb; marg
   <a href="#">Contact</a>
 </div>
     <a href="cart.html" class="cart-btn">    
-    <i class="fas fa-shopping-bag"></i><span class="badge" id="cartCount">0</span></a>
+    <i class="fas fa-shopping-bag"></i><span id="cartCount">0</span></a>
     <i class="fa-solid fa-user"></i>
   </nav>
 </header>
