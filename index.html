@@ -434,13 +434,17 @@ color:var(--brand);
 
   // Monitor auth state
   onAuthStateChanged(auth, (user) => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify({ email: user.email }));
-    } else {
-      localStorage.removeItem("user");
-    }
-    renderDropdown();
-  });
+  if (user) {
+    // Save displayName (if available) and email
+    localStorage.setItem("user", JSON.stringify({ 
+      email: user.email, 
+      displayName: user.displayName || user.email.split("@")[0] 
+    }));
+  } else {
+    localStorage.removeItem("user");
+  }
+  renderDropdown();
+});
 
   // Logout function
   window.signOutUser = async function () {
@@ -456,7 +460,7 @@ color:var(--brand);
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
       dropdown.innerHTML = `
-        <a href="#">Hello, ${user.displayName || "customer"}</a>
+        <a href="#">Hello, ${user.displayName}</a>
         <a href="dashboard.html">Dashboard</a>
         <a href="#" onclick="signOutUser()">Logout</a>
       `;
