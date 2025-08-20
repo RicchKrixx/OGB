@@ -456,7 +456,7 @@ color:var(--brand);
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
       dropdown.innerHTML = `
-        <a href="#">Hello, ${user.displayName || "User"}
+        <a href="#">Hello, ${user.displayName}
 }</a>
         <a href="dashboard.html">Dashboard</a>
         <a href="#" onclick="signOutUser()">Logout</a>
