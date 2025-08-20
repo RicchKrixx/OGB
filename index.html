@@ -472,7 +472,7 @@ color:var(--brand);
         div.innerHTML = `
           <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
           <h3>${product.name}</h3>
-          <div class="price">GHS ${product.price}</div>
+          <div class="price">GH₵ ${product.price}</div>
           <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">Add to Cart</button>
         `;
         container.appendChild(div);
@@ -531,7 +531,7 @@ color:var(--brand);
                 div.innerHTML = `
                   <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
                   <h3>${product.name}</h3>
-                  <div class="price">GHS ${product.price}</div>
+                  <div class="price">GH₵ ${product.price}</div>
                   <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">Add to Cart</button>
                 `;
                 container.appendChild(div);
