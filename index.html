@@ -596,6 +596,57 @@ document.addEventListener("DOMContentLoaded", () => {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+    // Load products by category from Firestore
+    async function loadProducts(category, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = getSkeletons(2); // Show skeletons while loading
+
+      const q = query(collection(db, "products"), where("category", "==", category));
+      const snapshot = await getDocs(q);
+
+      container.innerHTML = ""; // Clear skeletons
+      const products = [];
+      snapshot.forEach(docSnap => {
+        const product = docSnap.data();
+        products.push(product);
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <div class="price">GHS ${product.price}</div>
+          <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">Add to Cart</button>
+        `;
+        container.appendChild(div);
+      });
+
+      return products; // Return products for search functionality
+    }
+
+    // Load all products for search
+    async function loadAllProducts() {
+      const categories = [
+        { name: "Wines", id: "grid-wines" },
+        { name: "Liquors", id: "grid-liquors" },
+        { name: "Essentials", id: "grid-essentials" }
+      ];
+      let allProducts = [];
+      for (const cat of categories) {
+        const products = await loadProducts(cat.name, cat.id);
+        allProducts = allProducts.concat(products);
+      }
+      return allProducts;
+    }
+
+    // Search functionality
+    let allProducts = [];
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Load all products and store them for search
+      allProducts = await loadAllProducts();
+
+      // Update year
+      document.getElementById("year").textContent = new Date().getFullYear();
+
   // Monitor auth state
   onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -743,30 +794,6 @@ document.addEventListener("click", function(event) {
   }
 });
 </script>
-<script>
-// Function to render products
-  async function loadProducts(section, containerId) {
-    const querySnapshot = await getDocs(collection(db, section));
-    const container = document.getElementById(containerId);
-    container.innerHTML = ""; // clear before rendering
 
-    querySnapshot.forEach((doc) => {
-      const product = doc.data();
-      const card = document.createElement("div");
-      card.className = "product-card";
-      card.innerHTML = `
-        <img src="${product.image}" alt="${product.name}" />
-        <h3>${product.name}</h3>
-        <p>${product.price} GHS</p>
-      `;
-      container.appendChild(card);
-    });
-  }
-
-  // 🔹 Load all sections
-  loadProducts("Wines", "wines-list");
-  loadProducts("Liquors", "liquors-list");
-  loadProducts("EverydayEssentials", "essentials-list");
-</script>
 </body>
 </html>
