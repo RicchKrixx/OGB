@@ -507,79 +507,104 @@ color:var(--brand);
       // Update year
       document.getElementById("year").textContent = new Date().getFullYear();
 
-  // Monitor auth state
-  onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // Save displayName (if available) and email
-    localStorage.setItem("user", JSON.stringify({ 
-      email: user.email, 
-      displayName: user.displayName || user.email.split("@")[0] 
-    }));
-  } else {
-    localStorage.removeItem("user");
-  }
-  renderDropdown();
-});
 
-  // Logout function
-  window.signOutUser = async function () {
-    await signOut(auth);
-    alert("Logged out!");
-  };
+          // Hide or show sections based on search results
+        const sections = ["wines", "liquors", "essentials"];
+        sections.forEach(section => {
+          const container = document.getElementById(`grid-${section}`);
+          container.innerHTML = getSkeletons(2); // Show skeletons during filter
+          setTimeout(() => {
+            container.innerHTML = ""; // Clear skeletons
+            const categoryProducts = filteredProducts.filter(p => p.category.toLowerCase() === section);
+            if (categoryProducts.length === 0) {
+              container.innerHTML = `<p>No ${section} found.</p>`;
+            } else {
+              categoryProducts.forEach(product => {
+                const div = document.createElement("div");
+                div.className = "card";
+                div.innerHTML = `
+                  <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
+                  <h3>${product.name}</h3>
+                  <div class="price">GHS ${product.price}</div>
+                  <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">Add to Cart</button>
+                `;
+                container.appendChild(div);
+              });
+            }
+          }, 500); // Simulate loading delay
+        });
 
-  // Render dropdown
-  function renderDropdown() {
-    const dropdown = document.getElementById("userDropdown");
-    dropdown.innerHTML = "";
+        // Show/hide no results message
+        noResults.classList.toggle("hidden", filteredProducts.length > 0);
+      });
+    });
 
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
-      dropdown.innerHTML = `
-        <a href="#">Hello, ${user.displayName}</a>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="#" onclick="signOutUser()">Logout</a>
-      `;
-    } else {
-      dropdown.innerHTML = `
-        <a href="auth.html">Login/Register</a>
-      `;
+    // Cart functions
+    function getCart() {
+      return JSON.parse(localStorage.getItem("cart")) || [];
     }
-  }
-</script>
-<script>
-// Update year
-document.getElementById("year").textContent = new Date().getFullYear();
 
-// Cart functions
-function getCart() { 
-  return JSON.parse(localStorage.getItem("cart")) || []; 
-}
+    function saveCart(cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateBadge();
+    }
 
-function saveCart(cart) { 
-  localStorage.setItem("cart", JSON.stringify(cart)); 
-  updateBadge(); 
-}
+    function updateBadge() {
+      const cart = getCart();
+      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById("cartCount").textContent = totalQty;
+    }
 
-function updateBadge() { 
-  const cart = getCart();
-  const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-  document.getElementById("cartCount").textContent = totalQty;
-}
+    window.addToCart = function(name, price, img) {
+      let cart = getCart();
+      let existing = cart.find(i => i.name === name);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ name, price, qty: 1, img });
+      }
+      saveCart(cart);
+    };
 
-function addToCart(name, price, img) {
-  let cart = getCart();
-  let existing = cart.find(i => i.name === name);
-  if (existing) {
-    existing.qty++;
-  } else {
-    cart.push({ name, price, qty: 1, img });
-  }
-  saveCart(cart);
-}
+    updateBadge();
 
-updateBadge();
-</script>
-<script>
+    // Auth and dropdown
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        localStorage.setItem("user", JSON.stringify({
+          email: user.email,
+          displayName: user.displayName || user.email.split("@")[0]
+        }));
+      } else {
+        localStorage.removeItem("user");
+      }
+      renderDropdown();
+    });
+
+    window.signOutUser = async function() {
+      await signOut(auth);
+      alert("Logged out!");
+    };
+
+    function renderDropdown() {
+      const dropdown = document.getElementById("userDropdown");
+      dropdown.innerHTML = "";
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user) {
+        dropdown.innerHTML = `
+          <a href="#">Hello, ${user.displayName}</a>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="#" onclick="signOutUser()">Logout</a>
+        `;
+      } else {
+        dropdown.innerHTML = `<a href="auth.html">Login/Register</a>`;
+      }
+    }
+
+    window.toggleDropdown = function() {
+      document.getElementById("userDropdown").classList.toggle("show");
+    };
+
   const hamburger = document.getElementById('hamburger');
   const menu = document.getElementById('menu');
 
@@ -637,8 +662,7 @@ searchInput.addEventListener('input', () => {
     noResults.style.display = 'none';
   }
 });
-</script>
-<script>
+
 function toggleDropdown() {
   const dropdown = document.getElementById("userDropdown");
   dropdown.classList.toggle("show");
