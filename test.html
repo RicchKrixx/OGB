@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta property="og:title" content="On God Bend" />
+  <meta property="og:description" content="Premium Wines, Liquors & Everyday Essentials." />
+  <meta property="og:image" content="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" />
+  <meta property="og:url" content="https://ricchkrixx.github.io/r/" />
+  <meta property="og:type" content="website" />
+  <meta name="description" content="Everything under one roof." />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8QXD268M23"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-8QXD268M23');
+  </script>
+  <link rel="icon" href="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" type="image/png">
+  <title>On God Bend Mini Mart • Wine & Liquor</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    :root {
+      --brand: #b8860b;
+      --brand-dark: #8b6508;
+      --ink: #1f1f1f;
+      --bg: #f7f7f9;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+    a { color:inherit; text-decoration:none; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:10px 16px; background:#111; color:#fff; }
+    .brand { display:flex; align-items:center; gap:10px; }
+    .brand img { height:90px; border-radius:6px; }
+    .nav { display:flex; gap:14px; }
+    .nav a { padding:8px 10px; border-radius:8px; }
+    .nav a:hover { background: rgba(255,255,255,.08); }
+    .cart-icon { position: relative; display: inline-block; }
+    .cart-btn {
+      font-size: 30px; text-decoration: none; display: inline-flex; align-items: center; color: #fff;
+      border: 0; border-radius: 10px; padding: 8px 12px; font-weight: 600; cursor: pointer; position: relative;
+    }
+    #cartCount {
+      position: absolute; top: -3px; right: -3px; background:var(--brand); font-size: 12px;
+      font-weight: bold; border-radius: 50%; padding: 2px 6px; color: #fff; line-height: 1;
+    }
+    .hero {
+      position: relative; height: 400px; display: flex; justify-content: center; align-items: center;
+      text-align: center; color: #fff; overflow: hidden; background: linear-gradient(135deg,#3a3a3a 0%,#161616 100%);
+    }
+    .hero-video {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
+    }
+    .hero-content { position: relative; z-index: 1; }
+    .hero::after {
+      content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 0;
+    }
+    .section { padding:26px 16px; max-width:1100px; margin:0 auto; }
+    .section h2 { margin:0 0 14px; color:var(--brand); }
+    .grid { display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); }
+    .card { background:var(--card); border-radius:14px; padding:12px; box-shadow:0 6px 18px rgba(0,0,0,.06); display:flex; flex-direction:column; align-items:center; text-align:center; }
+    .card img { width:100%; height:130px; object-fit:cover; border-radius:10px; }
+    .card h3 { font-size:16px; margin:8px 0 2px; }
+    .price { font-weight:700; color:#222; }
+    .add { margin-top:8px; border:0; background:#111; color:#fff; padding:8px 10px; border-radius:10px; cursor:pointer; }
+    .add:hover { opacity:.9; }
+    .info { background:#bbb; border-radius:16px; padding:18px; box-shadow:0 6px 18px rgba(0,0,0,.06); color: #fff; }
+    footer { padding:24px 16px; text-align:center; background:#111; margin-top:26px; color:#fff; }
+    .hamburger { display: block; width: 30px; height: 25px; margin: 20px; position: relative; cursor: pointer; z-index: 2001; color: white; }
+    .hamburger span { position: absolute; height: 4px; width: 100%; background: #fff; border-radius: 2px; transition: all 0.3s ease; }
+    .hamburger span:nth-child(1) { top: 0; }
+    .hamburger span:nth-child(2) { top: 10px; }
+    .hamburger span:nth-child(3) { top: 20px; }
+    .menu { position: fixed; top: 40px; right: -250px; width: 250px; height: auto; background: #f1f1f1; box-shadow: -2px 0 5px rgba(0,0,0,0.3); transition: right 0.3s ease; padding-top: 60px; border-radius: 8px; z-index: 2000; }
+    .menu a { display: block; padding: 15px 25px; text-decoration: none; color: #333; font-size: 18px; }
+    .menu a:hover { background: #ddd; }
+    .menu.active { right: 0; }
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg); top: 10px; }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg); top: 10px; }
+    .no-results {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff3cd;
+      border: 1px solid #ffeeba; color: #856404; padding: 30px 20px; border-radius: 12px; text-align: center;
+      max-width: 400px; margin: 20px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); animation: fadeIn 0.5s ease; height: 250px;
+    }
+    .no-results img { width: 80px; margin-bottom: 12px; }
+    .no-results p { font-weight: 600; margin: 0 0 6px 0; }
+    .no-results small { opacity: 0.7; font-size: 14px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .hidden { display: none; }
+    .fa-user { font-size: 24px; }
+    .user-menu { position: relative; display: inline-block; }
+    .user-icon { font-size: 24px; cursor: pointer; padding:10px; border-radius:100%; background:var(--brand); }
+    .dropdown { display: none; position: absolute; top: 45px; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 8px; min-width: 160px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1); z-index: 1000; }
+    .dropdown a { display: block; padding: 10px; color: #333; text-decoration: none; }
+    .dropdown a:hover { background: #f1f1f1; }
+    .show { display: block; }
+    /* Skeleton Loader */
+    .skeleton { background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; border-radius: 8px; }
+    @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+    .skeleton-card { background: var(--card); border-radius: 14px; padding: 12px; box-shadow: 0 6px 18px rgba(0,0,0,.06); display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .skeleton-img { width: 100%; height: 130px; border-radius: 10px; }
+    .skeleton-text { height: 14px; margin-top: 8px; width: 70%; }
+    .skeleton-price { height: 16px; margin-top: 6px; width: 40%; }
+    .skeleton-btn { height: 32px; margin-top: 10px; width: 60%; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="On God Bend Logo"/>
+    </div>
+    <nav class="nav">
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="menu" id="menu">
+        <a href="#">Shop</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="cart-icon">
+        <a href="cart.html" class="cart-btn">
+          <i class="fas fa-shopping-bag"></i>
+          <span id="cartCount">0</span>
+        </a>
+      </div>
+      <div class="user-menu">
+        <div class="user-icon" onclick="toggleDropdown()"><i class="fa-solid fa-user"></i></div>
+        <div class="dropdown" id="userDropdown"></div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <video autoplay muted loop playsinline class="hero-video">
+      <source src="257265_small.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <div class="hero-content">
+      <h1><span class="cta">Premium</span> Wines, Liquors & Everyday Essentials</h1>
+      <p>Quality you trust • Prices you love • Fast local delivery</p>
+      <div class="section">
+        <input type="text" id="searchInput" placeholder="🔍 Search products..." style="width:100%;max-width:400px;padding:10px;font-size:16px;margin-bottom:5px;border-radius:8px;border:1px solid #ccc; background:#bbb;">
+      </div>
+    </div>
+  </section>
+  <div id="noResults" class="no-results hidden">
+    <img src="https://i.postimg.cc/fyBZgbnw/file-0000000085b0622fad52b0ff61c2fb58.png" alt="No results" />
+    <p>No products match your search 😕</p>
+    <small>Try checking your spelling or search for something else.</small>
+  </div>
+
+  <!-- PRODUCTS -->
+  <section class="section" id="wines">
+    <h2>Wines</h2>
+    <div class="grid" id="grid-wines"></div>
+  </section>
+  <section class="section" id="liquors">
+    <h2>Liquors</h2>
+    <div class="grid" id="grid-liquors"></div>
+  </section>
+  <section class="section" id="essentials">
+    <h2>Everyday Essentials</h2>
+    <div class="grid" id="grid-essentials"></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <h2>About Us</h2>
+    <div class="info">
+      We are your neighborhood source for premium wines and spirits plus everyday mini-mart staples.
+      Visit in-store or order online for fast local delivery. Quality products, honest pricing, friendly service — always.
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <h2>Contact</h2>
+    <div class="info">
+      📍 Tse Addo Roundabout<br>
+      <small>Accra, Ghana</small><br><br>
+      📞 +233 53 014 9667<br><br>
+      <a href="mailto:info@ongodbend.com">✉️ info@ongodbend.com</a><br><br>
+      <a href="https://wa.me/233530149667"><i class="fa fa-whatsapp"></i> WhatsApp</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    © <span id="year"></span> On God Bend OGB — All Rights Reserved.
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+      authDomain: "ongod-5073e.firebaseapp.com",
+      projectId: "ongod-5073e",
+      storageBucket: "ongod-5073e.firebasestorage.app",
+      messagingSenderId: "439687837026",
+      appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+      measurementId: "G-1TVP0X3J62"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Reusable skeleton template
+    function getSkeletons(count = 2) {
+      let skeletons = "";
+      for (let i = 0; i < count; i++) {
+        skeletons += `
+          <div class="skeleton-card">
+            <div class="skeleton skeleton-img"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-price"></div>
+            <div class="skeleton skeleton-btn"></div>
+          </div>
+        `;
+      }
+      return skeletons;
+    }
+
+    // Load products by category from Firestore
+    async function loadProducts(category, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = getSkeletons(2); // Show skeletons while loading
+
+      const q = query(collection(db, "products"), where("category", "==", category));
+      const snapshot = await getDocs(q);
+
+      container.innerHTML = ""; // Clear skeletons
+      const products = [];
+      snapshot.forEach(docSnap => {
+        const product = docSnap.data();
+        products.push(product);
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <div class="price">GHS ${product.price}</div>
+          <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">Add to Cart</button>
+        `;
+        container.appendChild(div);
+      });
+
+      return products; // Return products for search functionality
+    }
+
+    // Load all products for search
+    async function loadAllProducts() {
+      const categories = [
+        { name: "Wines", id: "grid-wines" },
+        { name: "Liquors", id: "grid-liquors" },
+        { name: "Essentials", id: "grid-essentials" }
+      ];
+      let allProducts = [];
+      for (const cat of categories) {
+        const products = await loadProducts(cat.name, cat.id);
+        allProducts = allProducts.concat(products);
+      }
+      return allProducts;
+    }
+
+    // Search functionality
+    let allProducts = [];
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Load all products and store them for search
+      allProducts = await loadAllProducts();
+
+      // Update year
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Search input handler
+      const searchInput = document.getElementById("searchInput");
+      const noResults = document.getElementById("noResults");
+      searchInput.addEventListener("input", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filteredProducts = allProducts.filter(product =>
+          product.name.toLowerCase().includes(searchTerm)
+        );
+
+        // Hide or show sections based on search results
+        const sections = ["wines", "liquors", "essentials"];
+        sections.forEach(section => {
+          const container = document.getElementById(`grid-${section}`);
+          container.innerHTML = getSkeletons(2); // Show skeletons during filter
+          setTimeout(() => {
+            container.innerHTML = ""; // Clear skeletons
+            const categoryProducts = filteredProducts.filter(p => p.category.toLowerCase() === section);
+            if (categoryProducts.length === 0) {
+              container.innerHTML = `<p>No ${section} found.</p>`;
+            } else {
+              categoryProducts.forEach(product => {
+                const div = document.createElement("div");
+                div.className = "card";
+                div.innerHTML = `
+                  <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
+                  <h3>${product.name}</h3>
+                  <div class="price">GHS ${product.price}</div>
+                  <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">Add to Cart</button>
+                `;
+                container.appendChild(div);
+              });
+            }
+          }, 500); // Simulate loading delay
+        });
+
+        // Show/hide no results message
+        noResults.classList.toggle("hidden", filteredProducts.length > 0);
+      });
+    });
+
+    // Cart functions
+    function getCart() {
+      return JSON.parse(localStorage.getItem("cart")) || [];
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateBadge();
+    }
+
+    function updateBadge() {
+      const cart = getCart();
+      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById("cartCount").textContent = totalQty;
+    }
+
+    window.addToCart = function(name, price, img) {
+      let cart = getCart();
+      let existing = cart.find(i => i.name === name);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ name, price, qty: 1, img });
+      }
+      saveCart(cart);
+    };
+
+    updateBadge();
+
+    // Auth and dropdown
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        localStorage.setItem("user", JSON.stringify({
+          email: user.email,
+          displayName: user.displayName || user.email.split("@")[0]
+        }));
+      } else {
+        localStorage.removeItem("user");
+      }
+      renderDropdown();
+    });
+
+    window.signOutUser = async function() {
+      await signOut(auth);
+      alert("Logged out!");
+    };
+
+    function renderDropdown() {
+      const dropdown = document.getElementById("userDropdown");
+      dropdown.innerHTML = "";
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user) {
+        dropdown.innerHTML = `
+          <a href="#">Hello, ${user.displayName}</a>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="#" onclick="signOutUser()">Logout</a>
+        `;
+      } else {
+        dropdown.innerHTML = `<a href="auth.html">Login/Register</a>`;
+      }
+    }
+
+    window.toggleDropdown = function() {
+      document.getElementById("userDropdown").classList.toggle("show");
+    };
+
+    // Hamburger menu
+    const hamburger = document.getElementById('hamburger');
+    const menu = document.getElementById('menu');
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hamburger.classList.toggle('active');
+      menu.classList.toggle('active');
+    });
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+        menu.classList.remove('active');
+        hamburger.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
