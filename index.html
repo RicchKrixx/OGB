@@ -462,7 +462,21 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 
+<!-- Example Wines Section -->
+<section id="wines">
+  <h2>Wines</h2>
+  <div id="wines-list" class="product-grid"></div>
+</section>
 
+<section id="liquors">
+  <h2>Liquors</h2>
+  <div id="liquors-list" class="product-grid"></div>
+</section>
+
+<section id="essentials">
+  <h2>Everyday Essentials</h2>
+  <div id="essentials-list" class="product-grid"></div>
+</section>
 
 
 
@@ -714,6 +728,31 @@ document.addEventListener("click", function(event) {
     dropdown.classList.remove("show");
   }
 });
+</script>
+<script>
+// Function to render products
+  async function loadProducts(section, containerId) {
+    const querySnapshot = await getDocs(collection(db, section));
+    const container = document.getElementById(containerId);
+    container.innerHTML = ""; // clear before rendering
+
+    querySnapshot.forEach((doc) => {
+      const product = doc.data();
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.innerHTML = `
+        <img src="${product.image}" alt="${product.name}" />
+        <h3>${product.name}</h3>
+        <p>${product.price} GHS</p>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  // 🔹 Load all sections
+  loadProducts("Wines", "wines-list");
+  loadProducts("Liquors", "liquors-list");
+  loadProducts("EverydayEssentials", "essentials-list");
 </script>
 </body>
 </html>
