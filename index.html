@@ -361,6 +361,63 @@ color:var(--brand);
   cursor: pointer;
 }
 </style>
+
+<style>
+  .socials {
+    display: flex;
+    gap: 8px;
+    padding: 1rem;
+    justify-content: center;
+    }
+
+  .socials a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: white;
+    font-size: 20px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+  }
+
+  .socials a:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+  }
+
+  .facebook { background: #3b5998; }
+  .instagram { background: #e1306c; }
+  .tiktok { background: #000; }
+  .x { background: #1da1f2; }
+  .whatsapp { background: #00b489; }
+
+  /* Optional Tooltip */
+  .socials a::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: -30px;
+    background: #333;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(5px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .socials a:hover::after {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
 </head>
 <body>
 <!-- HEADER -->
@@ -458,6 +515,14 @@ color:var(--brand);
     <a href="https://wa.me/233530149667">    <i class="fa fa-whatsapp"></i> WhatsApp</a>
   </div>
 </section>
+
+<div class="socials">
+  <a href="https://www.facebook.com/share/19dfn17s9G/" class="facebook" class="facebook" data-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+  <a href="https://www.instagram.com/bixmax_store?igsh=d29xMTBlcTZ4N3I3" class="instagram" data-label="Instagram"><i class="fab fa-instagram"></i></a>
+  <a href="https://www.tiktok.com/@bixmaxgh?_t=ZM-8yce1U7b0kQ&_r=1" class="tiktok" data-label="TikTok"><i class="fab fa-tiktok"></i></a>
+  <a href="#" class="x" data-label="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
+ <a href="https://wa.me/233536345825?text=Hello%20BixMAX%2C%20I%20need%20assistance" class="whatsapp" data-label="Whatsapp"><i class="fab fa-whatsapp"></i></a>
+</div>
 <div class="footer" style="color:#fff;">
   © <span id="year"></span> On God Bend OGB — All Rights Reserved.
 </footer>
@@ -516,7 +581,7 @@ color:var(--brand);
           <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
           <h3>${product.name}</h3>
           <div class="price">GH₵ ${product.price}</div>
-          <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">Add to Cart</button>
+          <button class="add" onclick="addToCart('${product.name}', ${product.price.toFixed(2)}, '${product.image || 'https://via.placeholder.com/150'}')">Add to Cart</button>
         `;
         container.appendChild(div);
       });
