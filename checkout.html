@@ -200,8 +200,8 @@ function renderOrderSummary(){
   if(cart.length===0){ summary.innerHTML="<p>Cart is empty.</p>"; return; }
   let html = "<b>Order Summary:</b><br/>";
   let total=0;
-  cart.forEach(i=>{ total+=i.price*i.qty; html+=`${i.name} x${i.qty} — GHS ${i.price*i.qty}<br/>`; });
-  html+="<b>Total: GHS "+total+"</b>";
+  cart.forEach(i=>{ total+=i.price*i.qty; html+=`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}<br/>`; });
+  html+="<b>Total: GH₵ "+total+"</b>";
   summary.innerHTML=html;
 }
 renderOrderSummary();
@@ -230,7 +230,7 @@ function submitOrder(e){
       key: 'YOUR_PUBLIC_KEY_HERE', // Replace with your Paystack public key
       email: order.email || "customer@example.com",
       amount: order.total*100,
-      currency: "GHS",
+      currency: "GH₵",
       onClose: function(){ alert('Payment cancelled.'); },
       callback: function(response){
         order.status = "Paid";
