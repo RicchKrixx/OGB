@@ -455,43 +455,6 @@ function getSkeletons(count = 2) {
   return skeletons;
 }
 
-// Products HTML (moved into JS for skeleton replacement)
-const productsHTML = {
-  wines: `
-      <!-- PRODUCTS -->
-  <section class="section" id="wines">
-    <h2>Wines</h2>
-    <div class="grid" id="grid-wines"></div>
-  </section>
-  <section class="section" id="liquors">
-    <h2>Liquors</h2>
-    <div class="grid" id="grid-liquors"></div>
-  </section>
-  <section class="section" id="essentials">
-    <h2>Everyday Essentials</h2>
-    <div class="grid" id="grid-essentials"></div>
-  </section>
-  `
-};
-
-// On DOM ready
-document.addEventListener("DOMContentLoaded", () => {
-  // Insert skeletons first
-  document.getElementById("grid-wines").innerHTML = getSkeletons(2);
-  document.querySelector("section:nth-of-type(2) .grid").innerHTML = getSkeletons(2);
-  document.querySelector("section:nth-of-type(3) .grid").innerHTML = getSkeletons(2);
-
-  // Replace skeletons with products after delay
-  setTimeout(() => {
-    document.getElementById("grid-wines").innerHTML = productsHTML.wines;
-    document.querySelector("section:nth-of-type(2) .grid").innerHTML = productsHTML.liquor;
-    document.querySelector("section:nth-of-type(3) .grid").innerHTML = productsHTML.essentials;
-  }, 2000); // adjust time as needed
-});
-
-
-
-
     // Load products by category from Firestore
     async function loadProducts(category, containerId) {
       const container = document.getElementById(containerId);
