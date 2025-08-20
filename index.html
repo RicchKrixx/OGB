@@ -453,10 +453,10 @@ color:var(--brand);
     const dropdown = document.getElementById("userDropdown");
     dropdown.innerHTML = "";
 
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
+    const user = JSON.parse(localStorage.getItem("userName"));
+    if (userName) {
       dropdown.innerHTML = `
-        <a href="#">Hello, ${user.displayName || "user"}</a>
+        <a href="#">Hello, ${user.displayName || "customer"}</a>
         <a href="dashboard.html">Dashboard</a>
         <a href="#" onclick="signOutUser()">Logout</a>
       `;
@@ -496,7 +496,6 @@ function addToCart(name, price, img) {
     cart.push({ name, price, qty: 1, img });
   }
   saveCart(cart);
-  alert(`${name} added to cart`);
 }
 
 updateBadge();
