@@ -420,40 +420,41 @@ color:var(--brand);
 <div class="footer" style="color:#fff;">
   © <span id="year"></span> On God Bend OGB — All Rights Reserved.
 </footer>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
- const firebaseConfig = {
-  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
-  authDomain: "ongod-5073e.firebaseapp.com",
-  projectId: "ongod-5073e",
-  storageBucket: "ongod-5073e.firebasestorage.app",
-  messagingSenderId: "439687837026",
-  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
-  measurementId: "G-1TVP0X3J62"
-};
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+      authDomain: "ongod-5073e.firebaseapp.com",
+      projectId: "ongod-5073e",
+      storageBucket: "ongod-5073e.firebasestorage.app",
+      messagingSenderId: "439687837026",
+      appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+      measurementId: "G-1TVP0X3J62"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-
-// Reusable skeleton template
-function getSkeletons(count = 2) {
-  let skeletons = "";
-  for (let i = 0; i < count; i++) {
-    skeletons += `
-      <div class="skeleton-card">
-        <div class="skeleton skeleton-img"></div>
-        <div class="skeleton skeleton-text"></div>
-        <div class="skeleton skeleton-price"></div>
-        <div class="skeleton skeleton-btn"></div>
-      </div>
-    `;
-  }
-  return skeletons;
-}
+    // Reusable skeleton template
+    function getSkeletons(count = 2) {
+      let skeletons = "";
+      for (let i = 0; i < count; i++) {
+        skeletons += `
+          <div class="skeleton-card">
+            <div class="skeleton skeleton-img"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-price"></div>
+            <div class="skeleton skeleton-btn"></div>
+          </div>
+        `;
+      }
+      return skeletons;
+    }
 
     // Load products by category from Firestore
     async function loadProducts(category, containerId) {
