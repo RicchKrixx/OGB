@@ -159,7 +159,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
   <header><strong>🛒 Your Cart</strong></header>
   <div class="cart-list" id="cartList"></div>
   <div class="cart-footer">
-    <div class="total"><span>Subtotal</span><span id="subtotal">GHS 0</span></div>
+    <div class="total"><span>Subtotal</span><span id="subtotal">GH₵ 0</span></div>
     <a href="checkout.html" class="checkout-btn">Proceed to Checkout</a>
   </div>
 </section>
@@ -183,7 +183,7 @@ function renderCart(){
   const cart = getCart();
   list.innerHTML = "";
   let subtotal = 0;
-  if(cart.length===0){ list.innerHTML="<p>Your cart is empty.</p>"; document.getElementById("subtotal").textContent="GHS 0"; return; }
+  if(cart.length===0){ list.innerHTML="<p>Your cart is empty.</p>"; document.getElementById("subtotal").textContent="GH₵ 0"; return; }
   cart.forEach((item,i)=>{
     subtotal += item.price*item.qty;
     const div = document.createElement("div");
@@ -192,7 +192,7 @@ function renderCart(){
       <img src="${item.img}" alt="${item.name}">
       <div>
         <strong>${item.name}</strong><br/>
-        GHS ${item.price} each
+        GH₵ ${item.price} each
       </div>
       <div class="qty">
         <button onclick="decrease(${i})">-</button>
@@ -203,7 +203,7 @@ function renderCart(){
     `;
     list.appendChild(div);
   });
-  document.getElementById("subtotal").textContent = "GHS "+subtotal;
+  document.getElementById("subtotal").textContent = "GH₵ "+subtotal;
 }
 
 function increase(i){ let cart=getCart(); cart[i].qty++; saveCart(cart); }
