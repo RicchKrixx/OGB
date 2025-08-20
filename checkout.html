@@ -257,5 +257,24 @@ function saveOrder(order){
     .catch(err=>{ console.error(err); alert("Failed to submit order."); });
 }
 </script>
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const menu = document.getElementById('menu');
+
+  // Toggle menu on hamburger click
+  hamburger.addEventListener('click', (e) => {
+    e.stopPropagation(); // prevent closing immediately
+    hamburger.classList.toggle('active');
+    menu.classList.toggle('active');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+      menu.classList.remove('active');
+      hamburger.classList.remove('active');
+    }
+  });
+</script>
 </body>
 </html>
