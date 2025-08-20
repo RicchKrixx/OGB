@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OGB AUTH</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -33,9 +29,7 @@
       transition: transform 0.3s ease;
     }
 
-    .auth-container:hover {
-      transform: translateY(-4px);
-    }
+    .auth-container:hover { transform: translateY(-4px); }
 
     .auth-container h2 {
       text-align: center;
@@ -75,9 +69,7 @@
       transition: background 0.3s ease;
     }
 
-    .auth-container button:hover {
-      background: #2563eb;
-    }
+    .auth-container button:hover { background: #2563eb; }
 
     .google-signin {
       display: flex;
@@ -89,14 +81,9 @@
       color: #1f2937;
     }
 
-    .google-signin:hover {
-      background: #f3f4f6;
-    }
+    .google-signin:hover { background: #f3f4f6; }
 
-    .google-signin img {
-      width: 20px;
-      height: 20px;
-    }
+    .google-signin img { width: 20px; height: 20px; }
 
     .divider {
       display: flex;
@@ -125,38 +112,25 @@
       transition: color 0.3s ease;
     }
 
-    .switch-link:hover {
-      color: #2563eb;
-      text-decoration: underline;
-    }
+    .switch-link:hover { color: #2563eb; text-decoration: underline; }
 
-    #nameInput {
-      display: none;
-    }
+    #nameInput { display: none; }
 
     @media (max-width: 480px) {
-      .auth-container {
-        margin: 1rem;
-        padding: 1.5rem;
-      }
+      .auth-container { margin: 1rem; padding: 1.5rem; }
     }
-.password-wrapper {
-  position: relative;
-}
 
-.password-wrapper input {
-  padding-right: 40px;
-}
-
-.toggle-password {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 1.1rem;
-  color: #6b7280;
-}
+    .password-wrapper { position: relative; }
+    .password-wrapper input { padding-right: 40px; }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: #6b7280;
+    }
   </style>
 </head>
 <body>
@@ -164,10 +138,10 @@
     <h2 id="formTitle">Sign In</h2>
     <input type="text" id="nameInput" placeholder="Username" />
     <input type="email" id="emailInput" placeholder="Email" />
-   <div class="password-wrapper">
-  <input type="password" id="passwordInput" placeholder="Password" />
-  <span class="toggle-password" onclick="togglePassword()">👁️</span>
-</div>
+    <div class="password-wrapper">
+      <input type="password" id="passwordInput" placeholder="Password" />
+      <span class="toggle-password" onclick="togglePassword()">👁️</span>
+    </div>
     <button onclick="handleAuth()">Sign In</button>
 
     <div class="divider">or</div>
@@ -201,19 +175,26 @@
     addDoc
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-   const firebaseConfig = {
-  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
-  authDomain: "ongod-5073e.firebaseapp.com",
-  projectId: "ongod-5073e",
-  storageBucket: "ongod-5073e.appspot.com", // ✅ fixed
-  messagingSenderId: "439687837026",
-  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
-  measurementId: "G-1TVP0X3J62"
-};
+  // 🔑 Your Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+    authDomain: "ongod-5073e.firebaseapp.com",
+    projectId: "ongod-5073e",
+    storageBucket: "ongod-5073e.appspot.com",
+    messagingSenderId: "439687837026",
+    appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+    measurementId: "G-1TVP0X3J62"
+  };
+
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+
+  // ✅ Setup Google Provider properly
   const provider = new GoogleAuthProvider();
+  provider.addScope("profile");
+  provider.addScope("email");
+  provider.setCustomParameters({ prompt: "select_account" });
 
   let isSignUp = false;
 
@@ -266,6 +247,7 @@
         alert("Signup successful!");
         window.location.href = "index.html";
       } catch (error) {
+        console.error("Signup Error:", error.code, error.message);
         alert(error.message);
       }
     } else {
@@ -274,19 +256,24 @@
         alert("Login successful!");
         window.location.href = "index.html";
       } catch (error) {
+        console.error("Login Error:", error.code, error.message);
         alert(error.message);
       }
     }
   };
 
+  // ✅ Updated Google Sign-In
   window.signInWithGoogle = function () {
     signInWithPopup(auth, provider)
-      .then(() => {
-        alert("Google Sign-In successful!");
+      .then((result) => {
+        const user = result.user;
+        console.log("Google User:", user);
+        alert(`Welcome ${user.displayName || "User"}!`);
         window.location.href = "index.html";
       })
-      .catch(error => {
-        alert(error.message);
+      .catch((error) => {
+        console.error("Google Sign-In Error:", error.code, error.message);
+        alert("Error: " + error.message);
       });
   };
 
@@ -299,10 +286,12 @@
         alert("Password reset email sent! Check your inbox.");
       })
       .catch(error => {
+        console.error("Password Reset Error:", error.code, error.message);
         alert("Error: " + error.message);
       });
   };
 </script>
+
 <script>
   function togglePassword() {
     const input = document.getElementById("passwordInput");
