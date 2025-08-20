@@ -515,8 +515,16 @@ color:var(--brand);
       // Update year
       document.getElementById("year").textContent = new Date().getFullYear();
 
+      // Search input handler
+      const searchInput = document.getElementById("searchInput");
+      const noResults = document.getElementById("noResults");
+      searchInput.addEventListener("input", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filteredProducts = allProducts.filter(product =>
+          product.name.toLowerCase().includes(searchTerm)
+        );
 
-          // Hide or show sections based on search results
+        // Hide or show sections based on search results
         const sections = ["wines", "liquors", "essentials"];
         sections.forEach(section => {
           const container = document.getElementById(`grid-${section}`);
@@ -613,79 +621,23 @@ color:var(--brand);
       document.getElementById("userDropdown").classList.toggle("show");
     };
 
-  const hamburger = document.getElementById('hamburger');
-  const menu = document.getElementById('menu');
-
-  // Toggle menu on hamburger click
-  hamburger.addEventListener('click', (e) => {
-    e.stopPropagation(); // prevent closing immediately
-    hamburger.classList.toggle('active');
-    menu.classList.toggle('active');
-  });
-
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
-      menu.classList.remove('active');
-      hamburger.classList.remove('active');
-    }
-  });
-</script>
-<script>
-const searchInput = document.getElementById('searchInput');
-const sections = document.querySelectorAll('.sections .section');
-const noResults = document.getElementById('noResults');
-
-searchInput.addEventListener('input', () => {
-  const query = searchInput.value.toLowerCase().trim();
-  let anyVisible = false;
-
-  sections.forEach(section => {
-    const sectionTitle = section.querySelector('h2')?.textContent.toLowerCase() || '';
-    const products = section.querySelectorAll('.card');
-    let sectionMatch = sectionTitle.includes(query);
-    let productVisible = false;
-
-    products.forEach(product => {
-      const productName = product.querySelector('h3')?.textContent.toLowerCase() || '';
-      if(productName.includes(query) || sectionMatch) {
-        product.classList.remove('hidden');
-        productVisible = true;
-      } else {
-        product.classList.add('hidden');
+    // Hamburger menu
+    const hamburger = document.getElementById('hamburger');
+    const menu = document.getElementById('menu');
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hamburger.classList.toggle('active');
+      menu.classList.toggle('active');
+    });
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+        menu.classList.remove('active');
+        hamburger.classList.remove('active');
       }
     });
-
-    if(sectionMatch || productVisible) {
-      section.classList.remove('hidden');
-      anyVisible = true;
-    } else {
-      section.classList.add('hidden');
-    }
-  });
-
-  if(!anyVisible && query !== "") {
-    noResults.style.display = 'block';
-  } else {
-    noResults.style.display = 'none';
-  }
-});
-
-function toggleDropdown() {
-  const dropdown = document.getElementById("userDropdown");
-  dropdown.classList.toggle("show");
-}
-
-// Close dropdown when clicking outside
-document.addEventListener("click", function(event) {
-  const dropdown = document.getElementById("userDropdown");
-  const userIcon = document.querySelector(".user-icon");
-
-  if (!dropdown.contains(event.target) && !userIcon.contains(event.target)) {
-    dropdown.classList.remove("show");
-  }
-});
-</script>
+  </script>
+</body>
+</html>
 
 </body>
 </html>
