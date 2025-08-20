@@ -2,93 +2,208 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Edit Products</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products Edit - OGB</title>
   <style>
-    body { font-family: sans-serif; background: #f7f7f9; padding: 20px; }
-    h1 { color: #b8860b; }
-    form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-    input { padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
-    button { padding: 8px 14px; border: none; background: #111; color: #fff; border-radius: 6px; cursor: pointer; }
-    .product-list { display: grid; gap: 12px; }
-    .product { background: #fff; padding: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,.1); }
-    .product img { height: 60px; border-radius: 6px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .accordion {
+      background: #fff;
+      color: #333;
+      cursor: pointer;
+      padding: 15px;
+      width: 100%;
+      border: none;
+      outline: none;
+      transition: 0.3s;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .accordion.active {
+      background: #0077ff;
+      color: #fff;
+    }
+    .panel {
+      padding: 15px;
+      background: #fff;
+      display: none;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .product {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .product img {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      margin-right: 10px;
+      object-fit: cover;
+    }
+    .product-info {
+      flex: 1;
+    }
+    .product-actions button {
+      margin-left: 5px;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .edit-btn { background: #0077ff; color: #fff; }
+    .delete-btn { background: #ff3b3b; color: #fff; }
+    .add-form {
+      margin-top: 15px;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+    }
+    .add-form input {
+      padding: 6px;
+      margin: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .add-form button {
+      padding: 6px 12px;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h1>Edit Products</h1>
+  <h1>Products Editor</h1>
 
-  <!-- Product Form -->
-  <form id="productForm">
-    <input type="text" id="name" placeholder="Product Name" required>
-    <input type="number" id="price" placeholder="Price" required>
-    <input type="url" id="img" placeholder="Image URL" required>
-    <button type="submit">Add / Update</button>
-  </form>
+  <button class="accordion">🍷 Wines</button>
+  <div class="panel" id="wines"></div>
 
-  <!-- Products -->
-  <div class="product-list" id="productList"></div>
+  <button class="accordion">🥃 Liquors</button>
+  <div class="panel" id="liquors"></div>
 
-  <script>
-    function getProducts() {
-      return JSON.parse(localStorage.getItem("products")) || [];
-    }
+  <button class="accordion">🛒 Everyday Essentials</button>
+  <div class="panel" id="essentials"></div>
 
-    function saveProducts(products) {
-      localStorage.setItem("products", JSON.stringify(products));
-    }
+  <!-- Firebase -->
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } 
+      from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-    function renderProducts() {
-      const list = document.getElementById("productList");
-      const products = getProducts();
-      list.innerHTML = "";
-      products.forEach((p, i) => {
-        list.innerHTML += `
-          <div class="product">
-            <img src="${p.img}" alt="${p.name}">
-            <strong>${p.name}</strong> - GHS ${p.price}
-            <br>
-            <button onclick="editProduct(${i})">✏️ Edit</button>
-            <button onclick="deleteProduct(${i})">🗑️ Delete</button>
-          </div>
-        `;
+    // TODO: Replace with your Firebase config
+     const firebaseConfig = {
+  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+  authDomain: "ongod-5073e.firebaseapp.com",
+  projectId: "ongod-5073e",
+  storageBucket: "ongod-5073e.firebasestorage.app",
+  messagingSenderId: "439687837026",
+  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+  measurementId: "G-1TVP0X3J62"
+};
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Toggle accordion
+    document.querySelectorAll(".accordion").forEach(btn => {
+      btn.addEventListener("click", function() {
+        this.classList.toggle("active");
+        const panel = this.nextElementSibling;
+        panel.style.display = panel.style.display === "block" ? "none" : "block";
       });
-    }
-
-    document.getElementById("productForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const price = document.getElementById("price").value;
-      const img = document.getElementById("img").value;
-
-      let products = getProducts();
-      if (editingIndex !== null) {
-        products[editingIndex] = { name, price, img };
-        editingIndex = null;
-      } else {
-        products.push({ name, price, img });
-      }
-      saveProducts(products);
-      renderProducts();
-      e.target.reset();
     });
 
-    let editingIndex = null;
-    function editProduct(index) {
-      const product = getProducts()[index];
-      document.getElementById("name").value = product.name;
-      document.getElementById("price").value = product.price;
-      document.getElementById("img").value = product.img;
-      editingIndex = index;
+    // Render products by category
+    async function loadProducts(category, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "<p>Loading...</p>";
+
+      const q = query(collection(db, "products"), where("category", "==", category));
+      const snapshot = await getDocs(q);
+
+      container.innerHTML = "";
+      snapshot.forEach(docSnap => {
+        const product = docSnap.data();
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <img src="${product.image || 'https://via.placeholder.com/50'}" />
+          <div class="product-info">
+            <strong>${product.name}</strong><br>
+            $${product.price} | Stock: ${product.stock}
+          </div>
+          <div class="product-actions">
+            <button class="edit-btn">Edit</button>
+            <button class="delete-btn">Delete</button>
+          </div>
+        `;
+        // Delete product
+        div.querySelector(".delete-btn").addEventListener("click", async () => {
+          await deleteDoc(doc(db, "products", docSnap.id));
+          loadProducts(category, containerId);
+        });
+        // Edit product
+        div.querySelector(".edit-btn").addEventListener("click", async () => {
+          const newName = prompt("Enter new name", product.name);
+          const newPrice = prompt("Enter new price", product.price);
+          const newStock = prompt("Enter new stock", product.stock);
+          await updateDoc(doc(db, "products", docSnap.id), {
+            name: newName,
+            price: Number(newPrice),
+            stock: Number(newStock)
+          });
+          loadProducts(category, containerId);
+        });
+        container.appendChild(div);
+      });
+
+      // Add new product form
+      const form = document.createElement("div");
+      form.className = "add-form";
+      form.innerHTML = `
+        <h4>Add New ${category}</h4>
+        <input type="text" placeholder="Name" id="${containerId}-name" />
+        <input type="number" placeholder="Price" id="${containerId}-price" />
+        <input type="number" placeholder="Stock" id="${containerId}-stock" />
+        <input type="text" placeholder="Image URL" id="${containerId}-image" />
+        <button>Add</button>
+      `;
+      form.querySelector("button").addEventListener("click", async () => {
+        const name = document.getElementById(`${containerId}-name`).value;
+        const price = document.getElementById(`${containerId}-price`).value;
+        const stock = document.getElementById(`${containerId}-stock`).value;
+        const image = document.getElementById(`${containerId}-image`).value;
+        await addDoc(collection(db, "products"), {
+          name, price: Number(price), stock: Number(stock), image, category
+        });
+        loadProducts(category, containerId);
+      });
+      container.appendChild(form);
     }
 
-    function deleteProduct(index) {
-      let products = getProducts();
-      products.splice(index, 1);
-      saveProducts(products);
-      renderProducts();
-    }
-
-    renderProducts();
+    // Load all categories
+    loadProducts("Wines", "wines");
+    loadProducts("Liquors", "liquors");
+    loadProducts("Essentials", "essentials");
   </script>
 </body>
 </html>
