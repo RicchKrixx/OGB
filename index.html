@@ -322,6 +322,39 @@ color:var(--brand);
   width: 60%;
   border-radius: 10px;
 }
+/* Image preview overlay */
+.img-preview {
+  display: none; 
+  position: fixed;
+  z-index: 3000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8);
+  justify-content: center; 
+  align-items: center;
+}
+
+.img-preview img {
+  max-width: 80%;
+  max-height: 80%;
+  border-radius: 12px;
+  animation: zoomIn 2s ease forwards; /* slow zoom */
+}
+
+/* Zoom animation */
+@keyframes zoomIn {
+  from { transform: scale(1); }
+  to { transform: scale(1.2); }
+}
+
+/* Close button */
+.img-preview .close {
+  position: absolute;
+  top: 20px; right: 30px;
+  font-size: 40px;
+  color: white;
+  cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -401,6 +434,11 @@ color:var(--brand);
     Visit in-store or order online for fast local delivery. Quality products, honest pricing, friendly service — always.
   </div>
 </section>
+<!-- Image Preview Modal -->
+<div id="imgPreview" class="img-preview">
+  <span class="close">&times;</span>
+  <img class="preview-content" id="previewImg">
+</div>
 
 <!-- CONTACT -->
 <section class="section" id="contact">
@@ -639,6 +677,27 @@ async function loadAllProducts() {
         hamburger.classList.remove('active');
       }
     });
-  </script>
+  
+
+  // Open preview when any product image is clicked
+  document.addEventListener("click", function(e) {
+    if (e.target.tagName === "IMG" && e.target.closest(".card")) {
+      const modal = document.getElementById("imgPreview");
+      const modalImg = document.getElementById("previewImg");
+      modal.style.display = "flex";
+      modalImg.src = e.target.src;
+    }
+  });
+
+  // Close preview
+  document.querySelector("#imgPreview .close").onclick = function() {
+    document.getElementById("imgPreview").style.display = "none";
+  };
+
+  // Close if clicked outside image
+  document.getElementById("imgPreview").onclick = function(e) {
+    if (e.target === this) this.style.display = "none";
+  };
+</script>
 </body>
 </html>
