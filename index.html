@@ -481,20 +481,34 @@ color:var(--brand);
       return products; // Return products for search functionality
     }
 
-    // Load all products for search
-    async function loadAllProducts() {
-      const categories = [
-        { name: "Wines", id: "grid-wines" },
-        { name: "Liquors", id: "grid-liquors" },
-        { name: "Essentials", id: "grid-essentials" }
-      ];
-      let allProducts = [];
-      for (const cat of categories) {
-        const products = await loadProducts(cat.name, cat.id);
-        allProducts = allProducts.concat(products);
-      }
-      return allProducts;
-    }
+// Show skeletons for all sections at once
+function showAllSkeletons() {
+  const categories = ["wines", "liquors", "essentials"];
+  categories.forEach(section => {
+    const container = document.getElementById(`grid-${section}`);
+    container.innerHTML = getSkeletons(4); // uniform skeletons everywhere
+  });
+}
+
+// Load all products in parallel
+async function loadAllProducts() {
+  showAllSkeletons(); // put skeletons first
+
+  const categories = [
+    { name: "Wines", id: "grid-wines" },
+    { name: "Liquors", id: "grid-liquors" },
+    { name: "Essentials", id: "grid-essentials" }
+  ];
+
+  let allProducts = [];
+
+  await Promise.all(categories.map(async cat => {
+    const products = await loadProducts(cat.name, cat.id);
+    allProducts = allProducts.concat(products);
+  }));
+
+  return allProducts;
+}
 
     // Search functionality
     let allProducts = [];
