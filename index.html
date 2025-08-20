@@ -453,8 +453,8 @@ color:var(--brand);
     const dropdown = document.getElementById("userDropdown");
     dropdown.innerHTML = "";
 
-    const user = JSON.parse(localStorage.getItem("userName"));
-    if (userName) {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
       dropdown.innerHTML = `
         <a href="#">Hello, ${user.displayName || "customer"}</a>
         <a href="dashboard.html">Dashboard</a>
