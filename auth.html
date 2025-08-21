@@ -131,6 +131,37 @@
       font-size: 1.1rem;
       color: #6b7280;
     }
+.loader {
+  height: 3px;
+  width: 60px;
+  background: linear-gradient(#000 0 0) right/51% 100% no-repeat;
+  display: flex;
+  animation: l10-0 2s linear infinite;
+  margin-top: 1rem;
+}
+
+.loader:before,
+.loader:after {
+  content: "";
+  width: 15px;
+  background: #000;
+  animation: l10-1 2s linear infinite;
+}
+
+.loader:after {
+  animation-delay: -1s;
+  --s:-1;
+}
+
+@keyframes l10-1 {
+  0%,100% { transform: scaleX(var(--s,1)) rotate(0); }
+  25%,75% { transform: scaleX(var(--s,1)) rotate(180deg); }
+}
+
+@keyframes l10-0 {
+  0%,49.9% { transform: scaleX(1); }
+  50%,100% { transform: scaleX(-1); }
+}
   </style>
 </head>
 <body>
@@ -153,7 +184,7 @@
     <div class="switch-link" onclick="toggleMode()">Don't have an account? Sign Up</div>
     <div class="switch-link" onclick="resetPassword()">Forgot Password?</div>
   </div>
-
+<div class="loader" id="authLoader" style="display:none; margin: 1rem auto;"></div>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import {
@@ -209,74 +240,75 @@
   };
 
   window.handleAuth = async function () {
-    const email = document.getElementById("emailInput").value.trim();
-    const password = document.getElementById("passwordInput").value.trim();
-    const name = document.getElementById("nameInput").value.trim();
+  const email = document.getElementById("emailInput").value.trim();
+  const password = document.getElementById("passwordInput").value.trim();
+  const name = document.getElementById("nameInput").value.trim();
+  const loader = document.getElementById("authLoader");
 
-    if (isSignUp) {
-      if (!name || !email || !password) {
-        alert("Please fill all fields.");
+  // Show loader
+  loader.style.display = "block";
+
+  if (isSignUp) {
+    if (!name || !email || !password) {
+      alert("Please fill all fields.");
+      loader.style.display = "none";
+      return;
+    }
+
+    try {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("username", "==", name.toLowerCase()));
+      const snapshot = await getDocs(q);
+
+      if (!snapshot.empty) {
+        alert("Username already exists. Choose a different one.");
+        loader.style.display = "none";
         return;
       }
 
-      try {
-        // Check if username already exists
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("username", "==", name.toLowerCase()));
-        const snapshot = await getDocs(q);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      await updateProfile(user, { displayName: name });
+      await addDoc(usersRef, { uid: user.uid, username: name.toLowerCase(), email });
 
-        if (!snapshot.empty) {
-          alert("Username already exists. Choose a different one.");
-          return;
-        }
-
-        // Create user
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        // Set display name
-        await updateProfile(user, { displayName: name });
-
-        // Save username to Firestore
-        await addDoc(usersRef, {
-          uid: user.uid,
-          username: name.toLowerCase(),
-          email: email
-        });
-
-        alert("Signup successful!");
-        window.location.href = "index.html";
-      } catch (error) {
-        console.error("Signup Error:", error.code, error.message);
-        alert(error.message);
-      }
-    } else {
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("Login successful!");
-        window.location.href = "index.html";
-      } catch (error) {
-        console.error("Login Error:", error.code, error.message);
-        alert(error.message);
-      }
+      alert("Signup successful!");
+      window.location.href = "index.html";
+    } catch (error) {
+      console.error("Signup Error:", error.code, error.message);
+      alert(error.message);
+    } finally {
+      loader.style.display = "none";
     }
-  };
-
+  } else {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("Login successful!");
+      window.location.href = "index.html";
+    } catch (error) {
+      console.error("Login Error:", error.code, error.message);
+      alert(error.message);
+    } finally {
+      loader.style.display = "none";
+    }
+  }
+};
   // ✅ Updated Google Sign-In
-  window.signInWithGoogle = function () {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        console.log("Google User:", user);
-        alert(`Welcome ${user.displayName || "User"}!`);
-        window.location.href = "index.html";
-      })
-      .catch((error) => {
-        console.error("Google Sign-In Error:", error.code, error.message);
-        alert("Error: " + error.message);
-      });
-  };
+  window.signInWithGoogle = async function () {
+  const loader = document.getElementById("authLoader");
+  loader.style.display = "block";
 
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    alert(`Welcome ${user.displayName || "User"}!`);
+    window.location.href = "index.html";
+  } catch (error) {
+    console.error("Google Sign-In Error:", error.code, error.message);
+    alert("Error: " + error.message);
+  } finally {
+    loader.style.display = "none";
+  }
+};
   window.resetPassword = function () {
     const email = prompt("Enter your email to reset your password:");
     if (!email) return;
