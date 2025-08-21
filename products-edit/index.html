@@ -149,6 +149,11 @@
           <img src="${product.image || 'https://via.placeholder.com/50'}" />
           <div class="product-info">
             <strong>${product.name}</strong><br>
+<div class="product-info">
+  <strong>${product.name}</strong><br>
+  ${product.originalPrice ? `<span style="text-decoration: line-through; color: gray;">GH₵${product.originalPrice}</span> ` : ""}
+  GH₵${product.price} | Stock: ${product.stock}
+</div>
             GH₵${product.price} | Stock: ${product.stock}
           </div>
           <div class="product-actions">
@@ -162,43 +167,49 @@
           loadProducts(category, containerId);
         });
         // Edit product
-        div.querySelector(".edit-btn").addEventListener("click", async () => {
-          const newName = prompt("Enter new name", product.name);
-          const newPrice = prompt("Enter new price", product.price);
-          const newStock = prompt("Enter new stock", product.stock);
-          await updateDoc(doc(db, "products", docSnap.id), {
-            name: newName,
-            price: Number(newPrice),
-            stock: Number(newStock)
-          });
-          loadProducts(category, containerId);
-        });
-        container.appendChild(div);
-      });
-
+        // Edit product
+div.querySelector(".edit-btn").addEventListener("click", async () => {
+  const newName = prompt("Enter new name", product.name);
+  const newPrice = prompt("Enter new price", product.price);
+  const newOriginal = prompt("Enter original price (optional)", product.originalPrice || "");
+  const newStock = prompt("Enter new stock", product.stock);
+  await updateDoc(doc(db, "products", docSnap.id), {
+    name: newName,
+    price: Number(newPrice),
+    originalPrice: newOriginal ? Number(newOriginal) : null,
+    stock: Number(newStock)
+  });
+  loadProducts(category, containerId);
+});
       // Add new product form
       const form = document.createElement("div");
       form.className = "add-form";
       form.innerHTML = `
-        <h4>Add New ${category}</h4>
-        <input type="text" placeholder="Name" id="${containerId}-name" />
-        <input type="number" placeholder="Price" id="${containerId}-price" />
-        <input type="number" placeholder="Stock" id="${containerId}-stock" />
-        <input type="text" placeholder="Image URL" id="${containerId}-image" />
-        <button>Add</button>
-      `;
-      form.querySelector("button").addEventListener("click", async () => {
-        const name = document.getElementById(`${containerId}-name`).value;
-        const price = document.getElementById(`${containerId}-price`).value;
-        const stock = document.getElementById(`${containerId}-stock`).value;
-        const image = document.getElementById(`${containerId}-image`).value;
-        await addDoc(collection(db, "products"), {
-          name, price: Number(price), stock: Number(stock), image, category
-        });
-        loadProducts(category, containerId);
-      });
-      container.appendChild(form);
-    }
+  <h4>Add New ${category}</h4>
+  <input type="text" placeholder="Name" id="${containerId}-name" />
+  <input type="number" placeholder="Price" id="${containerId}-price" />
+  <input type="number" placeholder="Original Price (optional)" id="${containerId}-original" />
+  <input type="number" placeholder="Stock" id="${containerId}-stock" />
+  <input type="text" placeholder="Image URL" id="${containerId}-image" />
+  <button>Add</button>
+`;
+
+form.querySelector("button").addEventListener("click", async () => {
+  const name = document.getElementById(`${containerId}-name`).value;
+  const price = document.getElementById(`${containerId}-price`).value;
+  const original = document.getElementById(`${containerId}-original`).value;
+  const stock = document.getElementById(`${containerId}-stock`).value;
+  const image = document.getElementById(`${containerId}-image`).value;
+  await addDoc(collection(db, "products"), {
+    name,
+    price: Number(price),
+    originalPrice: original ? Number(original) : null,
+    stock: Number(stock),
+    image,
+    category
+  });
+  loadProducts(category, containerId);
+});
 
     // Load all categories
     loadProducts("Wines", "wines");
