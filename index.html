@@ -747,7 +747,7 @@ flex-wrap: wrap;
     // Load products by category from Firestore
     async function loadProducts(category, containerId) {
   const container = document.getElementById(containerId);
-  container.innerHTML = getSkeletons(2); // Show skeletons while loading
+  container.innerHTML = getSkeletons(4); // Show skeletons while loading
 
   const q = query(collection(db, "products"), where("category", "==", category));
   const snapshot = await getDocs(q);
