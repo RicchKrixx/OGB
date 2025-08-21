@@ -307,9 +307,9 @@ async function renderSuggestions(){
     <div class="suggested-grid">
       ${suggestions.map(p=>`
         <div class="suggested-item">
-          <img src="${p.img}" alt="${p.name}">
+         <img src="${p.imageUrl}" alt="${p.name}">
           <h4>${p.name}</h4>
-          <p>GH₵ ${p.price}</p>
+          <p>GH₵ ${p.price.toFixed(2)}</p>
           <button onclick="addSuggested('${p.id}')">Add to Cart</button>
         </div>
       `).join("")}
@@ -380,10 +380,10 @@ function renderCart(){
       const div = document.createElement("div");
       div.className = "cart-item";
       div.innerHTML = `
-        <img src="${item.img}" alt="${item.name}">
+       <img src="${p.imageUrl}" alt="${p.name}">
         <div>
           <strong>${item.name}</strong><br/>
-          GH₵ ${item.price} each
+          GH₵ ${item.price.toFixed(2)} each
         </div>
         <div class="qty">
           <button onclick="decrease(${i})">-</button>
@@ -428,8 +428,11 @@ document.getElementById("year").textContent = new Date().getFullYear();
 renderCart();
 updateBadge();
 
-// expose addSuggested to window (needed for onclick)
+// expose functions to window (needed for inline onclick)
 window.addSuggested = addSuggested;
+window.increase = increase;
+window.decrease = decrease;
+window.removeItem = removeItem;
 </script>
 <script>
   const hamburger = document.getElementById('hamburger');
