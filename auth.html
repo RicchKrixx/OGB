@@ -131,24 +131,36 @@
       font-size: 1.1rem;
       color: #6b7280;
     }
-.loader {
-  height: 3px;
-  width: 60px;
-  background: linear-gradient(#000 0 0) right/51% 100% no-repeat;
+.page-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5); /* semi-transparent overlay */
   display: flex;
-  animation: l10-0 2s linear infinite;
-  margin-top: 1rem;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
 }
 
-.loader:before,
-.loader:after {
+.page-loader .loader {
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(#fff 0 0) right/51% 100% no-repeat;
+  display: flex;
+  animation: l10-0 2s linear infinite;
+}
+
+.page-loader .loader:before,
+.page-loader .loader:after {
   content: "";
   width: 15px;
-  background: #000;
+  background: #fff;
   animation: l10-1 2s linear infinite;
 }
 
-.loader:after {
+.page-loader .loader:after {
   animation-delay: -1s;
   --s:-1;
 }
@@ -183,7 +195,9 @@
 
     <div class="switch-link" onclick="toggleMode()">Don't have an account? Sign Up</div>
     <div class="switch-link" onclick="resetPassword()">Forgot Password?</div>
-<div class="loader" id="authLoader" style="display:none; margin: 1rem auto;"></div>
+<div id="pageLoader" class="page-loader" style="display:none;">
+  <div class="loader"></div>
+</div>
   </div>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -243,10 +257,9 @@
   const email = document.getElementById("emailInput").value.trim();
   const password = document.getElementById("passwordInput").value.trim();
   const name = document.getElementById("nameInput").value.trim();
-  const loader = document.getElementById("authLoader");
+  const loader = document.getElementById("pageLoader");
 
-  // Show loader
-  loader.style.display = "block";
+  loader.style.display = "flex"; // show page loader
 
   if (isSignUp) {
     if (!name || !email || !password) {
