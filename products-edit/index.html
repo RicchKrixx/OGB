@@ -104,117 +104,121 @@
   <div class="panel" id="essentials"></div>
 
   <!-- Firebase -->
-  <script type="module">
-    // Import Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } 
-      from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+  import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } 
+    from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-    // TODO: Replace with your Firebase config
-     const firebaseConfig = {
-  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
-  authDomain: "ongod-5073e.firebaseapp.com",
-  projectId: "ongod-5073e",
-  storageBucket: "ongod-5073e.firebasestorage.app",
-  messagingSenderId: "439687837026",
-  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
-  measurementId: "G-1TVP0X3J62"
-};
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const firebaseConfig = {
+    apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+    authDomain: "ongod-5073e.firebaseapp.com",
+    projectId: "ongod-5073e",
+    storageBucket: "ongod-5073e.firebasestorage.app",
+    messagingSenderId: "439687837026",
+    appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+    measurementId: "G-1TVP0X3J62"
+  };
 
-    // Toggle accordion
-    document.querySelectorAll(".accordion").forEach(btn => {
-      btn.addEventListener("click", function() {
-        this.classList.toggle("active");
-        const panel = this.nextElementSibling;
-        panel.style.display = panel.style.display === "block" ? "none" : "block";
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Accordion toggle
+  document.querySelectorAll(".accordion").forEach(btn => {
+    btn.addEventListener("click", function() {
+      this.classList.toggle("active");
+      const panel = this.nextElementSibling;
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    });
+  });
+
+  // Render products by category
+  async function loadProducts(category, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "<p>Loading...</p>";
+
+    const q = query(collection(db, "products"), where("category", "==", category));
+    const snapshot = await getDocs(q);
+
+    container.innerHTML = "";
+    snapshot.forEach(docSnap => {
+      const product = docSnap.data();
+      const div = document.createElement("div");
+      div.className = "product";
+      div.innerHTML = `
+        <img src="${product.image || 'https://via.placeholder.com/50'}" />
+        <div class="product-info">
+          <strong>${product.name}</strong><br>
+          ${product.originalPrice ? `<span style="text-decoration: line-through; color: gray;">GH₵${product.originalPrice}</span> ` : ""}
+          GH₵${product.price} | Stock: ${product.stock}
+        </div>
+        <div class="product-actions">
+          <button class="edit-btn">Edit</button>
+          <button class="delete-btn">Delete</button>
+        </div>
+      `;
+
+      // Delete
+      div.querySelector(".delete-btn").addEventListener("click", async () => {
+        await deleteDoc(doc(db, "products", docSnap.id));
+        loadProducts(category, containerId);
       });
+
+      // Edit
+      div.querySelector(".edit-btn").addEventListener("click", async () => {
+        const newName = prompt("Enter new name", product.name);
+        const newPrice = prompt("Enter new price", product.price);
+        const newOriginal = prompt("Enter original price (optional)", product.originalPrice || "");
+        const newStock = prompt("Enter new stock", product.stock);
+        await updateDoc(doc(db, "products", docSnap.id), {
+          name: newName,
+          price: Number(newPrice),
+          originalPrice: newOriginal ? Number(newOriginal) : null,
+          stock: Number(newStock)
+        });
+        loadProducts(category, containerId);
+      });
+
+      container.appendChild(div);
     });
 
-    // Render products by category
-    async function loadProducts(category, containerId) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = "<p>Loading...</p>";
+    // Add new product form
+    const form = document.createElement("div");
+    form.className = "add-form";
+    form.innerHTML = `
+      <h4>Add New ${category}</h4>
+      <input type="text" placeholder="Name" id="${containerId}-name" />
+      <input type="number" placeholder="Price" id="${containerId}-price" />
+      <input type="number" placeholder="Original Price (optional)" id="${containerId}-original" />
+      <input type="number" placeholder="Stock" id="${containerId}-stock" />
+      <input type="text" placeholder="Image URL" id="${containerId}-image" />
+      <button>Add</button>
+    `;
 
-      const q = query(collection(db, "products"), where("category", "==", category));
-      const snapshot = await getDocs(q);
+    form.querySelector("button").addEventListener("click", async () => {
+      const name = document.getElementById(`${containerId}-name`).value;
+      const price = document.getElementById(`${containerId}-price`).value;
+      const original = document.getElementById(`${containerId}-original`).value;
+      const stock = document.getElementById(`${containerId}-stock`).value;
+      const image = document.getElementById(`${containerId}-image`).value;
+      if(!name || !price || !stock) return alert("Please fill all required fields");
+      await addDoc(collection(db, "products"), {
+        name,
+        price: Number(price),
+        originalPrice: original ? Number(original) : null,
+        stock: Number(stock),
+        image,
+        category
+      });
+      loadProducts(category, containerId);
+    });
 
-      container.innerHTML = "";
-      snapshot.forEach(docSnap => {
-        const product = docSnap.data();
-        const div = document.createElement("div");
-        div.className = "product";
-        div.innerHTML = `
-          <img src="${product.image || 'https://via.placeholder.com/50'}" />
-          <div class="product-info">
-            <strong>${product.name}</strong><br>
-<div class="product-info">
-  <strong>${product.name}</strong><br>
-  ${product.originalPrice ? `<span style="text-decoration: line-through; color: gray;">GH₵${product.originalPrice}</span> ` : ""}
-  GH₵${product.price} | Stock: ${product.stock}
-</div>
-            GH₵${product.price} | Stock: ${product.stock}
-          </div>
-          <div class="product-actions">
-            <button class="edit-btn">Edit</button>
-            <button class="delete-btn">Delete</button>
-          </div>
-        `;
-        // Delete product
-        div.querySelector(".delete-btn").addEventListener("click", async () => {
-          await deleteDoc(doc(db, "products", docSnap.id));
-          loadProducts(category, containerId);
-        });
-        // Edit product
-        // Edit product
-div.querySelector(".edit-btn").addEventListener("click", async () => {
-  const newName = prompt("Enter new name", product.name);
-  const newPrice = prompt("Enter new price", product.price);
-  const newOriginal = prompt("Enter original price (optional)", product.originalPrice || "");
-  const newStock = prompt("Enter new stock", product.stock);
-  await updateDoc(doc(db, "products", docSnap.id), {
-    name: newName,
-    price: Number(newPrice),
-    originalPrice: newOriginal ? Number(newOriginal) : null,
-    stock: Number(newStock)
-  });
-  loadProducts(category, containerId);
-});
-      // Add new product form
-      const form = document.createElement("div");
-      form.className = "add-form";
-      form.innerHTML = `
-  <h4>Add New ${category}</h4>
-  <input type="text" placeholder="Name" id="${containerId}-name" />
-  <input type="number" placeholder="Price" id="${containerId}-price" />
-  <input type="number" placeholder="Original Price (optional)" id="${containerId}-original" />
-  <input type="number" placeholder="Stock" id="${containerId}-stock" />
-  <input type="text" placeholder="Image URL" id="${containerId}-image" />
-  <button>Add</button>
-`;
+    container.appendChild(form);
+  }
 
-form.querySelector("button").addEventListener("click", async () => {
-  const name = document.getElementById(`${containerId}-name`).value;
-  const price = document.getElementById(`${containerId}-price`).value;
-  const original = document.getElementById(`${containerId}-original`).value;
-  const stock = document.getElementById(`${containerId}-stock`).value;
-  const image = document.getElementById(`${containerId}-image`).value;
-  await addDoc(collection(db, "products"), {
-    name,
-    price: Number(price),
-    originalPrice: original ? Number(original) : null,
-    stock: Number(stock),
-    image,
-    category
-  });
-  loadProducts(category, containerId);
-});
-
-    // Load all categories
-    loadProducts("Wines", "wines");
-    loadProducts("Liquors", "liquors");
-    loadProducts("Essentials", "essentials");
-  </script>
+  // Load all categories (must match Firestore category exactly)
+  loadProducts("Wines", "wines");
+  loadProducts("Liquors", "liquors");
+  loadProducts("Essentials", "essentials");
+</script>
 </body>
 </html>
