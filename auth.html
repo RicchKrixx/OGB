@@ -286,10 +286,14 @@
 
       alert("Signup successful!");
       window.location.href = "index.html";
-    } catch (error) {
-      console.error("Signup Error:", error.code, error.message);
-      alert(error.message);
-    } finally {
+    } 
+catch (error) {
+  console.error("Signup Error:", error.code, error.message);
+  // Remove "Firebase: " prefix if it exists
+  const msg = error.message.replace(/^Firebase:\s*/, '');
+  alert(msg);
+}
+ finally {
       loader.style.display = "none";
     }
   } else {
@@ -298,9 +302,11 @@
       alert("Login successful!");
       window.location.href = "index.html";
     } catch (error) {
-      console.error("Login Error:", error.code, error.message);
-      alert(error.message);
-    } finally {
+  console.error("Login Error:", error.code, error.message);
+  const msg = error.message.replace(/^Firebase:\s*/, '');
+  alert(msg);
+}
+ finally {
       loader.style.display = "none";
     }
   }
@@ -331,9 +337,10 @@
         alert("Password reset email sent! Check your inbox.");
       })
       .catch(error => {
-        console.error("Password Reset Error:", error.code, error.message);
-        alert("Error: " + error.message);
-      });
+  console.error("Password Reset Error:", error.code, error.message);
+  const msg = error.message.replace(/^Firebase:\s*/, '');
+  alert(msg);
+});
   };
 </script>
 
