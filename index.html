@@ -542,6 +542,30 @@ justify-content: center;
 font-size: 16px;
 flex-wrap: wrap;
 }
+ /* Toast message style */
+    #toast {
+      visibility: hidden;
+      min-width: 200px;
+      background: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 12px;
+      position: fixed;
+      z-index: 1000;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.5s, bottom 0.5s;
+    }
+
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+      bottom: 50px;
+    }
 </style>
 </head>
 <body>
@@ -640,6 +664,19 @@ flex-wrap: wrap;
     <div class="grid" id="grid-essentials"></div>
   </section>
 </div>
+ <!-- Toast container -->
+  <div id="toast">✅ Item added to cart</div>
+
+  <script>
+    function addToCart() {
+      // your existing add-to-cart logic goes here
+
+      // show toast
+      let toast = document.getElementById("toast");
+      toast.className = "show";
+      setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2000);
+    }
+  </script>
 <section class="shop">
   <h2>Our Shop</h2>
   <video width="100%" controls>
