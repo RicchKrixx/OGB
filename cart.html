@@ -263,25 +263,36 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
   © <span id="year"></span> On God Bend OGB — All Rights Reserved.
 </footer>
 
-<script>
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-const firebaseConfig = { /* your config */ };
+// 🔥 Your Firebase config
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// ---------------------------
+// Suggested products
+// ---------------------------
 async function renderSuggestions(){
   const container = document.getElementById("suggestedProducts");
-  const productsRef = collection(db, "products"); // 🔥 adjust if your collection is named differently
+  const productsRef = collection(db, "products");
   const snapshot = await getDocs(productsRef);
 
   let allProducts = [];
-  snapshot.forEach(doc => {
-    allProducts.push({ id: doc.id, ...doc.data() });
+  snapshot.forEach(docSnap => {
+    allProducts.push({ id: docSnap.id, ...docSnap.data() });
   });
 
-  // pick random 4
+  // Pick random 4
   const shuffled = allProducts.sort(() => 0.5 - Math.random());
   const suggestions = shuffled.slice(0, 4);
 
@@ -320,23 +331,29 @@ async function addSuggested(productId){
       cart.push({...product, qty:1});
     }
     saveCart(cart);
+    updateBadge(); // refresh badge instantly
   }
 }
 
-
-// Update year
-document.getElementById("year").textContent = new Date().getFullYear();
-
+// ---------------------------
 // Cart functions
-function getCart(){ return JSON.parse(localStorage.getItem("cart"))||[]; }
-function saveCart(cart){ localStorage.setItem("cart",JSON.stringify(cart)); updateBadge(); renderCart(); }
+// ---------------------------
+function getCart(){ 
+  return JSON.parse(localStorage.getItem("cart"))||[]; 
+}
+
+function saveCart(cart){ 
+  localStorage.setItem("cart",JSON.stringify(cart)); 
+  updateBadge(); 
+  renderCart(); 
+}
+
 function updateBadge() {
   const cart = getCart();
   const totalQty = cart.reduce((sum, item) => sum + item.qty, 0); 
   document.getElementById("cartCount").textContent = totalQty;
 }
 
-// Render cart items
 function renderCart(){
   const list = document.getElementById("cartList");
   const cart = getCart();
@@ -353,7 +370,8 @@ function renderCart(){
         <a href="index.html">Continue Shopping</a>
       </div>
     `;
-    footer.style.display = "none";   // 🔥 hide subtotal + checkout
+    footer.style.display = "none";   // hide subtotal + checkout
+    renderSuggestions();             // ✅ only show suggestions if empty
     return; 
   }
 
@@ -381,13 +399,36 @@ function renderCart(){
   });
   document.getElementById("subtotal").textContent = "GH₵ "+subtotal;
 }
-function increase(i){ let cart=getCart(); cart[i].qty++; saveCart(cart); }
-function decrease(i){ let cart=getCart(); if(cart[i].qty>1){ cart[i].qty--; saveCart(cart); } }
-function removeItem(i){ let cart=getCart(); cart.splice(i,1); saveCart(cart); }
 
+function increase(i){ 
+  let cart=getCart(); 
+  cart[i].qty++; 
+  saveCart(cart); 
+}
+
+function decrease(i){ 
+  let cart=getCart(); 
+  if(cart[i].qty>1){ 
+    cart[i].qty--; 
+    saveCart(cart); 
+  } 
+}
+
+function removeItem(i){ 
+  let cart=getCart(); 
+  cart.splice(i,1); 
+  saveCart(cart); 
+}
+
+// ---------------------------
+// Init
+// ---------------------------
+document.getElementById("year").textContent = new Date().getFullYear();
 renderCart();
 updateBadge();
-renderSuggestions();
+
+// expose addSuggested to window (needed for onclick)
+window.addSuggested = addSuggested;
 </script>
 <script>
   const hamburger = document.getElementById('hamburger');
