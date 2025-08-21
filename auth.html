@@ -220,7 +220,7 @@
     addDoc
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // 🔑 Your Firebase Config
+  // 🔑 Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
     authDomain: "ongod-5073e.firebaseapp.com",
@@ -235,7 +235,7 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // ✅ Setup Google Provider properly
+  // ✅ Google Provider
   const provider = new GoogleAuthProvider();
   provider.addScope("profile");
   provider.addScope("email");
@@ -243,6 +243,7 @@
 
   let isSignUp = false;
 
+  // 🔹 Toggle Sign In / Sign Up
   window.toggleMode = function () {
     isSignUp = !isSignUp;
     document.getElementById("formTitle").textContent = isSignUp ? "Sign Up" : "Sign In";
@@ -253,123 +254,100 @@
     document.getElementById("nameInput").style.display = isSignUp ? "block" : "none";
   };
 
+  // 🔹 Handle Sign Up / Sign In
   window.handleAuth = async function () {
-  const email = document.getElementById("loginInput").value.trim();
-  const password = document.getElementById("passwordInput").value.trim();
-  const name = document.getElementById("nameInput").value.trim();
-  const loader = document.getElementById("pageLoader");
+    const email = document.getElementById("loginInput").value.trim();
+    const password = document.getElementById("passwordInput").value.trim();
+    const name = document.getElementById("nameInput").value.trim();
+    const loader = document.getElementById("pageLoader");
 
-  loader.style.display = "flex"; // show page loader
+    loader.style.display = "flex"; // show loader
 
-  if (isSignUp) {
-    if (!name || !email || !password) {
-      alert("Please fill all fields.");
-      loader.style.display = "none";
-      return;
+    if (isSignUp) {
+      // SIGN UP
+      try {
+        if (!name || !email || !password) throw new Error("Please fill all fields.");
+
+        // Check if username exists
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("username", "==", name.toLowerCase()));
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) throw new Error("Username already exists. Choose a different one.");
+
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        await updateProfile(user, { displayName: name });
+        await addDoc(usersRef, { uid: user.uid, username: name.toLowerCase(), email });
+
+        alert("Signup successful!");
+        window.location.href = "index.html";
+      } catch (error) {
+        const msg = error.message.replace(/^Firebase:\s*/, '');
+        alert(msg);
+      } finally {
+        loader.style.display = "none";
+      }
+    } else {
+      // SIGN IN
+      try {
+        let loginValue = email;
+        if (!loginValue || !password) throw new Error("Please fill all fields.");
+
+        let emailToLogin = loginValue;
+        if (!loginValue.includes("@")) {
+          // Treat as username
+          const usersRef = collection(db, "users");
+          const q = query(usersRef, where("username", "==", loginValue.toLowerCase()));
+          const snapshot = await getDocs(q);
+
+          if (snapshot.empty) throw new Error("No account found with that username.");
+          emailToLogin = snapshot.docs[0].data().email;
+        }
+
+        await signInWithEmailAndPassword(auth, emailToLogin, password);
+        alert("Login successful!");
+        window.location.href = "index.html";
+      } catch (error) {
+        const msg = error.message.replace(/^Firebase:\s*/, '');
+        alert(msg);
+      } finally {
+        loader.style.display = "none";
+      }
     }
+  };
+
+  // 🔹 Google Sign In
+  window.signInWithGoogle = async function () {
+    const loader = document.getElementById("pageLoader");
+    loader.style.display = "flex";
 
     try {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("username", "==", name.toLowerCase()));
-      const snapshot = await getDocs(q);
-
-      if (!snapshot.empty) {
-        alert("Username already exists. Choose a different one.");
-        loader.style.display = "none";
-        return;
-      }
-
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      await updateProfile(user, { displayName: name });
-      await addDoc(usersRef, { uid: user.uid, username: name.toLowerCase(), email });
-
-      alert("Signup successful!");
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      alert(`Welcome ${user.displayName || "User"}!`);
       window.location.href = "index.html";
-    } 
-catch (error) {
-  console.error("Signup Error:", error.code, error.message);
-  // Remove "Firebase: " prefix if it exists
-  const msg = error.message.replace(/^Firebase:\s*/, '');
-  alert(msg);
-}
- finally {
+    } catch (error) {
+      const msg = error.message.replace(/^Firebase:\s*/, '');
+      alert("Error: " + msg);
+    } finally {
       loader.style.display = "none";
     }
-  } else {
-  try {
-    let loginValue = document.getElementById("loginInput").value.trim();
-    const password = document.getElementById("passwordInput").value.trim();
+  };
 
-    if (!loginValue || !password) {
-      alert("Please fill all fields.");
-      loader.style.display = "none";
-      return;
-    }
-
-    let emailToLogin = loginValue;
-
-    // If it's not an email, treat as username
-    if (!loginValue.includes("@")) {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("username", "==", loginValue.toLowerCase()));
-      const snapshot = await getDocs(q);
-
-      if (snapshot.empty) {
-        alert("No account found with that username.");
-        loader.style.display = "none";
-        return;
-      }
-
-      emailToLogin = snapshot.docs[0].data().email;
-    }
-
-    await signInWithEmailAndPassword(auth, emailToLogin, password);
-    alert("Login successful!");
-    window.location.href = "index.html";
-
-  } catch (error) {
-    console.error("Login Error:", error.code, error.message);
-    const msg = error.message.replace(/^Firebase:\s*/, '');
-    alert(msg);
-  } finally {
-    loader.style.display = "none";
-  }
-} // <-- closes handleAuth properly
-
-// ✅ Google Sign-In (now global)
-window.signInWithGoogle = async function () {
-  const loader = document.getElementById("pageLoader");
-  loader.style.display = "flex";
-
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    alert(`Welcome ${user.displayName || "User"}!`);
-    window.location.href = "index.html";
-  } catch (error) {
-    console.error("Google Sign-In Error:", error.code, error.message);
-    alert("Error: " + error.message);
-  } finally {
-    loader.style.display = "none";
-  }
-};
+  // 🔹 Reset Password
   window.resetPassword = function () {
     const email = prompt("Enter your email to reset your password:");
     if (!email) return;
 
     sendPasswordResetEmail(auth, email)
-      .then(() => {
-        alert("Password reset email sent! Check your inbox.");
-      })
+      .then(() => alert("Password reset email sent! Check your inbox."))
       .catch(error => {
-  console.error("Password Reset Error:", error.code, error.message);
-  const msg = error.message.replace(/^Firebase:\s*/, '');
-  alert(msg);
-});
+        const msg = error.message.replace(/^Firebase:\s*/, '');
+        alert(msg);
+      });
   };
 </script>
-
 <script>
   function togglePassword() {
     const input = document.getElementById("passwordInput");
