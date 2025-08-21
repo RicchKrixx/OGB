@@ -335,11 +335,12 @@ catch (error) {
   } finally {
     loader.style.display = "none";
   }
-}
-  // ✅ Updated Google Sign-In
-  window.signInWithGoogle = async function () {
+} // <-- closes handleAuth properly
+
+// ✅ Google Sign-In (now global)
+window.signInWithGoogle = async function () {
   const loader = document.getElementById("pageLoader");
-+ loader.style.display = "flex";
+  loader.style.display = "flex";
 
   try {
     const result = await signInWithPopup(auth, provider);
