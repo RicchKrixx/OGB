@@ -307,7 +307,7 @@ async function renderSuggestions(){
     <div class="suggested-grid">
       ${suggestions.map(p=>`
         <div class="suggested-item">
-         <img src="${p.imageUrl}" alt="${p.name}">
+         <img src="${p.imgUrl}" alt="${p.name}">
           <h4>${p.name}</h4>
           <p>GH₵ ${p.price.toFixed(2)}</p>
           <button onclick="addSuggested('${p.id}')">Add to Cart</button>
