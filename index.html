@@ -770,43 +770,46 @@ async function loadAllProducts() {
       document.getElementById("year").textContent = new Date().getFullYear();
 
       // Search input handler
-      const searchInput = document.getElementById("searchInput");
-      const noResults = document.getElementById("noResults");
-      searchInput.addEventListener("input", () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const filteredProducts = allProducts.filter(product =>
-          product.name.toLowerCase().includes(searchTerm)
-        );
+      const searchInput = document.getElementById('searchInput');
+const sections = document.querySelectorAll('.sections .section');
+const noResults = document.getElementById('noResults');
 
-        // Hide or show sections based on search results
-        const sections = ["wines", "liquors", "essentials"];
-        sections.forEach(section => {
-          const container = document.getElementById(`grid-${section}`);
-          container.innerHTML = getSkeletons(2); // Show skeletons during filter
-          setTimeout(() => {
-            container.innerHTML = ""; // Clear skeletons
-            const categoryProducts = filteredProducts.filter(p => p.category.toLowerCase() === section);
-            if (categoryProducts.length === 0) {
-              container.innerHTML = `<p>No ${section} found.</p>`;
-            } else {
-              categoryProducts.forEach(product => {
-                const div = document.createElement("div");
-                div.className = "card";
-                div.innerHTML = `
-                  <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
-                  <h3>${product.name}</h3>
-                  <div class="price">GH₵ ${product.price}</div>
-                  <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">Add to Cart</button>
-                `;
-                container.appendChild(div);
-              });
-            }
-          }, 500); // Simulate loading delay
-        });
+searchInput.addEventListener('input', () => {
+const query = searchInput.value.toLowerCase().trim();
+let anyVisible = false;
 
-        // Show/hide no results message
-        noResults.classList.toggle("hidden", filteredProducts.length > 0);
-      });
+sections.forEach(section => {
+const sectionTitle = section.querySelector('h2')?.textContent.toLowerCase() || '';
+const products = section.querySelectorAll('.card');
+let sectionMatch = sectionTitle.includes(query);
+let productVisible = false;
+
+products.forEach(product => {    
+  const productName = product.querySelector('h3')?.textContent.toLowerCase() || '';    
+  if(productName.includes(query) || sectionMatch) {    
+    product.classList.remove('hidden');    
+    productVisible = true;    
+  } else {    
+    product.classList.add('hidden');    
+  }    
+});    
+
+if(sectionMatch || productVisible) {    
+  section.classList.remove('hidden');    
+  anyVisible = true;    
+} else {    
+  section.classList.add('hidden');    
+}
+
+});
+
+if(!anyVisible && query !== "") {
+noResults.style.display = 'block';
+} else {
+noResults.style.display = 'none';
+}
+});
+
     });
 
     // Cart functions
