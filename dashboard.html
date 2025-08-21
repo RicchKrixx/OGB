@@ -1,87 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OGB • Customer Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OGB Dashboard</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #f7faff; color: #222; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f5f7fa;
+    }
     header {
-      background: linear-gradient(135deg, #ff2525, #ffe53b);
-      color: white; text-align: center;
-      padding: 20px; font-size: 22px; font-weight: bold;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      background: #222;
+      color: #fff;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .container {
+      padding: 20px;
     }
     .profile {
-      display: flex; flex-direction: column; align-items: center;
-      margin-top: 15px;
+      text-align: center;
+      margin-bottom: 20px;
     }
     .profile img {
-      width: 100px; height: 100px; border-radius: 50%;
-      object-fit: cover; margin-bottom: 10px;
-      border: 3px solid #ffe53b;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
     }
-    .profile input {
-      display: none;
+    .settings {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .profile button {
-      margin: 5px;
-      padding: 8px 15px;
+    .settings h3 {
+      margin-bottom: 15px;
+    }
+    .settings button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;
+      font-weight: bold;
     }
-    .upload-btn { background: #4caf50; color: white; }
-    .remove-btn { background: #ff2525; color: white; }
-    .dashboard { max-width: 800px; margin: 20px auto; padding: 15px; }
-    .card {
-      background: white; padding: 15px; border-radius: 12px;
-      margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    .card h2 { font-size: 18px; margin-bottom: 10px; }
-    .logout-btn {
-      display: block; width: 100%; padding: 12px;
-      background: #ff2525; color: white; text-align: center;
-      border: none; border-radius: 8px; cursor: pointer;
-      font-size: 16px; margin-top: 15px;
-    }
-    .logout-btn:hover { background: #d91c1c; }
+    .change { background: #3498db; color: #fff; }
+    .remove { background: #e67e22; color: #fff; }
+    .delete { background: #e74c3c; color: #fff; }
+    .logout { background: #555; color: #fff; }
+    .home { background: #27ae60; color: #fff; margin-top: 20px; }
   </style>
 </head>
 <body>
-  <header>Customer Dashboard</header>
+  <header>
+    <h2>OGB Dashboard</h2>
+    <img id="navProfilePic" src="default.png" alt="Profile">
+  </header>
 
-  <div class="dashboard">
-
+  <div class="container">
     <div class="profile">
-      <img id="profilePic" src="https://i.postimg.cc/7LmbxZ7L/avatar.png" alt="Profile Picture">
-      <h2 id="customerName">Loading...</h2>
-      <p id="customerEmail">Loading...</p>
-
-      <input type="file" id="uploadInput" accept="image/*">
-      <button class="upload-btn" onclick="document.getElementById('uploadInput').click()">Change Picture</button>
-      <button class="remove-btn" onclick="removeProfilePic()">Remove Picture</button>
+      <img id="profilePic" src="default.png" alt="Profile">
+      <h2 id="userName">Loading...</h2>
+      <p id="userEmail"></p>
     </div>
 
-    <div class="card">
-      <h2>My Orders</h2>
-      <ul class="orders" id="ordersList">
-        <li><span>Loading orders...</span></li>
-      </ul>
+    <div class="settings">
+      <h3>Settings</h3>
+      <input type="file" id="fileInput" style="display:none" accept="image/*">
+      <button class="change" onclick="document.getElementById('fileInput').click()">Change Profile Picture</button>
+      <button class="remove" onclick="removeProfilePicture()">Remove Profile Picture</button>
+      <button class="delete" onclick="deleteAccount()">Delete Account</button>
+      <button class="logout" onclick="logout()">Logout</button>
+      <button class="home" onclick="goHome()">Go Back Home</button>
     </div>
-
-    <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <!-- Firebase SDKs -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
 
-    // 🔹 Your Firebase config
+  <script>
+    // 🔥 Firebase Config
      const firebaseConfig = {
   apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
   authDomain: "ongod-5073e.firebaseapp.com",
@@ -91,71 +104,79 @@
   appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
   measurementId: "G-1TVP0X3J62"
 };
-    // Init
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // Initialize
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
     const profilePic = document.getElementById("profilePic");
-    const uploadInput = document.getElementById("uploadInput");
+    const navProfilePic = document.getElementById("navProfilePic");
+    const userName = document.getElementById("userName");
+    const userEmail = document.getElementById("userEmail");
+    const fileInput = document.getElementById("fileInput");
 
-    // 🔹 Load stored picture from localStorage
-    const savedPic = localStorage.getItem("profilePic");
-    if (savedPic) profilePic.src = savedPic;
-
-    // 🔹 Upload new picture
-    uploadInput.addEventListener("change", (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          profilePic.src = e.target.result;
-          localStorage.setItem("profilePic", e.target.result);
-        }
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // 🔹 Remove picture
-    window.removeProfilePic = function() {
-      localStorage.removeItem("profilePic");
-      profilePic.src = "https://i.postimg.cc/7LmbxZ7L/avatar.png";
-    }
-
-    // 🔹 Watch user login
-    onAuthStateChanged(auth, async (user) => {
+    // 🟢 Load User Data
+    auth.onAuthStateChanged(async (user) => {
       if (user) {
-        document.getElementById("customerName").textContent = user.displayName || "Customer";
-        document.getElementById("customerEmail").textContent = user.email;
+        userName.textContent = user.displayName || "OGB Customer";
+        userEmail.textContent = user.email;
 
-        // Orders from Firestore
-        const ordersRef = collection(db, "orders");
-        const q = query(ordersRef, where("userId", "==", user.uid));
-        const querySnapshot = await getDocs(q);
-
-        const ordersList = document.getElementById("ordersList");
-        ordersList.innerHTML = "";
-
-        if (querySnapshot.empty) {
-          ordersList.innerHTML = "<li><span>No orders yet</span></li>";
-        } else {
-          querySnapshot.forEach((doc) => {
-            const order = doc.data();
-            const li = document.createElement("li");
-            li.innerHTML = `<span>Order #${doc.id}</span><span>Status: ${order.status || "Pending"}</span>`;
-            ordersList.appendChild(li);
-          });
+        if (user.photoURL) {
+          profilePic.src = user.photoURL;
+          navProfilePic.src = user.photoURL;
         }
       } else {
-        window.location.href = "login.html"; 
+        window.location.href = "login.html"; // Redirect if not logged in
       }
     });
 
-    // 🔹 Logout
-    window.logout = function() {
-      signOut(auth).then(() => {
-        window.location.href = "login.html";
-      });
+    // 📤 Change Profile Picture
+    fileInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const user = auth.currentUser;
+      const storageRef = storage.ref(`profilePics/${user.uid}`);
+      await storageRef.put(file);
+      const url = await storageRef.getDownloadURL();
+      await user.updateProfile({ photoURL: url });
+      await db.collection("users").doc(user.uid).set({
+        name: user.displayName || "OGB Customer",
+        email: user.email,
+        photoURL: url
+      }, { merge: true });
+      profilePic.src = url;
+      navProfilePic.src = url;
+    });
+
+    // ❌ Remove Profile Picture
+    async function removeProfilePicture() {
+      const user = auth.currentUser;
+      await user.updateProfile({ photoURL: "" });
+      await db.collection("users").doc(user.uid).update({ photoURL: "" });
+      profilePic.src = "default.png";
+      navProfilePic.src = "default.png";
+    }
+
+    // 🗑 Delete Account
+    async function deleteAccount() {
+      if (confirm("Are you sure you want to delete your account? This cannot be undone.")) {
+        const user = auth.currentUser;
+        await db.collection("users").doc(user.uid).delete();
+        await user.delete();
+        alert("Account deleted successfully");
+        window.location.href = "signup.html";
+      }
+    }
+
+    // 🚪 Logout
+    function logout() {
+      auth.signOut().then(() => window.location.href = "login.html");
+    }
+
+    // 🏠 Go Home
+    function goHome() {
+      window.location.href = "index.html";
     }
   </script>
 </body>
