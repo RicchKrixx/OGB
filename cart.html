@@ -372,33 +372,33 @@ function renderCart(){
       </div>
     `;
     footer.style.display = "none";   // hide subtotal + checkout
-    renderSuggestions();             // ✅ only show suggestions if empty
-    return; 
+  } else {
+    footer.style.display = "block";
+
+    cart.forEach((item,i)=>{
+      subtotal += item.price*item.qty;
+      const div = document.createElement("div");
+      div.className = "cart-item";
+      div.innerHTML = `
+        <img src="${item.img}" alt="${item.name}">
+        <div>
+          <strong>${item.name}</strong><br/>
+          GH₵ ${item.price} each
+        </div>
+        <div class="qty">
+          <button onclick="decrease(${i})">-</button>
+          <span>${item.qty}</span>
+          <button onclick="increase(${i})">+</button>
+          <button style="margin-left:6px;background:#f44336;color:#fff;" onclick="removeItem(${i})">×</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+    document.getElementById("subtotal").textContent = "GH₵ "+subtotal;
   }
 
-  // If not empty, show footer
-  footer.style.display = "block";
-
-  cart.forEach((item,i)=>{
-    subtotal += item.price*item.qty;
-    const div = document.createElement("div");
-    div.className = "cart-item";
-    div.innerHTML = `
-      <img src="${item.img}" alt="${item.name}">
-      <div>
-        <strong>${item.name}</strong><br/>
-        GH₵ ${item.price} each
-      </div>
-      <div class="qty">
-        <button onclick="decrease(${i})">-</button>
-        <span>${item.qty}</span>
-        <button onclick="increase(${i})">+</button>
-        <button style="margin-left:6px;background:#f44336;color:#fff;" onclick="removeItem(${i})">×</button>
-      </div>
-    `;
-    list.appendChild(div);
-  });
-  document.getElementById("subtotal").textContent = "GH₵ "+subtotal;
+  // ✅ Always show suggested products
+  renderSuggestions(); 
 }
 
 function increase(i){ 
