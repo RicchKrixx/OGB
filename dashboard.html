@@ -13,17 +13,34 @@
       padding: 20px; font-size: 22px; font-weight: bold;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
+    .profile {
+      display: flex; flex-direction: column; align-items: center;
+      margin-top: 15px;
+    }
+    .profile img {
+      width: 100px; height: 100px; border-radius: 50%;
+      object-fit: cover; margin-bottom: 10px;
+      border: 3px solid #ffe53b;
+    }
+    .profile input {
+      display: none;
+    }
+    .profile button {
+      margin: 5px;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .upload-btn { background: #4caf50; color: white; }
+    .remove-btn { background: #ff2525; color: white; }
     .dashboard { max-width: 800px; margin: 20px auto; padding: 15px; }
     .card {
       background: white; padding: 15px; border-radius: 12px;
       margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .card h2 { font-size: 18px; margin-bottom: 10px; }
-    .orders li {
-      list-style: none; padding: 10px; border-bottom: 1px solid #eee;
-      display: flex; justify-content: space-between; font-size: 14px;
-    }
-    .orders li:last-child { border-bottom: none; }
     .logout-btn {
       display: block; width: 100%; padding: 12px;
       background: #ff2525; color: white; text-align: center;
@@ -34,34 +51,36 @@
   </style>
 </head>
 <body>
-  <header>
-    Welcome, <span id="customerName">Loading...</span>
-  </header>
+  <header>Customer Dashboard</header>
 
   <div class="dashboard">
+
+    <div class="profile">
+      <img id="profilePic" src="https://i.postimg.cc/7LmbxZ7L/avatar.png" alt="Profile Picture">
+      <h2 id="customerName">Loading...</h2>
+      <p id="customerEmail">Loading...</p>
+
+      <input type="file" id="uploadInput" accept="image/*">
+      <button class="upload-btn" onclick="document.getElementById('uploadInput').click()">Change Picture</button>
+      <button class="remove-btn" onclick="removeProfilePic()">Remove Picture</button>
+    </div>
 
     <div class="card">
       <h2>My Orders</h2>
       <ul class="orders" id="ordersList">
-        <li><span>No orders yet</span></li>
+        <li><span>Loading orders...</span></li>
       </ul>
-    </div>
-
-    <div class="card">
-      <h2>Profile</h2>
-      <p>Email: <span id="customerEmail">Loading...</span></p>
-      <p>UID: <span id="customerUID">Loading...</span></p>
     </div>
 
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
-
   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
     // 🔹 Your Firebase config
      const firebaseConfig = {
   apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
@@ -72,33 +91,72 @@
   appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
   measurementId: "G-1TVP0X3J62"
 };
-    // 🔹 Init Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-
+    // Init
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // 🔹 Watch user state
-    onAuthStateChanged(auth, (user) => {
+    const profilePic = document.getElementById("profilePic");
+    const uploadInput = document.getElementById("uploadInput");
+
+    // 🔹 Load stored picture from localStorage
+    const savedPic = localStorage.getItem("profilePic");
+    if (savedPic) profilePic.src = savedPic;
+
+    // 🔹 Upload new picture
+    uploadInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          profilePic.src = e.target.result;
+          localStorage.setItem("profilePic", e.target.result);
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // 🔹 Remove picture
+    window.removeProfilePic = function() {
+      localStorage.removeItem("profilePic");
+      profilePic.src = "https://i.postimg.cc/7LmbxZ7L/avatar.png";
+    }
+
+    // 🔹 Watch user login
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         document.getElementById("customerName").textContent = user.displayName || "Customer";
         document.getElementById("customerEmail").textContent = user.email;
-        document.getElementById("customerUID").textContent = user.uid;
 
-        // 🔹 Later we can fetch orders from Firestore here
+        // Orders from Firestore
+        const ordersRef = collection(db, "orders");
+        const q = query(ordersRef, where("userId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+
+        const ordersList = document.getElementById("ordersList");
+        ordersList.innerHTML = "";
+
+        if (querySnapshot.empty) {
+          ordersList.innerHTML = "<li><span>No orders yet</span></li>";
+        } else {
+          querySnapshot.forEach((doc) => {
+            const order = doc.data();
+            const li = document.createElement("li");
+            li.innerHTML = `<span>Order #${doc.id}</span><span>Status: ${order.status || "Pending"}</span>`;
+            ordersList.appendChild(li);
+          });
+        }
       } else {
-        window.location.href = "auth.html"; // redirect if not logged in
+        window.location.href = "login.html"; 
       }
     });
 
     // 🔹 Logout
-    function logout() {
+    window.logout = function() {
       signOut(auth).then(() => {
-        window.location.href = "auth.html";
+        window.location.href = "login.html";
       });
     }
-    window.logout = logout;
   </script>
 </body>
 </html>
