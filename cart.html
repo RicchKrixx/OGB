@@ -164,6 +164,63 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 .empty-cart a:hover {
   background: var(--brand-dark);
 }
+.suggested-products {
+  margin-top: 30px;
+}
+
+.suggested-products h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: var(--ink);
+}
+
+.suggested-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.suggested-item {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+  text-align: center;
+}
+
+.suggested-item img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.suggested-item h4 {
+  font-size: 15px;
+  margin: 6px 0;
+}
+
+.suggested-item p {
+  font-weight: bold;
+  color: var(--brand);
+  margin-bottom: 8px;
+}
+
+.suggested-item button {
+  background: var(--brand);
+  border: 0;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.suggested-item button:hover {
+  background: var(--brand-dark);
+}
 </style>
 </head>
 <body>
@@ -201,12 +258,72 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
   <a href="checkout.html" class="checkout-btn">Proceed to Checkout</a>
 </div>
 </section>
-
+<div class="suggested-products" id="suggestedProducts"></div>
 <footer>
   © <span id="year"></span> On God Bend OGB — All Rights Reserved.
 </footer>
 
 <script>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+const firebaseConfig = { /* your config */ };
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function renderSuggestions(){
+  const container = document.getElementById("suggestedProducts");
+  const productsRef = collection(db, "products"); // 🔥 adjust if your collection is named differently
+  const snapshot = await getDocs(productsRef);
+
+  let allProducts = [];
+  snapshot.forEach(doc => {
+    allProducts.push({ id: doc.id, ...doc.data() });
+  });
+
+  // pick random 4
+  const shuffled = allProducts.sort(() => 0.5 - Math.random());
+  const suggestions = shuffled.slice(0, 4);
+
+  if(suggestions.length === 0){
+    container.innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = `
+    <h3>You may also like</h3>
+    <div class="suggested-grid">
+      ${suggestions.map(p=>`
+        <div class="suggested-item">
+          <img src="${p.img}" alt="${p.name}">
+          <h4>${p.name}</h4>
+          <p>GH₵ ${p.price}</p>
+          <button onclick="addSuggested('${p.id}')">Add to Cart</button>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+async function addSuggested(productId){
+  const productRef = doc(db, "products", productId);
+  const productSnap = await getDoc(productRef);
+
+  if(productSnap.exists()){
+    let cart = getCart();
+    let product = { id: productSnap.id, ...productSnap.data() };
+
+    let existing = cart.find(item => item.id === product.id);
+    if(existing){
+      existing.qty++;
+    } else {
+      cart.push({...product, qty:1});
+    }
+    saveCart(cart);
+  }
+}
+
+
 // Update year
 document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -270,6 +387,7 @@ function removeItem(i){ let cart=getCart(); cart.splice(i,1); saveCart(cart); }
 
 renderCart();
 updateBadge();
+renderSuggestions();
 </script>
 <script>
   const hamburger = document.getElementById('hamburger');
