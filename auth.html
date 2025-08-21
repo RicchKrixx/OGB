@@ -338,8 +338,8 @@ catch (error) {
 }
   // ✅ Updated Google Sign-In
   window.signInWithGoogle = async function () {
-  const loader = document.getElementById("authLoader");
-  loader.style.display = "block";
+  const loader = document.getElementById("pageLoader");
++ loader.style.display = "flex";
 
   try {
     const result = await signInWithPopup(auth, provider);
