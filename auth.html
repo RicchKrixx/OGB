@@ -180,7 +180,7 @@
   <div class="auth-container">
     <h2 id="formTitle">Sign In</h2>
     <input type="text" id="nameInput" placeholder="Username" />
-    <input type="email" id="emailInput" placeholder="Email" />
+    <input type="text" id="loginInput" placeholder="Email/Username" />
     <div class="password-wrapper">
       <input type="password" id="passwordInput" placeholder="Password" />
       <span class="toggle-password" onclick="togglePassword()">👁️</span>
@@ -297,20 +297,45 @@ catch (error) {
       loader.style.display = "none";
     }
   } else {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("Login successful!");
-      window.location.href = "index.html";
-    } catch (error) {
-  console.error("Login Error:", error.code, error.message);
-  const msg = error.message.replace(/^Firebase:\s*/, '');
-  alert(msg);
-}
- finally {
+  try {
+    let loginValue = document.getElementById("loginInput").value.trim();
+    const password = document.getElementById("passwordInput").value.trim();
+
+    if (!loginValue || !password) {
+      alert("Please fill all fields.");
       loader.style.display = "none";
+      return;
     }
+
+    let emailToLogin = loginValue;
+
+    // If it's not an email, treat as username
+    if (!loginValue.includes("@")) {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("username", "==", loginValue.toLowerCase()));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        alert("No account found with that username.");
+        loader.style.display = "none";
+        return;
+      }
+
+      emailToLogin = snapshot.docs[0].data().email;
+    }
+
+    await signInWithEmailAndPassword(auth, emailToLogin, password);
+    alert("Login successful!");
+    window.location.href = "index.html";
+
+  } catch (error) {
+    console.error("Login Error:", error.code, error.message);
+    const msg = error.message.replace(/^Firebase:\s*/, '');
+    alert(msg);
+  } finally {
+    loader.style.display = "none";
   }
-};
+}
   // ✅ Updated Google Sign-In
   window.signInWithGoogle = async function () {
   const loader = document.getElementById("authLoader");
