@@ -127,6 +127,44 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
     top: 10px;
   } 
 </style>
+<style>
+.empty-cart {
+  text-align: center;
+  padding: 50px 20px;
+  color: #666;
+}
+
+.empty-cart i {
+  font-size: 70px;
+  color: var(--brand);
+  margin-bottom: 15px;
+}
+
+.empty-cart h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.empty-cart p {
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+.empty-cart a {
+  display: inline-block;
+  background: var(--brand);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.empty-cart a:hover {
+  background: var(--brand-dark);
+}
+</style>
 </head>
 <body>
 <header>
@@ -158,10 +196,10 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 <section class="cart-section">
   <header><strong>🛒 Your Cart</strong></header>
   <div class="cart-list" id="cartList"></div>
-  <div class="cart-footer">
-    <div class="total"><span>Subtotal</span><span id="subtotal">GH₵ 0</span></div>
-    <a href="checkout.html" class="checkout-btn">Proceed to Checkout</a>
-  </div>
+  <div class="cart-footer" id="cartFooter">
+  <div class="total"><span>Subtotal</span><span id="subtotal">GH₵ 0</span></div>
+  <a href="checkout.html" class="checkout-btn">Proceed to Checkout</a>
+</div>
 </section>
 
 <footer>
@@ -185,9 +223,26 @@ function updateBadge() {
 function renderCart(){
   const list = document.getElementById("cartList");
   const cart = getCart();
+  const footer = document.getElementById("cartFooter");
   list.innerHTML = "";
   let subtotal = 0;
-  if(cart.length===0){ list.innerHTML="<p>Your cart is empty.</p>"; document.getElementById("subtotal").textContent="GH₵ 0"; return; }
+
+  if(cart.length===0){ 
+    list.innerHTML = `
+      <div class="empty-cart">
+        <i class="fas fa-shopping-cart"></i>
+        <h2>Your cart is empty</h2>
+        <p>Looks like you haven’t added anything yet.</p>
+        <a href="index.html">Continue Shopping</a>
+      </div>
+    `;
+    footer.style.display = "none";   // 🔥 hide subtotal + checkout
+    return; 
+  }
+
+  // If not empty, show footer
+  footer.style.display = "block";
+
   cart.forEach((item,i)=>{
     subtotal += item.price*item.qty;
     const div = document.createElement("div");
@@ -209,7 +264,6 @@ function renderCart(){
   });
   document.getElementById("subtotal").textContent = "GH₵ "+subtotal;
 }
-
 function increase(i){ let cart=getCart(); cart[i].qty++; saveCart(cart); }
 function decrease(i){ let cart=getCart(); if(cart[i].qty>1){ cart[i].qty--; saveCart(cart); } }
 function removeItem(i){ let cart=getCart(); cart.splice(i,1); saveCart(cart); }
