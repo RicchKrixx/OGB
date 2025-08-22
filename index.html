@@ -1032,27 +1032,27 @@ noResults.style.display = 'none';
   document.getElementById("imgPreview").onclick = function(e) {
     if (e.target === this) this.style.display = "none";
   };
-const form = document.getElementById("newsletterForm");
-const msg = document.getElementById("newsletterMsg");
 
-form.addEventListener("submit", async (e) => {
+
+document.getElementById("newsletterForm").addEventListener("submit", function(e) {
   e.preventDefault();
-  const email = document.getElementById("newsletterEmail").value;
+  const emailInput = document.getElementById("newsletterEmail");
+  const msg = document.getElementById("newsletterMsg");
 
-  try {
-    await db.collection("newsletter").add({
-      email: email,
-      date: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
+  db.collection("newsletter").add({
+    email: emailInput.value,
+    date: firebase.firestore.FieldValue.serverTimestamp()
+  })
+  .then(() => {
     msg.textContent = "✅ Thanks for subscribing!";
     msg.style.color = "green";
-    form.reset();
-  } catch (error) {
-    console.error("Error saving email: ", error);
-    msg.textContent = "❌ Error, try again!";
+    emailInput.value = "";
+  })
+  .catch((error) => {
+    console.error("Error adding document: ", error);
+    msg.textContent = "❌ Something went wrong!";
     msg.style.color = "red";
-  }
+  });
 });
 </script>
 </body>
