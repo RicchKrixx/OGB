@@ -354,11 +354,6 @@ color:var(--brand);
   margin-top: 6px;
   width: 40%;
 }
-.skeleton-stock {
-  height: 14px;
-  margin-top: 4px;
-  width: 70%;
-}
 
 .skeleton-btn {
   height: 32px;
@@ -852,7 +847,6 @@ flex-wrap: wrap;
             <div class="skeleton skeleton-img"></div>
             <div class="skeleton skeleton-text"></div>
             <div class="skeleton skeleton-price"></div>
-    v.       <div class="skeleton skeleton-stock"></div>
             <div class="skeleton skeleton-btn"></div>
           </div>
         `;
@@ -887,7 +881,6 @@ flex-wrap: wrap;
       <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
       <h3>${product.name}</h3>
       <div class="price">${priceHTML}</div>
-  <p class="stock-msg">Only ${item.stock} items left</p>
       <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">Add to Cart</button>
     `;
     container.appendChild(div);
