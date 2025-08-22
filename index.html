@@ -703,6 +703,40 @@ flex-wrap: wrap;
   max-width: 800px;
 }
 </style>
+<section class="newsletter">
+  <h2>📩 Subscribe to our Newsletter</h2>
+  <p>Get updates on new products and exclusive offers!</p>
+  <form id="newsletterForm">
+    <input type="email" id="newsletterEmail" placeholder="Enter your email" required>
+    <button type="submit">Subscribe</button>
+  </form>
+  <p id="newsletterMsg"></p>
+</section>
+
+<style>
+.newsletter {
+  background: #fff;
+  padding: 20px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  margin: 20px;
+}
+.newsletter input {
+  padding: 10px;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.newsletter button {
+  padding: 10px 15px;
+  background: #b8860b;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+</style>
 <!-- FOOTER -->
 <footer>
 <!-- ABOUT -->
@@ -998,6 +1032,28 @@ noResults.style.display = 'none';
   document.getElementById("imgPreview").onclick = function(e) {
     if (e.target === this) this.style.display = "none";
   };
+const form = document.getElementById("newsletterForm");
+const msg = document.getElementById("newsletterMsg");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("newsletterEmail").value;
+
+  try {
+    await db.collection("newsletter").add({
+      email: email,
+      date: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    msg.textContent = "✅ Thanks for subscribing!";
+    msg.style.color = "green";
+    form.reset();
+  } catch (error) {
+    console.error("Error saving email: ", error);
+    msg.textContent = "❌ Error, try again!";
+    msg.style.color = "red";
+  }
+});
 </script>
 </body>
 </html>
