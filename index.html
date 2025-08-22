@@ -913,13 +913,13 @@ noResults.style.display = 'none';
       document.getElementById("cartCount").textContent = totalQty;
     }
 
-    window.addToCart = function(name, price, img) {
+    window.addToCart = function(name, price, image) {
       let cart = getCart();
       let existing = cart.find(i => i.name === name);
       if (existing) {
         existing.qty++;
       } else {
-        cart.push({ name, price, qty: 1, img });
+        cart.push({ name, price, qty: 1, image });
       }
       saveCart(cart);
     };
