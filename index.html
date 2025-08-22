@@ -97,7 +97,8 @@ color:#222;
 }
 .add {
  margin-top:8px; 
-border:0; background:#111; 
+border:0; 
+background:var(--brand); 
 color:#fff; 
 padding:8px 10px; 
 border-radius:10px;
@@ -392,9 +393,6 @@ color:var(--brand);
   color: white;
   cursor: pointer;
 }
-</style>
-
-<style>
   .socials {
     display: flex;
     gap: 8px;
@@ -566,6 +564,67 @@ flex-wrap: wrap;
       opacity: 1;
       bottom: 50px;
     }
+.newsletter {
+  background: #fff;
+  padding: 25px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  margin: 20px;
+}
+
+.newsletter h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.newsletter p {
+  font-size: 14px;
+  margin-bottom: 15px;
+  color: #555;
+}
+
+.newsletter form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.newsletter input {
+  padding: 12px;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: border 0.3s ease;
+}
+
+.newsletter input:focus {
+  border-color: #b8860b;
+}
+
+.newsletter button {
+  padding: 12px 18px;
+  background: #b8860b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.newsletter button:hover {
+  background: #a0740a;
+}
+
+#newsletterMsg {
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: bold;
+}
 </style>
 </head>
 <body>
@@ -705,38 +764,12 @@ flex-wrap: wrap;
 </style>
 <section class="newsletter">
   <h2>📩 Subscribe to our Newsletter</h2>
-  <p>Get updates on new products and exclusive offers!</p>
   <form id="newsletterForm">
     <input type="email" id="newsletterEmail" placeholder="Enter your email" required>
     <button type="submit">Subscribe</button>
   </form>
   <p id="newsletterMsg"></p>
 </section>
-
-<style>
-.newsletter {
-  background: #fff;
-  padding: 20px;
-  text-align: center;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  margin: 20px;
-}
-.newsletter input {
-  padding: 10px;
-  width: 250px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-.newsletter button {
-  padding: 10px 15px;
-  background: #b8860b;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-</style>
 <!-- FOOTER -->
 <footer>
 <!-- ABOUT -->
@@ -1033,27 +1066,26 @@ noResults.style.display = 'none';
     if (e.target === this) this.style.display = "none";
   };
 
+  document.getElementById("newsletterForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const emailInput = document.getElementById("newsletterEmail");
+    const msg = document.getElementById("newsletterMsg");
 
-document.getElementById("newsletterForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-  const emailInput = document.getElementById("newsletterEmail");
-  const msg = document.getElementById("newsletterMsg");
-
-  db.collection("newsletter").add({
-    email: emailInput.value,
-    date: firebase.firestore.FieldValue.serverTimestamp()
-  })
-  .then(() => {
-    msg.textContent = "✅ Thanks for subscribing!";
-    msg.style.color = "green";
-    emailInput.value = "";
-  })
-  .catch((error) => {
-    console.error("Error adding document: ", error);
-    msg.textContent = "❌ Something went wrong!";
-    msg.style.color = "red";
+    db.collection("newsletter").add({
+      email: emailInput.value,
+      date: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+      msg.textContent = "✅ Thanks for subscribing!";
+      msg.style.color = "green";
+      emailInput.value = "";
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      msg.textContent = "❌ Something went wrong!";
+      msg.style.color = "red";
+    });
   });
-});
 </script>
 </body>
 </html>
