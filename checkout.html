@@ -123,9 +123,6 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
       <label><input type="radio" name="pay" value="paystack" /> Pay with Paystack</label>
     </div>
     <button class="place" id="placeOrderBtn" type="submit" disabled>Place Order</button>
-<p id="orderMsg" style="color:red;font-size:14px;margin-top:6px;display:none;">
-  ⚠️ Please wait for the delivery fee and  the total to continue.
-</p>
     <div class="success" id="successBox"></div>
   </form>
 </section>
@@ -179,10 +176,9 @@ function renderOrderSummary(){
   const summary=document.getElementById("orderSummary");
   const cart=getCart();
   const btn=document.getElementById("placeOrderBtn");
-  const msg=document.getElementById("orderMsg");
 
   btn.disabled = true;
-  msg.style.display = "block"; // show warning by default
+  btn.textContent = "Please wait…"; // show waiting state
 
   if(cart.length===0){
     summary.innerHTML="<p>Cart is empty.</p>";
@@ -215,7 +211,9 @@ function renderOrderSummary(){
     `;
 
     btn.disabled = false;
-    msg.style.display = "none"; // hide once ready
+    btn.textContent = document.querySelector("input[name='pay']:checked").value==="paystack" 
+      ? "Pay Now" 
+      : "Place Order"; // restore correct label
   }
 }
 // Geolocation
