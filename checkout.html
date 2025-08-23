@@ -43,6 +43,41 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 .hamburger.active span:nth-child(1){transform:rotate(45deg);top:10px;}
 .hamburger.active span:nth-child(2){opacity:0;}
 .hamburger.active span:nth-child(3){transform:rotate(-45deg);top:10px;}
+<div id="loaderOverlay">
+  <div class="spinner"></div>
+  <p>Processing your order...</p>
+</div>
+
+<style>
+#loaderOverlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255,255,255,0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 9999;
+}
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #b8860b;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { 
+  0% { transform: rotate(0deg); } 
+  100% { transform: rotate(360deg); } 
+}
+#loaderOverlay p {
+  margin-top: 12px;
+  font-weight: 600;
+  color: #333;
+}
+</style>
 </style>
 </head>
 <body>
@@ -53,7 +88,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
       <span></span><span></span><span></span>
     </div>
     <div class="menu" id="menu">
-      <a href="#">Home</a>
+      <a href="index.html">Home</a>
       <a href="#">Shop</a>
       <a href="#">About</a>
       <a href="#">Contact</a>
@@ -170,20 +205,22 @@ document.querySelectorAll("input[name='pay']").forEach(radio=>{
 // Submit order
 function submitOrder(e){
   e.preventDefault();
-  const cart=getCart();
+  const cart = getCart();
   if(cart.length===0){alert("Cart is empty.");return false;}
 
-  const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
-  const lat=parseFloat(document.getElementById("latitude").value);
-  const lng=parseFloat(document.getElementById("longitude").value);
-  let deliveryFee=0;
-  if(!isNaN(lat)&&!isNaN(lng)){
-    const dist=getDistanceKm(shopLat,shopLng,lat,lng);
-    deliveryFee=Math.round(dist*feePerKm);
-  }
-  const grand=subtotal+deliveryFee;
+  document.getElementById("loaderOverlay").style.display = "flex"; // show loader
 
-  const order={
+  const subtotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const lat = parseFloat(document.getElementById("latitude").value);
+  const lng = parseFloat(document.getElementById("longitude").value);
+  let deliveryFee = 0;
+  if(!isNaN(lat)&&!isNaN(lng)){
+    const dist = getDistanceKm(shopLat,shopLng,lat,lng);
+    deliveryFee = Math.round(dist*feePerKm);
+  }
+  const grand = subtotal+deliveryFee;
+
+  const order = {
     name:document.getElementById("name").value,
     phone:document.getElementById("phone").value,
     email:document.getElementById("email").value,
@@ -204,29 +241,33 @@ function submitOrder(e){
       email:order.email||"customer@example.com",
       amount:order.total*100,
       currency:"GHS",
-      onClose:()=>alert('Payment cancelled.'),
+      onClose:()=>{
+        document.getElementById("loaderOverlay").style.display = "none"; // hide if cancelled
+        alert('Payment cancelled.');
+      },
       callback:response=>{
         order.status="Paid";
         saveOrder(order);
       }
     });
     handler.openIframe();
-  }else{
+  } else {
     saveOrder(order);
   }
   return false;
 }
 
-// Save order
 function saveOrder(order){
   db.collection("orders").add(order).then(docRef=>{
-    // clear cart
     localStorage.removeItem("cart");
     updateBadge();
 
-    // redirect to thank you page with orderId
-    window.location.href = "thankyou.html?orderId=" + docRef.id;
+    // redirect after small delay so loader shows smoothly
+    setTimeout(()=>{
+      window.location.href = "thankyou.html?orderId=" + docRef.id;
+    }, 1000);
   }).catch(err=>{
+    document.getElementById("loaderOverlay").style.display = "none";
     console.error(err);
     alert("Failed to submit order.");
   });
