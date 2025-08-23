@@ -72,6 +72,16 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
   font-weight: 600;
   color: #333;
 }
+.place:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.place:not(:disabled) {
+  background: var(--brand);
+}
+.place:not(:disabled):hover {
+  background: var(--brand-dark);
+}
 </style>
 </head>
 <body>
@@ -145,7 +155,7 @@ const db = firebase.firestore();
 // Shop coordinates
 const shopLat = 5.595930;
 const shopLng = -0.134657;
-const feePerKm = 3.5;
+const feePerKm = 3.52;
 
 // Helpers
 function getCart(){ return JSON.parse(localStorage.getItem("cart"))||[]; }
@@ -169,9 +179,10 @@ function renderOrderSummary(){
   const summary=document.getElementById("orderSummary");
   const cart=getCart();
   const btn=document.getElementById("placeOrderBtn");
+  const msg=document.getElementById("orderMsg");
 
-  // disable by default
   btn.disabled = true;
+  msg.style.display = "block"; // show warning by default
 
   if(cart.length===0){
     summary.innerHTML="<p>Cart is empty.</p>";
@@ -203,12 +214,10 @@ function renderOrderSummary(){
       <br/><b>Total: GH₵ ${grand}</b>
     `;
 
-    // enable only when delivery + total are known
     btn.disabled = false;
+    msg.style.display = "none"; // hide once ready
   }
 }
-
-
 // Geolocation
 if(navigator.geolocation){
   navigator.geolocation.getCurrentPosition(pos=>{
