@@ -83,7 +83,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
       <label><input type="radio" name="pay" value="pod" checked /> Pay on Delivery</label>
       <label><input type="radio" name="pay" value="paystack" /> Pay with Paystack</label>
     </div>
-    <button class="place" type="submit">Place Order</button>
+    <button class="place" id="placeOrderBtn" type="submit">Place Order</button>
     <div class="success" id="successBox"></div>
   </form>
 </section>
@@ -107,24 +107,28 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // Shop coordinates
-const shopLat = 5.614818;  // Example shop (Accra)
+const shopLat = 5.614818;
 const shopLng = -0.205874;
-const feePerKm = 2.5; // GH₵ per km
+const feePerKm = 2.5;
 
 // Helpers
 function getCart(){ return JSON.parse(localStorage.getItem("cart"))||[]; }
-function updateBadge(){ document.getElementById("cartCount").textContent=getCart().length; }
+function updateBadge(){
+  let cart=getCart();
+  let qty=cart.reduce((sum,i)=>sum+(i.qty||1),0);
+  document.getElementById("cartCount").textContent=qty;
+}
 document.getElementById("year").textContent=new Date().getFullYear();
 updateBadge();
 
-// Haversine distance
-function getDistanceKm(lat1, lon1, lat2, lon2) {
+// Haversine
+function getDistanceKm(lat1, lon1, lat2, lon2){
   const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
   const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
 
-// Render order summary
+// Render summary
 function renderOrderSummary(){
   const summary=document.getElementById("orderSummary");
   const cart=getCart();
@@ -132,12 +136,9 @@ function renderOrderSummary(){
   let subtotal=0;
   let html="<b>Order Summary:</b><br/>";
   cart.forEach(i=>{subtotal+=i.price*i.qty;html+=`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}<br/>`;});
-
-  // Default placeholders
-  html+=`<br/>Subtotal: GH₵ ${subtotal}<br/>Delivery: Calculating…<br/><b>Total: Calculating…</b>`;
+  html+=`<br/>Subtotal: GH₵ ${subtotal}<br/>Delivery: Calculating…<br/><b>Total: Hang on…</b>`;
   summary.innerHTML=html;
 
-  // Try calculate delivery
   const lat=parseFloat(document.getElementById("latitude").value);
   const lng=parseFloat(document.getElementById("longitude").value);
   if(!isNaN(lat)&&!isNaN(lng)){
@@ -149,7 +150,7 @@ function renderOrderSummary(){
 }
 renderOrderSummary();
 
-// Auto fetch geolocation
+// Geolocation
 if(navigator.geolocation){
   navigator.geolocation.getCurrentPosition(pos=>{
     document.getElementById("latitude").value=pos.coords.latitude;
@@ -158,13 +159,21 @@ if(navigator.geolocation){
   });
 }
 
+// Paystack button toggle
+const placeOrderBtn=document.getElementById("placeOrderBtn");
+document.querySelectorAll("input[name='pay']").forEach(radio=>{
+  radio.addEventListener("change",()=>{
+    placeOrderBtn.textContent=radio.value==="paystack"?"Pay Now":"Place Order";
+  });
+});
+
 // Submit order
 function submitOrder(e){
   e.preventDefault();
   const cart=getCart();
   if(cart.length===0){alert("Cart is empty.");return false;}
 
-  const subtotal=cart.reduce((sum,i)=>sum+i.price*i.qty,0);
+  const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
   const lat=parseFloat(document.getElementById("latitude").value);
   const lng=parseFloat(document.getElementById("longitude").value);
   let deliveryFee=0;
@@ -208,7 +217,7 @@ function submitOrder(e){
   return false;
 }
 
-// Save to Firebase
+// Save order
 function saveOrder(order){
   db.collection("orders").add(order).then(docRef=>{
     document.getElementById("successBox").style.display="block";
