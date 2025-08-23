@@ -215,14 +215,21 @@ function renderOrderSummary(){
   }
 }
 // Geolocation
+// Always render summary once (with placeholders)
+renderOrderSummary();
+
+// Try geolocation → update when available
 if(navigator.geolocation){
   navigator.geolocation.getCurrentPosition(pos=>{
-    document.getElementById("latitude").value=pos.coords.latitude;
-    document.getElementById("longitude").value=pos.coords.longitude;
-    renderOrderSummary();
+    document.getElementById("latitude").value = pos.coords.latitude;
+    document.getElementById("longitude").value = pos.coords.longitude;
+    renderOrderSummary(); // update delivery + total
+  }, ()=>{
+    // If user denies geolocation → keep subtotal + placeholders
+    document.getElementById("deliveryFee").textContent = "Enter address to calculate";
+    document.getElementById("grandTotal").textContent = "—";
   });
 }
-
 // Paystack button toggle
 const placeOrderBtn=document.getElementById("placeOrderBtn");
 document.querySelectorAll("input[name='pay']").forEach(radio=>{
