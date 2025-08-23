@@ -77,7 +77,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
     <input type="hidden" id="latitude">
     <input type="hidden" id="longitude">
 
-    <div class="order-summary" id="orderSummary"></div>
+    <div class="order-summary" id="orderSummary"><em>Calculating…</em></div>
 
     <div class="pay-row">
       <label><input type="radio" name="pay" value="pod" checked /> Pay on Delivery</label>
@@ -107,7 +107,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // Shop coordinates
-const shopLat = 5.614818;  // Example: Accra coords
+const shopLat = 5.614818;  // Example shop (Accra)
 const shopLng = -0.205874;
 const feePerKm = 2.5; // GH₵ per km
 
@@ -124,7 +124,7 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
 
-// Render order summary with delivery fee
+// Render order summary
 function renderOrderSummary(){
   const summary=document.getElementById("orderSummary");
   const cart=getCart();
@@ -133,18 +133,19 @@ function renderOrderSummary(){
   let html="<b>Order Summary:</b><br/>";
   cart.forEach(i=>{subtotal+=i.price*i.qty;html+=`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}<br/>`;});
 
-  // Delivery fee calc if coords exist
+  // Default placeholders
+  html+=`<br/>Subtotal: GH₵ ${subtotal}<br/>Delivery: Calculating…<br/><b>Total: Calculating…</b>`;
+  summary.innerHTML=html;
+
+  // Try calculate delivery
   const lat=parseFloat(document.getElementById("latitude").value);
   const lng=parseFloat(document.getElementById("longitude").value);
-  let deliveryFee=0;
   if(!isNaN(lat)&&!isNaN(lng)){
     const dist=getDistanceKm(shopLat,shopLng,lat,lng);
-    deliveryFee=Math.round(dist*feePerKm);
+    const deliveryFee=Math.round(dist*feePerKm);
+    const grand=subtotal+deliveryFee;
+    summary.innerHTML=`<b>Order Summary:</b><br/>${cart.map(i=>`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}`).join("<br/>")}<br/><br/>Subtotal: GH₵ ${subtotal}<br/>Delivery: GH₵ ${deliveryFee}<br/><b>Total: GH₵ ${grand}</b>`;
   }
-
-  const grand=subtotal+deliveryFee;
-  html+=`<br/>Subtotal: GH₵ ${subtotal}<br/>Delivery: GH₵ ${deliveryFee}<br/><b>Total: GH₵ ${grand}</b>`;
-  summary.innerHTML=html;
 }
 renderOrderSummary();
 
