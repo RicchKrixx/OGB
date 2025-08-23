@@ -113,6 +113,9 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
       <label><input type="radio" name="pay" value="paystack" /> Pay with Paystack</label>
     </div>
     <button class="place" id="placeOrderBtn" type="submit" disabled>Place Order</button>
+<p id="orderMsg" style="color:red;font-size:14px;margin-top:6px;display:none;">
+  ⚠️ Please wait for the delivery fee and  the total to continue.
+</p>
     <div class="success" id="successBox"></div>
   </form>
 </section>
@@ -204,39 +207,7 @@ function renderOrderSummary(){
     btn.disabled = false;
   }
 }
-renderOrderSummary();
-const placeOrderBtn = document.getElementById("placeOrder");
 
-// disable button initially
-placeOrderBtn.disabled = true;
-
-// watch delivery + total updates
-function checkOrderReady(){
-  const deliverySelected = document.querySelector('input[name="delivery"]:checked');
-  const totalValue = parseFloat(document.getElementById("grandTotal").innerText.replace(/[^\d.]/g,''));
-  
-  if(deliverySelected && totalValue > 0){
-    placeOrderBtn.disabled = false;
-  } else {
-    placeOrderBtn.disabled = true;
-  }
-}
-
-// listen for delivery change
-document.querySelectorAll('input[name="delivery"]').forEach(r=>{
-  r.addEventListener("change", checkOrderReady);
-});
-
-// if user clicks disabled button → show msg
-placeOrderBtn.addEventListener("click", e=>{
-  if(placeOrderBtn.disabled){
-    e.preventDefault();
-    alert("⚠️ Please wait for delivery fee to update to continue.");
-    return;
-  }
-  // otherwise run submitOrder()
-  submitOrder();
-});
 
 // Geolocation
 if(navigator.geolocation){
