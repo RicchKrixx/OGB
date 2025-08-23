@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Thank You • On God Bend Mini Mart</title>
+  <style>
+    body{font-family:sans-serif;text-align:center;padding:40px;}
+    .box{background:#f9f9f9;padding:30px;border-radius:12px;max-width:400px;margin:auto;}
+    h1{color:#2b2b2b;}
+    p{margin:14px 0;}
+    .orderId{font-weight:bold;color:#b8860b;}
+    a{display:inline-block;margin-top:20px;padding:10px 16px;background:#111;color:#fff;
+      border-radius:8px;text-decoration:none;}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>🎉 Thank You!</h1>
+    <p>Your order has been placed successfully.</p>
+    <p>Your Order ID: <span class="orderId" id="orderId"></span></p>
+    <a href="index.html">Back to Home</a>
+  </div>
+
+  <script>
+    // Get orderId from URL
+    const params = new URLSearchParams(window.location.search);
+    document.getElementById("orderId").textContent = params.get("orderId");
+  </script>
+</body>
+</html>
