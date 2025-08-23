@@ -155,7 +155,17 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
       <div><label>Full Name</label><input id="name" required /></div>
       <div><label>Phone</label><input id="phone" required /></div>
       <div><label>Email</label><input id="email" type="email" placeholder="(optional)" /></div>
-      <div style="grid-column:1/-1"><label>Delivery Address</label><input id="address" required /></div>
+      <div style="margin:12px 0;">
+  <label>Delivery Address</label>
+  <input id="address" required placeholder="Enter full delivery address"/>
+</div>
+
+<div style="margin:12px 0;">
+  <button type="button" onclick="calculateDelivery()">Calculate Delivery Fee</button>
+</div>
+
+<div id="deliveryBox" style="margin:12px 0;font-weight:600;"></div>
+<div id="amountToPay" style="margin:12px 0;font-weight:600;"></div>
     </div>
     <div class="order-summary" id="orderSummary"></div>
     <div class="pay-row">
@@ -190,8 +200,19 @@ document.getElementById("year").textContent = new Date().getFullYear();
 
 // Cart
 function getCart(){ return JSON.parse(localStorage.getItem("cart"))||[]; }
-function updateBadge(){ document.getElementById("cartCount").textContent=getCart().length; }
+function updateBadge(){
+  const cart = getCart();
+  let qty = cart.reduce((sum,i)=>sum+i.qty,0);
+  document.getElementById("cartCount").textContent = qty;
+}
 updateBadge();
+
+// Global totals
+let cartTotal = 0;
+let deliveryFee = 0;
+
+// Store location (example Accra)
+const STORE_LOCATION = { lat: 5.6037, lng: -0.1870 }; 
 
 // Render order summary
 function renderOrderSummary(){
@@ -199,12 +220,70 @@ function renderOrderSummary(){
   const cart = getCart();
   if(cart.length===0){ summary.innerHTML="<p>Cart is empty.</p>"; return; }
   let html = "<b>Order Summary:</b><br/>";
-  let total=0;
-  cart.forEach(i=>{ total+=i.price*i.qty; html+=`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}<br/>`; });
-  html+="<b>Total: GH₵ "+total+"</b>";
+  cartTotal = 0;
+  cart.forEach(i=>{
+    cartTotal+=i.price*i.qty;
+    html+=`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}<br/>`;
+  });
+  html+="<b>Total (before delivery): GH₵ "+cartTotal+"</b>";
   summary.innerHTML=html;
+  updateTotals();
 }
 renderOrderSummary();
+
+// Delivery fee calculation with Google Maps API
+async function calculateDelivery(){
+  const address = document.getElementById("address").value;
+  if(!address){ alert("Enter your delivery address first."); return; }
+
+  const apiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your API key
+  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${STORE_LOCATION.lat},${STORE_LOCATION.lng}&destinations=${encodeURIComponent(address)}&key=${apiKey}`;
+
+  try {
+    let res = await fetch(url);
+    let data = await res.json();
+
+    if(data.rows[0].elements[0].status==="OK"){
+      let distanceMeters = data.rows[0].elements[0].distance.value;
+      let distanceKm = distanceMeters/1000;
+
+      // Fee formula: GH₵10 base + GH₵2 per km after 5km
+      deliveryFee = 10;
+      if(distanceKm > 5){
+        deliveryFee += Math.ceil(distanceKm-5) * 2;
+      }
+
+      document.getElementById("deliveryBox").textContent =
+        `Distance: ${distanceKm.toFixed(1)} km — Delivery Fee: GH₵${deliveryFee}`;
+
+      updateTotals();
+    }else{
+      alert("Could not calculate distance. Try again.");
+    }
+  }catch(err){
+    console.error(err);
+    alert("Error calculating delivery fee.");
+  }
+}
+
+// Update final amount
+function updateTotals(){
+  let final = cartTotal + deliveryFee;
+  document.getElementById("amountToPay").textContent =
+    "Amount to Pay: GH₵ "+final;
+}
+
+// Switch button text based on pay method
+document.querySelectorAll('input[name="pay"]').forEach(radio=>{
+  radio.addEventListener("change",()=>{
+    const btn=document.getElementById("placeBtn");
+    if(radio.value==="paystack" && radio.checked){
+      btn.textContent="Pay Now";
+    }else{
+      btn.textContent="Place Order";
+    }
+  });
+});
 
 // Submit order
 function submitOrder(e){
@@ -218,7 +297,9 @@ function submitOrder(e){
     email: document.getElementById("email").value,
     address: document.getElementById("address").value,
     items: cart,
-    total: cart.reduce((sum,i)=>sum+i.price*i.qty,0),
+    total: cartTotal,
+    deliveryFee: deliveryFee,
+    finalAmount: cartTotal + deliveryFee,
     payMethod: document.querySelector('input[name="pay"]:checked').value,
     status: "Pending",
     createdAt: new Date()
@@ -229,8 +310,8 @@ function submitOrder(e){
     let handler = PaystackPop.setup({
       key: 'YOUR_PUBLIC_KEY_HERE', // Replace with your Paystack public key
       email: order.email || "customer@example.com",
-      amount: order.total*100,
-      currency: "GH₵",
+      amount: order.finalAmount*100, // include delivery fee
+      currency: "GHS",
       onClose: function(){ alert('Payment cancelled.'); },
       callback: function(response){
         order.status = "Paid";
@@ -249,32 +330,19 @@ function saveOrder(order){
   db.collection("orders").add(order)
     .then(docRef=>{
       document.getElementById("successBox").style.display="block";
-      document.getElementById("successBox").textContent="Order placed successfully! Your Order ID: "+docRef.id;
+      document.getElementById("successBox").textContent=
+        "Order placed successfully! Your Order ID: "+docRef.id;
       localStorage.removeItem("cart");
       updateBadge();
       renderOrderSummary();
+      document.getElementById("amountToPay").textContent="";
+      document.getElementById("deliveryBox").textContent="";
     })
-    .catch(err=>{ console.error(err); alert("Failed to submit order."); });
+    .catch(err=>{
+      console.error(err);
+      alert("Failed to submit order.");
+    });
 }
-</script>
-<script>
-  const hamburger = document.getElementById('hamburger');
-  const menu = document.getElementById('menu');
-
-  // Toggle menu on hamburger click
-  hamburger.addEventListener('click', (e) => {
-    e.stopPropagation(); // prevent closing immediately
-    hamburger.classList.toggle('active');
-    menu.classList.toggle('active');
-  });
-
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
-      menu.classList.remove('active');
-      hamburger.classList.remove('active');
-    }
-  });
 </script>
 </body>
 </html>
