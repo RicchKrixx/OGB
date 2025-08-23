@@ -112,7 +112,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
       <label><input type="radio" name="pay" value="pod" checked /> Pay on Delivery</label>
       <label><input type="radio" name="pay" value="paystack" /> Pay with Paystack</label>
     </div>
-    <button class="place" id="placeOrderBtn" type="submit">Place Order</button>
+    <button class="place" id="placeOrderBtn" type="submit" disabled>Place Order</button>
     <div class="success" id="successBox"></div>
   </form>
 </section>
@@ -165,20 +165,43 @@ function getDistanceKm(lat1, lon1, lat2, lon2){
 function renderOrderSummary(){
   const summary=document.getElementById("orderSummary");
   const cart=getCart();
-  if(cart.length===0){summary.innerHTML="<p>Cart is empty.</p>";return;}
+  const btn=document.getElementById("placeOrderBtn");
+
+  // disable by default
+  btn.disabled = true;
+
+  if(cart.length===0){
+    summary.innerHTML="<p>Cart is empty.</p>";
+    return;
+  }
+
   let subtotal=0;
   let html="<b>Order Summary:</b><br/>";
-  cart.forEach(i=>{subtotal+=i.price*i.qty;html+=`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}<br/>`;});
+  cart.forEach(i=>{
+    subtotal+=i.price*i.qty;
+    html+=`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}<br/>`;
+  });
   html+=`<br/>Subtotal: GH₵ ${subtotal}<br/>Delivery: Calculating…<br/><b>Total: Hang on…</b>`;
   summary.innerHTML=html;
 
   const lat=parseFloat(document.getElementById("latitude").value);
   const lng=parseFloat(document.getElementById("longitude").value);
+
   if(!isNaN(lat)&&!isNaN(lng)){
     const dist=getDistanceKm(shopLat,shopLng,lat,lng);
     const deliveryFee=Math.round(dist*feePerKm);
     const grand=subtotal+deliveryFee;
-    summary.innerHTML=`<b>Order Summary:</b><br/>${cart.map(i=>`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}`).join("<br/>")}<br/><br/>Subtotal: GH₵ ${subtotal}<br/>Delivery: GH₵ ${deliveryFee}<br/><b>Total: GH₵ ${grand}</b>`;
+
+    summary.innerHTML=`
+      <b>Order Summary:</b><br/>
+      ${cart.map(i=>`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}`).join("<br/>")}
+      <br/><br/>Subtotal: GH₵ ${subtotal}
+      <br/>Delivery: GH₵ ${deliveryFee}
+      <br/><b>Total: GH₵ ${grand}</b>
+    `;
+
+    // enable only when delivery + total are known
+    btn.disabled = false;
   }
 }
 renderOrderSummary();
