@@ -684,7 +684,10 @@ flex-wrap: wrap;
   </a>
 </div>
 <div class="user-menu">
-  <div class="user-icon" onclick="toggleDropdown()"> <i class="fa-solid fa-user"></i></div>
+  <div class="user-icon" onclick="toggleDropdown()">
+    <img id="userAvatar" src="" alt="User" style="display:none;width:40px;height:40px;border-radius:50%;object-fit:cover;">
+    <i id="userIcon" class="fa-solid fa-user"></i>
+  </div>
   <div class="dropdown" id="userDropdown"></div>
 </div>
    
@@ -1113,6 +1116,22 @@ noResults.style.display = 'none';
       msg.textContent = "❌ Something went wrong!";
       msg.style.color = "red";
     });
+  });
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const profilePic = localStorage.getItem("profilePic"); // stored when user uploads
+    const avatar = document.getElementById("userAvatar");
+    const icon = document.getElementById("userIcon");
+
+    if (profilePic) {
+      avatar.src = profilePic;
+      avatar.style.display = "block";
+      icon.style.display = "none";
+    } else {
+      avatar.style.display = "none";
+      icon.style.display = "block";
+    }
   });
 </script>
 </body>
