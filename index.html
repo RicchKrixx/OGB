@@ -290,8 +290,8 @@ margin-top:26px;
 }
     .user-menu { position: relative; display: inline-block; }
     .user-icon { 
-      font-size: 24px; cursor: pointer; 
-      padding:10px; border-radius:100%; background:var(--brand); 
+      font-size: 30px; cursor: pointer; 
+      padding:5px; border-radius:100%; background:var(--brand); 
     }
     .dropdown {
       display: none;
@@ -1133,6 +1133,10 @@ noResults.style.display = 'none';
       icon.style.display = "block";
     }
   });
+// Close if clicked outside drop down 
+  document.getElementById("userDropdown").onclick = function(e) {
+    if (e.target === this) this.style.display = "none";
+  };
 </script>
 </body>
 </html>
