@@ -18,7 +18,7 @@
 
   gtag('config', 'G-8QXD268M23');
 </script>
-<link rel="icon" href=https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" type="image/png">
+<link rel="icon" href="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" type="image/png">
 <title>On God Bend Mini Mart • Wine & Liquor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.css"/>
@@ -707,7 +707,7 @@ flex-wrap: wrap;
 <div class="quick-sec">
 <a href="#wines" style="background-color: #bbb;border-radius: 20px; padding:10px 15px;">wine</a>
 <a href="#liquors" style="background-color: #bbb;border-radius: 20px; padding:10px 15px;">liquor</a>
-<a href="#essentials" style="background-color: #bbb;border-radius: 20px; padding:10px 15px;">everyday essentials<a>
+<a href="#essentials" style="background-color: #bbb;border-radius: 20px; padding:10px 15px;">everyday essentials</a>
 </div>
 </div>
 </section>
@@ -748,7 +748,21 @@ flex-wrap: wrap;
 <section class="shop">
   <h2>Our Shop</h2>
  
+<!-- Panorama Viewer -->
+<div id="panorama" style="width:100%;max-width:800px;height:400px;margin:20px auto;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.2);"></div>
 
+<script>
+  pannellum.viewer('panorama', {
+      type: 'equirectangular',
+      panorama: 'https://i.postimg.cc/j2tcvH8v/IMG-20250823-WA0004.jpg', // replace with your 360° image
+      autoLoad: true,
+      showControls: true,
+      compass: true,
+      title: "On God Bend Mini Mart",
+      author: "OGB",
+      hfov: 110
+  });
+</script>
  
   <video width="100%" controls>
     <source src="shop.mp4" type="video/mp4">
