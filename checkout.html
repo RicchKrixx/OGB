@@ -220,12 +220,16 @@ function submitOrder(e){
 // Save order
 function saveOrder(order){
   db.collection("orders").add(order).then(docRef=>{
-    document.getElementById("successBox").style.display="block";
-    document.getElementById("successBox").textContent="Order placed successfully! Your Order ID: "+docRef.id;
+    // clear cart
     localStorage.removeItem("cart");
     updateBadge();
-    renderOrderSummary();
-  }).catch(err=>{console.error(err);alert("Failed to submit order.");});
+
+    // redirect to thank you page with orderId
+    window.location.href = "thankyou.html?orderId=" + docRef.id;
+  }).catch(err=>{
+    console.error(err);
+    alert("Failed to submit order.");
+  });
 }
 </script>
 
