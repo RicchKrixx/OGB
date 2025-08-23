@@ -4,17 +4,20 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Checkout • On God Bend Mini Mart</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <style>
 :root{--brand:#b8860b;--brand-dark:#8b6508;--ink:#1f1f1f;--bg:#f7f7f9;--card:#fff;}
-*{box-sizing:border-box;}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+*{box-sizing:border-box;}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
 a{color:inherit;text-decoration:none;}
 header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#111;color:#fff;}
 .brand img{height:90px;width:auto;border-radius:6px;}
-.nav{display:flex;gap:14px;} .nav a{padding:8px 10px;border-radius:8px;} .nav a:hover{background:rgba(255,255,255,.08);}
+.nav{display:flex;gap:14px;}
+.nav a{padding:8px 10px;border-radius:8px;}
+.nav a:hover{background:rgba(255,255,255,.08);}
 #checkout{padding:26px 16px;max-width:900px;margin:0 auto 26px;}
 form.checkout{background:#fff;border-radius:16px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06);}
 .fields{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
@@ -25,102 +28,21 @@ input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px soli
 .note{font-size:12px;color:#666;}
 .success{background:#e9ffe9;border:1px solid #a7e7a7;color:#0a5d0a;padding:12px;border-radius:12px;margin-top:12px;display:none;}
 footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top:26px;}
-.cart-btn {
-  font-size: 30px;
-  text-decoration: none;
-  display: inline-flex; 
-  align-items: center; 
-  color: #fff; 
-  border: 0; 
-  border-radius: 10px; 
-  padding: 8px 12px; 
-  font-weight: 600; 
-  cursor: pointer;
-  position: relative;
-}
-
-#cartCount {
-  position: absolute;
-  top: -3px;    /* move slightly above */
-  right: -3px;  /* move slightly to the right */
-  background:var(--brand);
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 50%;
-  padding: 2px 6px;
-  color: #fff; 
-  line-height: 1;
-}
-
-/* Hamburger icon */
-  .hamburger {
-    display: block;
-    width: 30px;
-    height: 25px;
-    margin: 20px;
-    position: relative;
-    cursor: pointer;
-    z-index: 2001;
-    color: white;
-  }
-
-  .hamburger span {
-    position: absolute;
-    height: 4px;
-    width: 100%;
-    background: #333;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-  }
-
-  .hamburger span:nth-child(1) { top: 0; }
-  .hamburger span:nth-child(2) { top: 10px; }
-  .hamburger span:nth-child(3) { top: 20px; }
-
-  /* Popup menu */
-  .menu {
-    position: fixed;
-    top: 40px;
-    right: -250px; /* hidden by default */
-    width: 250px;
-    height: auto;
-    background: #f1f1f1;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.3);
-    transition: right 0.3s ease;
-    padding-top: 60px;
-    border-radius: 8px;
-    z-index: 2000;
-  }
-
-  .menu a {
-    display: block;
-    padding: 15px 25px;
-    text-decoration: none;
-    color: #333;
-    font-size: 18px;
-  }
-
-  .menu a:hover {
-    background: #ddd;
-  }
-
-  /* Active menu */
-  .menu.active {
-    right: 0;
-  }
-
-  /* Optional: animate hamburger to X */
-  .hamburger.active span:nth-child(1) {
-    transform: rotate(45deg);
-    top: 10px;
-  }
-  .hamburger.active span:nth-child(2) {
-    opacity: 0;
-  }
-  .hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg);
-    top: 10px;
-  } 
+.cart-btn{font-size:30px;text-decoration:none;display:inline-flex;align-items:center;color:#fff;border:0;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer;position:relative;}
+#cartCount{position:absolute;top:-3px;right:-3px;background:var(--brand);font-size:12px;font-weight:bold;border-radius:50%;padding:2px 6px;color:#fff;line-height:1;}
+/* Hamburger */
+.hamburger{display:block;width:30px;height:25px;margin:20px;position:relative;cursor:pointer;z-index:2001;color:white;}
+.hamburger span{position:absolute;height:4px;width:100%;background:#333;border-radius:2px;transition:all 0.3s ease;}
+.hamburger span:nth-child(1){top:0;}
+.hamburger span:nth-child(2){top:10px;}
+.hamburger span:nth-child(3){top:20px;}
+.menu{position:fixed;top:40px;right:-250px;width:250px;height:auto;background:#f1f1f1;box-shadow:-2px 0 5px rgba(0,0,0,0.3);transition:right 0.3s ease;padding-top:60px;border-radius:8px;z-index:2000;}
+.menu a{display:block;padding:15px 25px;text-decoration:none;color:#333;font-size:18px;}
+.menu a:hover{background:#ddd;}
+.menu.active{right:0;}
+.hamburger.active span:nth-child(1){transform:rotate(45deg);top:10px;}
+.hamburger.active span:nth-child(2){opacity:0;}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg);top:10px;}
 </style>
 </head>
 <body>
@@ -128,23 +50,17 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
  <div class="brand"><img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="Logo"/></div>
   <nav class="nav">
     <div class="hamburger" id="hamburger" style="color: white;">
-  <span></span>
-  <span></span>
-  <span></span>
-</div>
-
-<div class="menu" id="menu">
-  <a href="#">Home</a>
-  <a href="#">Shop</a>
-  <a href="#">About</a>
-  <a href="#">Contact</a>
-</div>
-<div class="cart-icon">
-  <a href="cart.html" class="cart-btn">    
-    <i class="fas fa-shopping-bag"></i>
-    <span id="cartCount">0</span>
-  </a>
-</div>
+      <span></span><span></span><span></span>
+    </div>
+    <div class="menu" id="menu">
+      <a href="#">Home</a>
+      <a href="#">Shop</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="cart-icon">
+      <a href="cart.html" class="cart-btn"><i class="fas fa-shopping-bag"></i><span id="cartCount">0</span></a>
+    </div>
   </nav>
 </header>
 
@@ -155,19 +71,14 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
       <div><label>Full Name</label><input id="name" required /></div>
       <div><label>Phone</label><input id="phone" required /></div>
       <div><label>Email</label><input id="email" type="email" placeholder="(optional)" /></div>
-      <div style="margin:12px 0;">
-  <label>Delivery Address</label>
-  <input id="address" required placeholder="Enter full delivery address"/>
-</div>
-
-<div style="margin:12px 0;">
-  <button type="button" onclick="calculateDelivery()">Calculate Delivery Fee</button>
-</div>
-
-<div id="deliveryBox" style="margin:12px 0;font-weight:600;"></div>
-<div id="amountToPay" style="margin:12px 0;font-weight:600;"></div>
+      <div style="grid-column:1/-1"><label>Delivery Address</label><input id="address" required /></div>
     </div>
+    <!-- Hidden lat/lng -->
+    <input type="hidden" id="latitude">
+    <input type="hidden" id="longitude">
+
     <div class="order-summary" id="orderSummary"></div>
+
     <div class="pay-row">
       <label><input type="radio" name="pay" value="pod" checked /> Pay on Delivery</label>
       <label><input type="radio" name="pay" value="paystack" /> Pay with Paystack</label>
@@ -195,126 +106,97 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Year
-document.getElementById("year").textContent = new Date().getFullYear();
+// Shop coordinates
+const shopLat = 5.614818;  // Example: Accra coords
+const shopLng = -0.205874;
+const feePerKm = 2.5; // GH₵ per km
 
-// Cart
+// Helpers
 function getCart(){ return JSON.parse(localStorage.getItem("cart"))||[]; }
-function updateBadge(){
-  const cart = getCart();
-  let qty = cart.reduce((sum,i)=>sum+i.qty,0);
-  document.getElementById("cartCount").textContent = qty;
-}
+function updateBadge(){ document.getElementById("cartCount").textContent=getCart().length; }
+document.getElementById("year").textContent=new Date().getFullYear();
 updateBadge();
 
-// Global totals
-let cartTotal = 0;
-let deliveryFee = 0;
+// Haversine distance
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
 
-// Store location (example Accra)
-const STORE_LOCATION = { lat: 5.6037, lng: -0.1870 }; 
-
-// Render order summary
+// Render order summary with delivery fee
 function renderOrderSummary(){
-  const summary = document.getElementById("orderSummary");
-  const cart = getCart();
-  if(cart.length===0){ summary.innerHTML="<p>Cart is empty.</p>"; return; }
-  let html = "<b>Order Summary:</b><br/>";
-  cartTotal = 0;
-  cart.forEach(i=>{
-    cartTotal+=i.price*i.qty;
-    html+=`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}<br/>`;
-  });
-  html+="<b>Total (before delivery): GH₵ "+cartTotal+"</b>";
+  const summary=document.getElementById("orderSummary");
+  const cart=getCart();
+  if(cart.length===0){summary.innerHTML="<p>Cart is empty.</p>";return;}
+  let subtotal=0;
+  let html="<b>Order Summary:</b><br/>";
+  cart.forEach(i=>{subtotal+=i.price*i.qty;html+=`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}<br/>`;});
+
+  // Delivery fee calc if coords exist
+  const lat=parseFloat(document.getElementById("latitude").value);
+  const lng=parseFloat(document.getElementById("longitude").value);
+  let deliveryFee=0;
+  if(!isNaN(lat)&&!isNaN(lng)){
+    const dist=getDistanceKm(shopLat,shopLng,lat,lng);
+    deliveryFee=Math.round(dist*feePerKm);
+  }
+
+  const grand=subtotal+deliveryFee;
+  html+=`<br/>Subtotal: GH₵ ${subtotal}<br/>Delivery: GH₵ ${deliveryFee}<br/><b>Total: GH₵ ${grand}</b>`;
   summary.innerHTML=html;
-  updateTotals();
 }
 renderOrderSummary();
 
-// Delivery fee calculation with Google Maps API
-async function calculateDelivery(){
-  const address = document.getElementById("address").value;
-  if(!address){ alert("Enter your delivery address first."); return; }
-
-  const apiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with your API key
-  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${STORE_LOCATION.lat},${STORE_LOCATION.lng}&destinations=${encodeURIComponent(address)}&key=${apiKey}`;
-
-  try {
-    let res = await fetch(url);
-    let data = await res.json();
-
-    if(data.rows[0].elements[0].status==="OK"){
-      let distanceMeters = data.rows[0].elements[0].distance.value;
-      let distanceKm = distanceMeters/1000;
-
-      // Fee formula: GH₵10 base + GH₵2 per km after 5km
-      deliveryFee = 10;
-      if(distanceKm > 5){
-        deliveryFee += Math.ceil(distanceKm-5) * 2;
-      }
-
-      document.getElementById("deliveryBox").textContent =
-        `Distance: ${distanceKm.toFixed(1)} km — Delivery Fee: GH₵${deliveryFee}`;
-
-      updateTotals();
-    }else{
-      alert("Could not calculate distance. Try again.");
-    }
-  }catch(err){
-    console.error(err);
-    alert("Error calculating delivery fee.");
-  }
-}
-
-// Update final amount
-function updateTotals(){
-  let final = cartTotal + deliveryFee;
-  document.getElementById("amountToPay").textContent =
-    "Amount to Pay: GH₵ "+final;
-}
-
-// Switch button text based on pay method
-document.querySelectorAll('input[name="pay"]').forEach(radio=>{
-  radio.addEventListener("change",()=>{
-    const btn=document.getElementById("placeBtn");
-    if(radio.value==="paystack" && radio.checked){
-      btn.textContent="Pay Now";
-    }else{
-      btn.textContent="Place Order";
-    }
+// Auto fetch geolocation
+if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    document.getElementById("latitude").value=pos.coords.latitude;
+    document.getElementById("longitude").value=pos.coords.longitude;
+    renderOrderSummary();
   });
-});
+}
 
 // Submit order
 function submitOrder(e){
   e.preventDefault();
-  const cart = getCart();
-  if(cart.length===0){ alert("Cart is empty."); return false; }
+  const cart=getCart();
+  if(cart.length===0){alert("Cart is empty.");return false;}
+
+  const subtotal=cart.reduce((sum,i)=>sum+i.price*i.qty,0);
+  const lat=parseFloat(document.getElementById("latitude").value);
+  const lng=parseFloat(document.getElementById("longitude").value);
+  let deliveryFee=0;
+  if(!isNaN(lat)&&!isNaN(lng)){
+    const dist=getDistanceKm(shopLat,shopLng,lat,lng);
+    deliveryFee=Math.round(dist*feePerKm);
+  }
+  const grand=subtotal+deliveryFee;
 
   const order={
-    name: document.getElementById("name").value,
-    phone: document.getElementById("phone").value,
-    email: document.getElementById("email").value,
-    address: document.getElementById("address").value,
-    items: cart,
-    total: cartTotal,
-    deliveryFee: deliveryFee,
-    finalAmount: cartTotal + deliveryFee,
-    payMethod: document.querySelector('input[name="pay"]:checked').value,
-    status: "Pending",
-    createdAt: new Date()
+    name:document.getElementById("name").value,
+    phone:document.getElementById("phone").value,
+    email:document.getElementById("email").value,
+    address:document.getElementById("address").value,
+    latitude:lat,longitude:lng,
+    items:cart,
+    subtotal:subtotal,
+    deliveryFee:deliveryFee,
+    total:grand,
+    payMethod:document.querySelector('input[name="pay"]:checked').value,
+    status:"Pending",
+    createdAt:new Date()
   };
 
-  // Paystack
   if(order.payMethod==="paystack"){
-    let handler = PaystackPop.setup({
-      key: 'YOUR_PUBLIC_KEY_HERE', // Replace with your Paystack public key
-      email: order.email || "customer@example.com",
-      amount: order.finalAmount*100, // include delivery fee
-      currency: "GHS",
-      onClose: function(){ alert('Payment cancelled.'); },
-      callback: function(response){
-        order.status = "Paid";
+    let handler=PaystackPop.setup({
+      key:'YOUR_PUBLIC_KEY_HERE',
+      email:order.email||"customer@example.com",
+      amount:order.total*100,
+      currency:"GHS",
+      onClose:()=>alert('Payment cancelled.'),
+      callback:response=>{
+        order.status="Paid";
         saveOrder(order);
       }
     });
@@ -327,22 +209,30 @@ function submitOrder(e){
 
 // Save to Firebase
 function saveOrder(order){
-  db.collection("orders").add(order)
-    .then(docRef=>{
-      document.getElementById("successBox").style.display="block";
-      document.getElementById("successBox").textContent=
-        "Order placed successfully! Your Order ID: "+docRef.id;
-      localStorage.removeItem("cart");
-      updateBadge();
-      renderOrderSummary();
-      document.getElementById("amountToPay").textContent="";
-      document.getElementById("deliveryBox").textContent="";
-    })
-    .catch(err=>{
-      console.error(err);
-      alert("Failed to submit order.");
-    });
+  db.collection("orders").add(order).then(docRef=>{
+    document.getElementById("successBox").style.display="block";
+    document.getElementById("successBox").textContent="Order placed successfully! Your Order ID: "+docRef.id;
+    localStorage.removeItem("cart");
+    updateBadge();
+    renderOrderSummary();
+  }).catch(err=>{console.error(err);alert("Failed to submit order.");});
 }
+</script>
+
+<script>
+const hamburger=document.getElementById('hamburger');
+const menu=document.getElementById('menu');
+hamburger.addEventListener('click',e=>{
+  e.stopPropagation();
+  hamburger.classList.toggle('active');
+  menu.classList.toggle('active');
+});
+document.addEventListener('click',e=>{
+  if(!menu.contains(e.target)&&!hamburger.contains(e.target)){
+    menu.classList.remove('active');
+    hamburger.classList.remove('active');
+  }
+});
 </script>
 </body>
 </html>
