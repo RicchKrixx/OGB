@@ -1,172 +1,419 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Customer Dashboard</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-    }
-    .dashboard {
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .profile-pic {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #ccc;
-    }
-    .btn {
-      display: block;
-      width: 100%;
-      margin: 8px 0;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      background: #007bff;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .btn.red { background: crimson; }
-    .orders {
-      margin-top: 20px;
-    }
-    .order {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>OGB • Customer Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+:root{
+  --brand:#b8860b;
+  --brand-dark:#8b6508;
+  --ink:#1f1f1f;
+  --bg:#0f0f0f;
+  --card:#171717;
+  --muted:#9ca3af;
+  --success:#16a34a;
+  --danger:#dc2626;
+  --warning:#f59e0b;
+  --border:#262626;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#fff}
+
+.container{max-width:980px;margin:0 auto;padding:18px 16px}
+
+/* Header */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;background:#111;border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:10
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{height:52px;border-radius:10px}
+.brand h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.3px}
+.header .actions{display:flex;gap:8px}
+.btn{
+  border:1px solid var(--border);background:#1a1a1a;color:#fff;
+  padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600
+}
+.btn:hover{background:#202020}
+.btn.brand{background:var(--brand);border-color:transparent;color:#111}
+.btn.brand:hover{background:var(--brand-dark);color:#fff}
+
+/* Grid */
+.grid{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:900px){.grid{grid-template-columns:340px 1fr}}
+
+/* Card */
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);padding:16px
+}
+.card h2{margin:0 0 10px;font-size:18px;color:var(--brand)}
+
+/* Profile */
+.profile-wrap{display:flex;gap:14px;align-items:center}
+.avatar-wrap{position:relative;width:96px;height:96px}
+.avatar{
+  width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--brand)
+}
+.avatar-fallback{
+  width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:#0e0e0e;border:2px dashed var(--border);font-size:32px;color:#bbb
+}
+.p-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 10px;border-radius:999px;background:#101010;border:1px solid var(--border);
+  font-size:12px;color:#d1d5db
+}
+
+/* Orders */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.input{
+  background:#101010;border:1px solid var(--border);padding:10px 12px;border-radius:10px;color:#fff;outline:none
+}
+.list{display:flex;flex-direction:column;gap:10px}
+.order{
+  border:1px solid var(--border);background:#121212;border-radius:14px;padding:12px
+}
+.order-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.order-id{font-weight:700}
+.stamp{color:var(--muted);font-size:12px}
+.pill{padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px}
+.pill.success{background:rgba(22,163,74,.1);color:#86efac;border:1px solid rgba(22,163,74,.3)}
+.pill.warn{background:rgba(245,158,11,.08);color:#facc15;border:1px solid rgba(245,158,11,.25)}
+.pill.danger{background:rgba(220,38,38,.08);color:#fca5a5;border:1px solid rgba(220,38,38,.25)}
+.pill.info{background:rgba(184,134,11,.12);color:#f7dfa0;border:1px solid rgba(184,134,11,.35)}
+.meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+.meta .chip{
+  border:1px dashed var(--border);background:#0f0f0f;padding:6px 10px;border-radius:10px;color:#d1d5db;font-size:12px
+}
+.total{font-weight:800}
+
+/* Skeletons */
+.skel{background:linear-gradient(90deg,#1b1b1b 25%,#232323 37%,#1b1b1b 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.skel-row{height:64px;border-radius:12px}
+
+/* Empty */
+.empty{
+  text-align:center;border:1px dashed var(--border);padding:20px;border-radius:14px;background:#101010;color:#d1d5db
+}
+
+/* Danger zone buttons */
+.btn.danger{background:#2a1414;border-color:#7f1d1d}
+.btn.danger:hover{background:#3a1b1b}
+.btn.outline{background:transparent}
+.small{font-size:12px;color:#9ca3af}
+hr{border:0;border-top:1px solid var(--border);margin:14px 0}
+</style>
 </head>
 <body>
-  <div class="dashboard">
-    <h2>Customer Dashboard</h2>
-    <div style="text-align:center;">
-      <img id="profilePic" class="profile-pic" src="default-user.png" alt="Profile Picture">
-      <input type="file" id="uploadPic" accept="image/*" style="display:none;">
-      <button class="btn" onclick="document.getElementById('uploadPic').click()">Change Picture</button>
-      <button class="btn red" onclick="removePicture()">Remove Picture</button>
+  <header class="header">
+    <div class="brand">
+      <img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="OGB">
+      <h1>Customer Dashboard</h1>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="goHome()"><i class="fa-solid fa-house"></i>&nbsp;Home</button>
+      <button class="btn" onclick="refreshOrders()"><i class="fa-solid fa-rotate-right"></i>&nbsp;Refresh</button>
+      <button class="btn brand" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i>&nbsp;Logout</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <!-- Profile Card -->
+      <section class="card">
+        <h2>Profile</h2>
+        <div class="profile-wrap">
+          <div class="avatar-wrap">
+            <img id="avatar" class="avatar" alt="Profile" style="display:none">
+            <div id="avatarFallback" class="avatar-fallback"><i class="fa-solid fa-user"></i></div>
+          </div>
+          <div style="flex:1">
+            <div class="badge"><i class="fa-solid fa-id-badge"></i> <span id="displayName">—</span></div>
+            <div class="badge" style="margin-left:6px"><i class="fa-solid fa-envelope"></i> <span id="email">—</span></div>
+            <div class="p-actions">
+              <input id="picInput" type="file" accept="image/*" style="display:none">
+              <button class="btn brand" onclick="document.getElementById('picInput').click()">
+                <i class="fa-solid fa-image"></i>&nbsp;Change Picture
+              </button>
+              <button class="btn outline" onclick="removePicture()">
+                <i class="fa-regular fa-trash-can"></i>&nbsp;Remove Picture
+              </button>
+            </div>
+            <div class="small" style="margin-top:6px">Profile picture is stored locally on your device.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Orders Card -->
+      <section class="card">
+        <h2>Order History</h2>
+        <div class="toolbar">
+          <input id="search" class="input" placeholder="Search by Order ID or status…" />
+          <select id="statusFilter" class="input">
+            <option value="">All statuses</option>
+            <option value="processing">Processing</option>
+            <option value="preparing">Preparing</option>
+            <option value="shipped">Shipped / On the way</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div id="ordersWrap" class="list">
+          <!-- Skeletons -->
+          <div class="skel skel-row"></div>
+          <div class="skel skel-row"></div>
+          <div class="skel skel-row"></div>
+        </div>
+      </section>
     </div>
 
-    <button class="btn" onclick="goHome()">🏠 Go Back Home</button>
-    <button class="btn" onclick="logout()">🚪 Logout</button>
-    <button class="btn red" onclick="deleteAccount()">🗑 Delete Account</button>
-
-    <div class="orders">
-      <h3>Your Order History</h3>
-      <div id="orderList">Loading...</div>
-    </div>
+    <!-- Danger Zone -->
+    <section class="card" style="margin-top:14px">
+      <h2>Account</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <button class="btn danger" onclick="deleteAccount()">
+          <i class="fa-solid fa-user-slash"></i>&nbsp;Delete Account
+        </button>
+        <button class="btn" onclick="logout()">
+          <i class="fa-solid fa-right-from-bracket"></i>&nbsp;Logout
+        </button>
+      </div>
+      <hr>
+      <div class="small">Deleting your account is permanent. If you see a “recent login required” message, log out and sign in again before retrying.</div>
+    </section>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- Firebase (modular v11, matching your homepage) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { 
+      getAuth, onAuthStateChanged, signOut, deleteUser 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { 
+      getFirestore, collection, query, where, getDocs, orderBy, limit 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-  <script>
-    // 🔹 Your Firebase config
-     const firebaseConfig = {
-  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
-  authDomain: "ongod-5073e.firebaseapp.com",
-  projectId: "ongod-5073e",
-  storageBucket: "ongod-5073e.firebasestorage.app",
-  messagingSenderId: "439687837026",
-  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
-  measurementId: "G-1TVP0X3J62"
-};
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    const profilePic = document.getElementById("profilePic");
-    const uploadPic = document.getElementById("uploadPic");
-
-    // Load saved profile picture from localStorage
-    window.onload = () => {
-      let savedPic = localStorage.getItem("profilePic");
-      if (savedPic) profilePic.src = savedPic;
+    // ✅ Your OGB Firebase config (same as homepage)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+      authDomain: "ongod-5073e.firebaseapp.com",
+      projectId: "ongod-5073e",
+      storageBucket: "ongod-5073e.firebasestorage.app",
+      messagingSenderId: "439687837026",
+      appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+      measurementId: "G-1TVP0X3J62"
     };
 
-    // Change profile picture
-    uploadPic.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ------- UI refs
+    const avatar = document.getElementById('avatar');
+    const avatarFallback = document.getElementById('avatarFallback');
+    const picInput = document.getElementById('picInput');
+    const displayNameEl = document.getElementById('displayName');
+    const emailEl = document.getElementById('email');
+    const ordersWrap = document.getElementById('ordersWrap');
+    const searchEl = document.getElementById('search');
+    const statusFilterEl = document.getElementById('statusFilter');
+
+    let ORDERS_CACHE = []; // keep last fetched to filter
+
+    // ------- Helpers
+    const cedi = (n)=> `GH₵${Number(n||0).toFixed(2)}`;
+    function fmtDate(val){
+      try{
+        if(!val) return '—';
+        // support Firestore Timestamp or ISO string/number
+        let d = val.toDate ? val.toDate() : new Date(val);
+        return d.toLocaleString();
+      }catch{ return '—'; }
+    }
+    function statusPill(status='processing'){
+      const s = String(status).toLowerCase();
+      let cls='info', label=status;
+      if(['delivered','completed'].includes(s)){ cls='success'; label='Delivered'; }
+      else if(['shipped','on the way','out for delivery'].includes(s)){ cls='warn'; label='On the way'; }
+      else if(['cancelled','canceled'].includes(s)){ cls='danger'; label='Cancelled'; }
+      else if(['preparing','processing'].includes(s)){ cls='info'; label=s.charAt(0).toUpperCase()+s.slice(1); }
+      return `<span class="pill ${cls}">${label}</span>`;
+    }
+
+    function renderOrders(list){
+      if(!list || !list.length){
+        ordersWrap.innerHTML = `<div class="empty">
+          <i class="fa-regular fa-folder-open" style="font-size:28px"></i>
+          <div style="margin-top:6px">No orders found yet.</div>
+        </div>`;
+        return;
+      }
+      ordersWrap.innerHTML = list.map(o=>{
+        const id = o.id || o.orderId || '—';
+        const items = Array.isArray(o.items) ? o.items.map(i=>`${i.name} ×${i.qty||i.quantity||1}`).join(', ') : (o.summary||'');
+        const total = o.total ?? o.grandTotal ?? o.amount ?? 0;
+        const date = o.createdAt || o.timestamp || o.date || o.created_on;
+        const status = o.status || 'processing';
+        return `
+          <div class="order">
+            <div class="order-top">
+              <div>
+                <div class="order-id">Order #${id}</div>
+                <div class="stamp">${fmtDate(date)}</div>
+              </div>
+              <div>${statusPill(status)}</div>
+            </div>
+            <div class="meta">
+              <div class="chip total"><i class="fa-solid fa-receipt"></i> ${cedi(total)}</div>
+              ${items ? `<div class="chip"><i class="fa-solid fa-boxes-stacked"></i> ${items}</div>`:''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function applyFilters(){
+      const q = (searchEl.value||'').toLowerCase().trim();
+      const sf = (statusFilterEl.value||'').toLowerCase();
+      const filtered = ORDERS_CACHE.filter(o=>{
+        const idStr = String(o.id || o.orderId || '').toLowerCase();
+        const st = String(o.status||'').toLowerCase();
+        const matchText = !q || idStr.includes(q) || st.includes(q);
+        const matchStatus = !sf || st.includes(sf);
+        return matchText && matchStatus;
+      });
+      renderOrders(filtered);
+    }
+
+    searchEl.addEventListener('input', applyFilters);
+    statusFilterEl.addEventListener('change', applyFilters);
+
+    // ------- Profile picture (localStorage)
+    function loadLocalAvatar(){
+      const src = localStorage.getItem('profilePic');
+      if(src){
+        avatar.src = src;
+        avatar.style.display='block';
+        avatarFallback.style.display='none';
+      }else{
+        avatar.style.display='none';
+        avatarFallback.style.display='flex';
+      }
+    }
+    loadLocalAvatar();
+
+    picInput.addEventListener('change', (e)=>{
+      const file = e.target.files?.[0];
+      if(!file) return;
       const reader = new FileReader();
-      reader.onload = () => {
-        profilePic.src = reader.result;
-        localStorage.setItem("profilePic", reader.result);
+      reader.onload = ()=>{
+        localStorage.setItem('profilePic', reader.result);
+        loadLocalAvatar();
       };
       reader.readAsDataURL(file);
+      e.target.value = ''; // reset chooser
     });
 
-    // Remove profile picture
-    function removePicture() {
-      profilePic.src = "default-user.png";
-      localStorage.removeItem("profilePic");
+    window.removePicture = ()=> {
+      localStorage.removeItem('profilePic');
+      loadLocalAvatar();
+    };
+
+    // ------- Auth & Orders
+    async function fetchOrdersForUser(user){
+      // Tries userId(uid), then email
+      const ordersRef = collection(db, 'orders');
+
+      // Prefer latest first if you store time; orderBy requires an indexed field.
+      // We'll first try by uid:
+      let results = [];
+
+      try{
+        const q1 = query(ordersRef, where('userId','==', user.uid));
+        const snap1 = await getDocs(q1);
+        snap1.forEach(d=> results.push({ id: d.id, ...d.data() }));
+      }catch(e){ /* ignore */ }
+
+      if(results.length === 0){
+        try{
+          const q2 = query(ordersRef, where('email','==', user.email));
+          const snap2 = await getDocs(q2);
+          snap2.forEach(d=> results.push({ id: d.id, ...d.data() }));
+        }catch(e){ /* ignore */ }
+      }
+
+      // Sort by createdAt desc if available
+      results.sort((a,b)=>{
+        const da = (a.createdAt && a.createdAt.toDate) ? a.createdAt.toDate().getTime() : (a.timestamp?.toDate?.() ? a.timestamp.toDate().getTime() : 0);
+        const dbt= (b.createdAt && b.createdAt.toDate) ? b.createdAt.toDate().getTime() : (b.timestamp?.toDate?.() ? b.timestamp.toDate().getTime() : 0);
+        return dbt - da;
+      });
+
+      return results;
     }
 
-    // Go Home
-    function goHome() {
-      window.location.href = "index.html";
-    }
+    async function loadUserAndOrders(){
+      ordersWrap.innerHTML = `<div class="skel skel-row"></div><div class="skel skel-row"></div><div class="skel skel-row"></div>`;
+      onAuthStateChanged(auth, async (user)=>{
+        if(!user){
+          displayNameEl.textContent = 'Guest';
+          emailEl.textContent = '—';
+          ordersWrap.innerHTML = `<div class="empty">Please sign in to view your orders.</div>`;
+          return;
+        }
+        displayNameEl.textContent = user.displayName || (user.email?.split('@')[0]) || 'Customer';
+        emailEl.textContent = user.email || '—';
 
-    // Logout
-    function logout() {
-      auth.signOut().then(() => {
-        alert("Logged out!");
-        window.location.href = "login.html";
+        try{
+          const orders = await fetchOrdersForUser(user);
+          ORDERS_CACHE = orders;
+          applyFilters();
+        }catch(err){
+          console.error(err);
+          ordersWrap.innerHTML = `<div class="empty">Could not load orders. Please try again.</div>`;
+        }
       });
     }
+    loadUserAndOrders();
 
-    // Delete Account
-    function deleteAccount() {
-      if(confirm("Are you sure you want to delete your account?")) {
-        auth.currentUser.delete().then(() => {
-          alert("Account deleted.");
-          window.location.href = "signup.html";
-        }).catch(err => {
-          alert("Error: " + err.message);
-        });
-      }
-    }
+    // ------- Global actions
+    window.refreshOrders = ()=> loadUserAndOrders();
+    window.goHome = ()=> location.href = "index.html";
 
-    // Fetch order history from Firestore
-    auth.onAuthStateChanged(user => {
-      if(user) {
-        db.collection("orders").where("userId", "==", user.uid)
-          .get().then(snapshot => {
-            const orderList = document.getElementById("orderList");
-            if(snapshot.empty) {
-              orderList.innerHTML = "<p>No orders found.</p>";
-              return;
-            }
-            orderList.innerHTML = "";
-            snapshot.forEach(doc => {
-              let order = doc.data();
-              orderList.innerHTML += `
-                <div class="order">
-                  <p><b>Order ID:</b> ${doc.id}</p>
-                  <p><b>Total:</b> $${order.total}</p>
-                  <p><b>Status:</b> ${order.status}</p>
-                </div>
-              `;
-            });
-          });
-      } else {
-        document.getElementById("orderList").innerHTML = "<p>Please login to see orders.</p>";
+    window.logout = async ()=>{
+      try{
+        await signOut(auth);
+        location.href = "auth.html"; // your login/register page
+      }catch(err){
+        alert("Logout failed: " + err.message);
       }
-    });
+    };
+
+    window.deleteAccount = async ()=>{
+      if(!confirm("Delete account permanently? This cannot be undone.")) return;
+      const user = auth.currentUser;
+      if(!user){ alert("No user logged in."); return; }
+      try{
+        await deleteUser(user);
+        // Optional: clear local profile pic
+        localStorage.removeItem('profilePic');
+        alert("Account deleted.");
+        location.href = "index.html";
+      }catch(err){
+        if(err.code === 'auth/requires-recent-login'){
+          alert("Please log out and sign in again, then retry delete.");
+        }else{
+          alert("Delete failed: " + err.message);
+        }
+      }
+    };
   </script>
 </body>
 </html>
