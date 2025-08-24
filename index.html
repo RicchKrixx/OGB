@@ -894,8 +894,8 @@ flex-wrap: wrap;
     // Show original price crossed out if exists
     const priceHTML = product.originalPrice
       ? `<span style="text-decoration: line-through; color: gray; font-size:10px; margin-right:4px;">GH₵${product.originalPrice.toFixed(2)}</span>
-         <span style="font-weight:700; color:#222;">GH₵${product.price.toFixed(2)}</span>`
-      : `<span style="font-weight:600; color:#222;">GH₵${product.price.toFixed(2)}</span>`;
+         <span style="font-weight:600; color:#222;">GH₵${product.price.toFixed(2)}</span>`
+      : `<span style="font-weight:500; color:#222;">GH₵${product.price.toFixed(2)}</span>`;
 
     div.innerHTML = `
       <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
