@@ -297,7 +297,7 @@ function submitOrder(e){
     });
   };
 
-  if(order.payMethod==="paystack"){
+  if(order.payMethod==="paid"){
     let handler = PaystackPop.setup({
       key:'pk_test_5a62d34951b3cd9b82fbb790145ec0427a4ac764',
       email:order.email||"customer@example.com",
@@ -308,7 +308,7 @@ function submitOrder(e){
         alert('Payment cancelled.');
       },
       callback:response=>{
-        order.status="Paid";
+        order.status="Pending";
         saveAndRedirect();
       }
     });
