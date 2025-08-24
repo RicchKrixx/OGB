@@ -928,7 +928,7 @@ flex-wrap: wrap;
       <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
       <h3>${product.name}</h3>
       <div class="price">${priceHTML}</div>
-      <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">Add to Cart</button>
+      <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}' '${product.image}', ${product.stock}')">Add to Cart</button>
     `;
     container.appendChild(div);
   });
@@ -1032,7 +1032,7 @@ noResults.style.display = 'none';
       const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
       document.getElementById("cartCount").textContent = totalQty;
     }
-
+<!--
     window.addToCart = function(name, price, image) {
       let cart = getCart();
       let existing = cart.find(i => i.name === name);
@@ -1043,7 +1043,24 @@ noResults.style.display = 'none';
       }
       saveCart(cart);
     };
+-->
+window.addToCart = function(name, price, image, stock) {
+  let cart = getCart();
+  let existing = cart.find(i => i.name === name);
 
+  if (existing) {
+    if (existing.qty < stock) {
+      existing.qty++;
+    } else {
+      alert(`Only ${stock} items left in stock!`);
+      return;
+    }
+  } else {
+    cart.push({ name, price, qty: 1, image, stock });
+  }
+
+  saveCart(cart);
+};
     updateBadge();
 
     // Auth and dropdown
@@ -1139,9 +1156,7 @@ noResults.style.display = 'none';
       msg.style.color = "red";
     });
   });
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
+ document.addEventListener("DOMContentLoaded", () => {
     const profilePic = localStorage.getItem("profilePic"); // stored when user uploads
     const avatar = document.getElementById("userAvatar");
     const icon = document.getElementById("userIcon");
