@@ -299,7 +299,7 @@ function submitOrder(e){
 
   if(order.payMethod==="paystack"){
     let handler = PaystackPop.setup({
-      key:'pk_test_5a62d34951b3cd9b82fbb790145ec0427a4ac764',
+      key:'pk_live_55fc4deb5da6100b52f981f9f754dc0249e7752f',
       email:order.email||"customer@example.com",
       amount:order.total*100,
       currency:"GHS",
