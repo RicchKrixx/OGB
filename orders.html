@@ -206,7 +206,6 @@ function renderOrder(doc){
   container.prepend(div);
 }
 
-const createdAt = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
 
 // Real-time listener
 db.collection("orders")
