@@ -37,6 +37,38 @@ h1{margin-bottom:20px;color:#111;}
 .status{font-weight:bold;margin-top:4px;}
 /* Footer */
 footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top:26px;}
+
+.items img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: transform 0.2s;
+}
+.items img:hover {
+  transform: scale(1.1);
+}
+.buttons {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.buttons button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #fff;
+}
+.preparing { background: #f0ad4e; }
+.ontheway { background: #5bc0de; }
+.delivered { background: #5cb85c; }
+.complete { background: #777; cursor: not-allowed; }
+.cancel { background: #d9534f; }
 </style>
 </head>
 <body>
@@ -88,22 +120,63 @@ function renderOrder(doc){
   const o = doc.data();
   const div = document.createElement("div");
   div.className = "order";
-  const itemsHTML = o.items.map(i=>`<p>${i.name} x${i.qty||i.quantity} — GHS ${i.price*(i.qty||i.quantity)}</p>`).join("");
+
+  // Items with images preview
+  const itemsHTML = o.items.map(i=>{
+    const img = i.image ? `<img src="${i.image}" alt="${i.name}" onclick="window.open('${i.image}','_blank')"/>` : "";
+    const qty = i.qty||i.quantity||1;
+    return `<p>${img} ${i.name} x${qty} — GHS ${i.price*qty}</p>`;
+  }).join("");
+
+  // Include lat/lng in address
+  const latlng = (o.latitude && o.longitude) ? ` (${o.latitude.toFixed(6)}, ${o.longitude.toFixed(6)})` : "";
+
+  // Buttons HTML
+  const buttonsHTML = `
+    ${o.status !== "Complete" ? `
+    <div class="buttons">
+      <button class="preparing" onclick="updateStatus('${doc.id}','Preparing')">Preparing</button>
+      <button class="ontheway" onclick="updateStatus('${doc.id}','On the way')">On the way</button>
+      <button class="delivered" onclick="updateStatus('${doc.id}','Delivered')">Delivered</button>
+      <button class="complete" onclick="updateStatus('${doc.id}','Complete')">Complete</button>
+      <button class="cancel" onclick="cancelOrder('${doc.id}')">Cancel Order</button>
+    </div>` : `<p><b>Order Completed</b></p>`}
+  `;
+
   div.innerHTML = `
     <h2>Order ID: ${doc.id}</h2>
     <p><b>Name:</b> ${o.name}</p>
     <p><b>Phone:</b> ${o.phone}</p>
     <p><b>Email:</b> ${o.email || "N/A"}</p>
-    <p><b>Address:</b> ${o.address}</p>
+    <p><b>Address:</b> ${o.address}${latlng}</p>
     <p><b>Date:</b> ${o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString() : o.createdAt}</p>
     <div class="items"><b>Items:</b>${itemsHTML}</div>
     <p class="total">Total: GHS ${o.total}</p>
     <p class="status"><b>Payment:</b> ${o.payMethod} | <b>Status:</b> ${o.status}</p>
+    ${buttonsHTML}
   `;
   container.prepend(div);
 }
 
-// Real-time listener
+// Update order status
+function updateStatus(orderId, status){
+  const docRef = db.collection("orders").doc(orderId);
+  docRef.update({ status }).then(()=>{
+    console.log(`Order ${orderId} updated to ${status}`);
+  }).catch(err=>console.error(err));
+}
+
+// Cancel order
+function cancelOrder(orderId){
+  if(confirm("Are you sure you want to cancel this order?")){
+    const docRef = db.collection("orders").doc(orderId);
+    docRef.update({ status: "Cancelled" }).then(()=>{
+      console.log(`Order ${orderId} cancelled`);
+    }).catch(err=>console.error(err));
+  }
+}
+
+// Real-time listener remains the same
 db.collection("orders")
   .orderBy("createdAt","desc")
   .onSnapshot(snapshot=>{
