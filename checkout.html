@@ -294,11 +294,20 @@ function submitOrder(e){
 }
 
 function saveOrder(order){
+  // ensure createdAt uses Firestore timestamp
+  order.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+
+  // try attach userId if logged in
+  const currentUser = firebase.auth().currentUser;
+  if(currentUser){
+    order.userId = currentUser.uid;
+    if(!order.email){ order.email = currentUser.email; }
+  }
+
   db.collection("orders").add(order).then(docRef=>{
     localStorage.removeItem("cart");
     updateBadge();
 
-    // redirect after small delay so loader shows smoothly
     setTimeout(()=>{
       window.location.href = "thankyou.html?orderId=" + docRef.id;
     }, 1000);
