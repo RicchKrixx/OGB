@@ -210,7 +210,7 @@ function renderOrderSummary(){
     document.getElementById("grandTotal").textContent = "GH₵ " + grand;
 
     btn.disabled = false;
-    btn.textContent = document.querySelector("input[name='pay']:checked").value==="paystack" 
+    btn.textContent = document.querySelector("input[name='pay']:checked").value==="paid" 
       ? "Pay Now" 
       : "Place Order";
   }
