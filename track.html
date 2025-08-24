@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Tracking • On God Bend Mini Mart</title>
+<title>Advanced Real-Time Order Tracking • On God Bend Mini Mart</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 :root {
   --brand: #b8860b;
-  --brand-dark: #8b6508;
   --bg: #f9f9f9;
   --text: #333;
   --text-light: #777;
+  --completed-line: #b8860b;
+  --line-bg: #ddd;
 }
 
 body {
   font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
+  margin: 0; padding: 0;
   background: var(--bg);
   color: var(--text);
 }
@@ -31,29 +31,32 @@ body {
   box-shadow: 0 6px 18px rgba(0,0,0,0.1);
 }
 
-h2 {
-  color: var(--brand);
-  text-align: center;
-  margin-bottom: 30px;
+h2 { color: var(--brand); text-align: center; margin-bottom: 20px; }
+
+.search-box {
+  text-align: center; margin-bottom: 30px;
 }
+
+.search-box input { padding: 10px; font-size: 16px; width: 250px; border-radius: 8px; border: 1px solid #ccc; }
+.search-box button { padding: 10px 20px; margin-left: 10px; background: var(--brand); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
 
 .order-details {
   background: #f5f5f5;
   padding: 15px;
   border-radius: 10px;
   margin-bottom: 30px;
+  display: none;
 }
 
-.order-details p {
-  margin: 5px 0;
-  font-size: 16px;
-}
+.order-details p { margin: 5px 0; font-size: 16px; }
 
 .tracker {
   display: flex;
   justify-content: space-between;
   position: relative;
   margin-bottom: 30px;
+  overflow-x: auto;
+  padding-bottom: 10px;
 }
 
 .tracker::before {
@@ -63,7 +66,7 @@ h2 {
   left: 0;
   width: 100%;
   height: 4px;
-  background: #ddd;
+  background: var(--line-bg);
   z-index: 0;
   border-radius: 2px;
 }
@@ -71,133 +74,151 @@ h2 {
 .step {
   text-align: center;
   width: 25%;
+  min-width: 100px;
   position: relative;
   z-index: 1;
+  transition: transform 0.3s;
 }
 
 .step .circle {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #ddd;
-  margin: 0 auto 8px auto;
-  line-height: 28px;
-  color: #fff;
-  font-weight: bold;
-  transition: background 0.3s;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #ddd; margin: 0 auto 8px auto;
+  line-height: 28px; color: #fff; font-weight: bold;
+  transition: all 0.3s;
 }
 
-.step.completed .circle {
-  background: var(--brand);
-}
+.step.completed .circle { background: var(--brand); transform: scale(1.2); }
+.step.current .circle { border: 2px solid var(--brand); transform: scale(1.4); }
 
-.step p {
-  font-size: 14px;
-  color: var(--text-light);
-}
+.step p { font-size: 14px; color: var(--text-light); transition: color 0.3s; }
+.step.completed p { color: var(--text); font-weight: 600; }
+.step.current p { color: var(--brand); font-weight: 700; }
 
-.step.completed p {
-  color: var(--text);
-  font-weight: 600;
-}
-
-.status-msg {
-  text-align: center;
-  font-size: 18px;
-  margin-bottom: 20px;
-}
+.status-msg { text-align: center; font-size: 18px; margin-bottom: 20px; }
 
 .cancel-btn {
-  display: block;
-  width: 200px;
-  margin: 0 auto;
-  padding: 10px 20px;
-  background: #e74c3c;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
+  display: block; width: 200px; margin: 0 auto;
+  padding: 10px 20px; background: #e74c3c; color: #fff;
+  border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
   transition: background 0.3s;
 }
+.cancel-btn:hover { background: #c0392b; }
 
-.cancel-btn:hover {
-  background: #c0392b;
+/* Arrow between steps */
+.step::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  height: 4px;
+  width: 100%;
+  background: var(--line-bg);
+  z-index: -1;
 }
+
+.step:last-child::after { display: none; }
+.step.completed::after { background: var(--completed-line); }
 </style>
 </head>
 <body>
+
 <div class="container">
   <h2>Track Your Order</h2>
 
-  <div class="order-details">
-    <p><strong>Order ID:</strong> #OGB12345</p>
-    <p><strong>Customer:</strong> John Doe</p>
-    <p><strong>Date:</strong> 24 Aug 2025</p>
+  <div class="search-box">
+    <input type="text" id="orderIdInput" placeholder="Enter your Order ID">
+    <button onclick="startTracking()">Track</button>
   </div>
 
-  <div class="tracker">
-    <div class="step completed">
-      <div class="circle"><i class="fas fa-check"></i></div>
-      <p>Processing</p>
-    </div>
-    <div class="step completed">
-      <div class="circle"><i class="fas fa-check"></i></div>
-      <p>Preparing</p>
-    </div>
-    <div class="step">
-      <div class="circle">3</div>
-      <p>On the way</p>
-    </div>
-    <div class="step">
-      <div class="circle">4</div>
-      <p>Delivered</p>
-    </div>
-  </div>
+  <div class="order-details" id="orderDetails">
+    <p><strong>Order ID:</strong> <span id="orderId"></span></p>
+    <p><strong>Customer:</strong> <span id="customerName"></span></p>
+    <p><strong>Date:</strong> <span id="orderDate"></span></p>
 
-  <p class="status-msg">Your order is being prepared!</p>
-  <button class="cancel-btn" onclick="cancelOrder()">Cancel Order</button>
+    <div class="tracker" id="tracker">
+      <div class="step" data-step="Pending">
+        <div class="circle">1</div>
+        <p>Pending</p>
+      </div>
+      <div class="step" data-step="Preparing">
+        <div class="circle">2</div>
+        <p>Preparing</p>
+      </div>
+      <div class="step" data-step="Ontheway">
+        <div class="circle">3</div>
+        <p>Ontheway</p>
+      </div>
+      <div class="step" data-step="Delivered">
+        <div class="circle">4</div>
+        <p>Delivered</p>
+      </div>
+    </div>
+
+    <p class="status-msg" id="statusMsg"></p>
+    <button class="cancel-btn" onclick="cancelOrder()">Cancel Order</button>
+  </div>
 </div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-// Simulate dynamic status update
-let currentStep = 2; // Index starts at 0
-const steps = document.querySelectorAll('.step');
-const statusMsg = document.querySelector('.status-msg');
+ const firebaseConfig = {
+  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+  authDomain: "ongod-5073e.firebaseapp.com",
+  projectId: "ongod-5073e",
+  storageBucket: "ongod-5073e.firebasestorage.app",
+  messagingSenderId: "439687837026",
+  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+  measurementId: "G-1TVP0X3J62"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-function updateTracker(stepIndex) {
-  steps.forEach((step, idx) => {
-    if(idx <= stepIndex) {
-      step.classList.add('completed');
-      if(step.querySelector('.circle').innerText !== '✓') {
-        step.querySelector('.circle').innerHTML = '<i class="fas fa-check"></i>';
-      }
-    } else {
-      step.classList.remove('completed');
-      step.querySelector('.circle').innerText = idx+1;
-    }
-  });
+let unsubscribe = null;
 
-  const messages = [
-    "Order received!",
-    "Order is being prepared!",
-    "Order is on the way!",
-    "Order has been delivered!"
-  ];
-  statusMsg.innerText = messages[stepIndex];
+function startTracking() {
+  const orderId = document.getElementById('orderIdInput').value.trim();
+  if(!orderId) return alert("Please enter an Order ID");
+
+  if(unsubscribe) unsubscribe();
+
+  unsubscribe = db.collection('Orders').where('orderId', '==', orderId)
+    .onSnapshot(snapshot => {
+      if(snapshot.empty) { alert("Order not found!"); return; }
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        document.getElementById('orderId').innerText = data.orderId;
+        document.getElementById('customerName').innerText = data.customerName;
+        document.getElementById('orderDate').innerText = data.date;
+        document.getElementById('orderDetails').style.display = 'block';
+        updateTracker(data.status);
+      });
+    }, err => console.error(err));
 }
 
-// Example: automatically update status every 5 seconds
-setInterval(() => {
-  if(currentStep < steps.length - 1) {
-    currentStep++;
-    updateTracker(currentStep);
-  }
-}, 5000);
+function updateTracker(status) {
+  const steps = document.querySelectorAll('.step');
+  const statusMsg = document.getElementById('statusMsg');
+  const statusOrder = ["Processing","Preparing","On the way","Delivered"];
+  let index = statusOrder.indexOf(status);
+
+  steps.forEach((step, idx) => {
+    step.classList.remove('completed','current');
+    if(idx < index) step.classList.add('completed');
+    if(idx === index) step.classList.add('current');
+    step.querySelector('.circle').innerHTML = idx < index ? '<i class="fas fa-check"></i>' : (idx+1);
+  });
+
+  statusMsg.innerText = `Current Status: ${status}`;
+
+  // Scroll current step into view (mobile-friendly)
+  const currentStep = document.querySelector('.step.current');
+  if(currentStep) currentStep.scrollIntoView({behavior: 'smooth', inline: 'center'});
+}
 
 function cancelOrder() {
-  alert("Order has been cancelled!");
-  // Here you can also send cancellation request to backend
+  alert("Order cancellation requested! Implement backend logic here.");
 }
 </script>
 </body>
