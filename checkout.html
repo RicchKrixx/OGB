@@ -285,7 +285,7 @@ function submitOrder(e){
 
   const saveAndRedirect = () => {
     db.collection("orders").add(order).then(docRef=>{
-     Firestore document
+   
     docRef.update({ orderId: docRef.id });
       localStorage.removeItem("cart");
       updateBadge();
