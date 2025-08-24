@@ -136,7 +136,7 @@ h2 { color: var(--brand); text-align: center; margin-bottom: 20px; }
     <p><strong>Date:</strong> <span id="orderDate"></span></p>
 
     <div class="tracker" id="tracker">
-      <div class="step" data-step="Pending">
+      <div class="step" data-step="Processing">
         <div class="circle">1</div>
         <p>Pending</p>
       </div>
@@ -144,9 +144,9 @@ h2 { color: var(--brand); text-align: center; margin-bottom: 20px; }
         <div class="circle">2</div>
         <p>Preparing</p>
       </div>
-      <div class="step" data-step="Ontheway">
+      <div class="step" data-step="On the way">
         <div class="circle">3</div>
-        <p>Ontheway</p>
+        <p>On the way</p>
       </div>
       <div class="step" data-step="Delivered">
         <div class="circle">4</div>
@@ -163,7 +163,7 @@ h2 { color: var(--brand); text-align: center; margin-bottom: 20px; }
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
- const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
   authDomain: "ongod-5073e.firebaseapp.com",
   projectId: "ongod-5073e",
@@ -185,12 +185,20 @@ function startTracking() {
 
   unsubscribe = db.collection('Orders').where('orderId', '==', orderId)
     .onSnapshot(snapshot => {
-      if(snapshot.empty) { alert("Order not found!"); return; }
+      if(snapshot.empty) { 
+        alert("Order not found!"); 
+        document.getElementById('orderDetails').style.display = 'none';
+        return; 
+      }
       snapshot.forEach(doc => {
         const data = doc.data();
         document.getElementById('orderId').innerText = data.orderId;
         document.getElementById('customerName').innerText = data.customerName;
-        document.getElementById('orderDate').innerText = data.date;
+
+        // Handle Firestore timestamp
+        const orderDate = data.date && data.date.toDate ? data.date.toDate().toLocaleString() : data.date;
+        document.getElementById('orderDate').innerText = orderDate;
+
         document.getElementById('orderDetails').style.display = 'block';
         updateTracker(data.status);
       });
