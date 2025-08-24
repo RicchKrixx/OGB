@@ -237,13 +237,13 @@ hr{border:0;border-top:1px solid var(--border);margin:14px 0}
         return d.toLocaleString();
       }catch{ return '—'; }
     }
-    function statusPill(status='processing'){
+    function statusPill(status='pending'){
       const s = String(status).toLowerCase();
       let cls='info', label=status;
       if(['delivered','completed'].includes(s)){ cls='success'; label='Delivered'; }
       else if(['shipped','on the way','out for delivery'].includes(s)){ cls='warn'; label='On the way'; }
-      else if(['pending','cancelled','canceled'].includes(s)){ cls='danger'; label='Cancelled'; }
-      else if(['preparing','processing'].includes(s)){ cls='info'; label=s.charAt(0).toUpperCase()+s.slice(1); }
+      else if(['cancelled','canceled'].includes(s)){ cls='danger'; label='Cancelled'; }
+      else if(['preparing','pending'].includes(s)){ cls='info'; label=s.charAt(0).toUpperCase()+s.slice(1); }
       return `<span class="pill ${cls}">${label}</span>`;
     }
 
