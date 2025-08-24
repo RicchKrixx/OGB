@@ -788,6 +788,32 @@ flex-wrap: wrap;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   max-width: 800px;
 }
+#review-overlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center;
+  z-index: 9999;
+}
+
+.review-popup {
+  background:white; padding:30px; border-radius:12px; width:90%; max-width:400px; text-align:center;
+}
+
+.review-popup .stars span {
+  font-size:30px; cursor:pointer;
+  margin:0 5px;
+}
+
+.review-popup .stars span.active {
+  color: gold;
+}
+
+.review-popup textarea {
+  width:100%; margin:15px 0; padding:10px; border-radius:8px; border:1px solid #ccc;
+}
+
+.review-popup button {
+  padding:10px 20px; margin:5px; border:none; border-radius:8px; cursor:pointer; background:#b8860b; color:white;
+}
 </style>
 <section class="newsletter">
   <h2>📩 Subscribe to our Newsletter</h2>
@@ -1129,6 +1155,86 @@ noResults.style.display = 'none';
       icon.style.display = "block";
     }
   });
+// Example when marking an order complete
+function markOrderComplete(orderId) {
+  const orders = JSON.parse(localStorage.getItem("orders")) || {};
+  if (orders[orderId]) {
+    orders[orderId].status = "Complete";
+    // Save timestamp of completion
+    orders[orderId].completeTime = Date.now();
+    localStorage.setItem("orders", JSON.stringify(orders));
+  }
+}
+window.addEventListener("load", () => {
+  const orders = JSON.parse(localStorage.getItem("orders")) || {};
+  
+  Object.keys(orders).forEach(orderId => {
+    const order = orders[orderId];
+    
+    // Only if order is complete and review not yet given
+    if (order.status === "Complete" && !order.reviewGiven) {
+      const now = Date.now();
+      const completedAt = order.completeTime || 0;
+      const hours24 = 10 * 1000;
+      
+      if (now - completedAt >= hours24) {
+        showReviewPopup(orderId);
+      }
+    }
+  });
+});
+
+function showReviewPopup(orderId) {
+  // Create overlay
+  const overlay = document.createElement("div");
+  overlay.id = "review-overlay";
+  overlay.innerHTML = `
+    <div class="review-popup">
+      <h2>How was your order?</h2>
+      <div class="stars">
+        <span data-star="1">⭐</span>
+        <span data-star="2">⭐</span>
+        <span data-star="3">⭐</span>
+        <span data-star="4">⭐</span>
+        <span data-star="5">⭐</span>
+      </div>
+      <textarea placeholder="Leave your feedback..."></textarea>
+      <button id="submit-review">Submit</button>
+      <button id="close-review">Close</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const stars = overlay.querySelectorAll(".stars span");
+  let rating = 0;
+  stars.forEach(star => {
+    star.addEventListener("click", () => {
+      rating = star.dataset.star;
+      stars.forEach(s => s.classList.toggle("active", s.dataset.star <= rating));
+    });
+  });
+
+  overlay.querySelector("#submit-review").addEventListener("click", () => {
+    const feedback = overlay.querySelector("textarea").value;
+    saveReview(orderId, rating, feedback);
+    document.body.removeChild(overlay);
+  });
+
+  overlay.querySelector("#close-review").addEventListener("click", () => {
+    document.body.removeChild(overlay);
+  });
+}
+
+// Save review in localStorage
+function saveReview(orderId, rating, feedback) {
+  const orders = JSON.parse(localStorage.getItem("orders")) || {};
+  if (orders[orderId]) {
+    orders[orderId].reviewGiven = true;
+    orders[orderId].review = { rating, feedback };
+    localStorage.setItem("orders", JSON.stringify(orders));
+    alert("Thank you for your review!");
+  }
+}
 </script>
 </body>
 </html>
