@@ -809,41 +809,7 @@ function showToast(itemName) {
   padding:10px 20px; margin:5px; border:none; border-radius:8px; cursor:pointer; background:#b8860b; color:white;
 }
 </style>
-<!-- Newsletter form -->
-<form id="newsletterForm" class="newsletter">
-  <input type="email" id="newsletterEmail" placeholder="Enter your email" required>
-  <button type="submit">Subscribe</button>
-</form>
 
-<!-- Toast -->
-<div id="toast" class="toast"></div>
-
-<style>
-  .toast {
-    visibility: hidden;
-    min-width: 250px;
-    background: #333;
-    color: #fff;
-    text-align: center;
-    border-radius: 8px;
-    padding: 12px;
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.5s, bottom 0.5s;
-  }
-  .toast.show {
-    visibility: visible;
-    opacity: 1;
-    bottom: 50px;
-  }
-</style>
-
-
-<div id="newsletterToast" class="toast"></div>
 <!-- FOOTER -->
 <footer>
 <!-- ABOUT -->
@@ -1238,40 +1204,6 @@ function saveReview(orderId, rating, feedback) {
   }
 }
 
-const db = getFirestore();
-
-  // Toast function
-  function showToast(message) {
-    const toast = document.getElementById("toast");
-    toast.innerText = message;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 3000);
-  }
-
-  // Newsletter form submit
-  const form = document.getElementById("newsletterForm");
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("newsletterEmail").value.trim();
-
-    if (!email) {
-      showToast("Please enter a valid email.");
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "newsletter"), {
-        email: email,
-        subscribedAt: serverTimestamp()
-      });
-
-      form.reset();
-      showToast("Subscribed successfully 🎉");
-    } catch (error) {
-      console.error("Error subscribing: ", error);
-      showToast("Error. Try again!");
-    }
-  });
 </script>
 </body>
 </html>
