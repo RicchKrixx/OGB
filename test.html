@@ -2,65 +2,218 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Street View with Arrows</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products Edit - OGB</title>
   <style>
-    body { margin: 0; background: #f4f4f4; }
-    #panorama {
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .accordion {
+      background: #fff;
+      color: #333;
+      cursor: pointer;
+      padding: 15px;
       width: 100%;
-      height: 500px; /* fixed height, no fullscreen */
-    }
-    .controls {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-    }
-    .controls button {
-      background: rgba(0,0,0,0.6);
-      color: white;
       border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
+      outline: none;
+      transition: 0.3s;
       font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .accordion.active {
+      background: #0077ff;
+      color: #fff;
+    }
+    .panel {
+      padding: 15px;
+      background: #fff;
+      display: none;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .product {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .product img {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      margin-right: 10px;
+      object-fit: cover;
+    }
+    .product-info {
+      flex: 1;
+    }
+    .product-actions button {
+      margin-left: 5px;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
     }
-    .controls button:hover {
-      background: rgba(0,0,0,0.8);
+    .edit-btn { background: #0077ff; color: #fff; }
+    .delete-btn { background: #ff3b3b; color: #fff; }
+    .add-form {
+      margin-top: 15px;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+    }
+    .add-form input {
+      padding: 6px;
+      margin: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .add-form button {
+      padding: 6px 12px;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div id="panorama"></div>
+  <h1>Products Editor</h1>
 
-  <!-- Arrow Controls -->
-  <div class="controls">
-    <button onclick="pan(-20,0)">⬅️</button>
-    <button onclick="pan(20,0)">➡️</button>
-    <button onclick="pan(0,20)">⬆️</button>
-    <button onclick="pan(0,-20)">⬇️</button>
-  </div>
+  <button class="accordion">🍷 Wines</button>
+  <div class="panel" id="wines"></div>
 
-  <script>
-    const viewer = pannellum.viewer('panorama', {
-      type: "equirectangular",
-      panorama: "https://i.postimg.cc/nhLh4XvW/IMG-20250822-WA0012.jpg", // replace with your panorama
-      autoLoad: true,
-      hfov: 110,
-      pitch: 0,
-      yaw: 0,
-      compass: false
+  <button class="accordion">🥃 Liquors</button>
+  <div class="panel" id="liquors"></div>
+
+  <button class="accordion">🛒 Everyday Essentials</button>
+  <div class="panel" id="essentials"></div>
+
+  <!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+  import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } 
+    from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+    authDomain: "ongod-5073e.firebaseapp.com",
+    projectId: "ongod-5073e",
+    storageBucket: "ongod-5073e.firebasestorage.app",
+    messagingSenderId: "439687837026",
+    appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+    measurementId: "G-1TVP0X3J62"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Accordion toggle
+  document.querySelectorAll(".accordion").forEach(btn => {
+    btn.addEventListener("click", function() {
+      this.classList.toggle("active");
+      const panel = this.nextElementSibling;
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    });
+  });
+
+  // Render products by category
+  async function loadProducts(category, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "<p>Loading...</p>";
+
+    const q = query(collection(db, "products"), where("category", "==", category));
+    const snapshot = await getDocs(q);
+
+    container.innerHTML = "";
+    snapshot.forEach(docSnap => {
+      const product = docSnap.data();
+      const div = document.createElement("div");
+      div.className = "product";
+      div.innerHTML = `
+        <img src="${product.image || 'https://via.placeholder.com/50'}" />
+        <div class="product-info">
+          <strong>${product.name}</strong><br>
+          ${product.originalPrice ? `<span style="text-decoration: line-through; color: gray;">GH₵${product.originalPrice}</span> ` : ""}
+          GH₵${product.price}
+        </div>
+        <div class="product-actions">
+          <button class="edit-btn">Edit</button>
+          <button class="delete-btn">Delete</button>
+        </div>
+      `;
+
+      // Delete
+      div.querySelector(".delete-btn").addEventListener("click", async () => {
+        await deleteDoc(doc(db, "products", docSnap.id));
+        loadProducts(category, containerId);
+      });
+
+      // Edit
+      div.querySelector(".edit-btn").addEventListener("click", async () => {
+        const newName = prompt("Enter new name", product.name);
+        const newPrice = prompt("Enter new price", product.price);
+        const newOriginal = prompt("Enter original price (optional)", product.originalPrice || "");
+        await updateDoc(doc(db, "products", docSnap.id), {
+          name: newName,
+          price: Number(newPrice),
+          originalPrice: newOriginal ? Number(newOriginal) : null
+        });
+        loadProducts(category, containerId);
+      });
+
+      container.appendChild(div);
     });
 
-    function pan(yawOffset, pitchOffset) {
-      const currentYaw = viewer.getYaw();
-      const currentPitch = viewer.getPitch();
-      viewer.setYaw(currentYaw + yawOffset);
-      viewer.setPitch(currentPitch + pitchOffset);
-    }
-  </script>
+    // Add new product form
+    const form = document.createElement("div");
+    form.className = "add-form";
+    form.innerHTML = `
+      <h4>Add New ${category}</h4>
+      <input type="text" placeholder="Name" id="${containerId}-name" />
+      <input type="number" placeholder="Price" id="${containerId}-price" />
+      <input type="number" placeholder="Original Price (optional)" id="${containerId}-original" />
+      <input type="text" placeholder="Image URL" id="${containerId}-image" />
+      <button>Add</button>
+    `;
+
+    form.querySelector("button").addEventListener("click", async () => {
+      const name = document.getElementById(`${containerId}-name`).value;
+      const price = document.getElementById(`${containerId}-price`).value;
+      const original = document.getElementById(`${containerId}-original`).value;
+      const image = document.getElementById(`${containerId}-image`).value;
+      if(!name || !price) return alert("Please fill all required fields");
+      await addDoc(collection(db, "products"), {
+        name,
+        price: Number(price),
+        originalPrice: original ? Number(original) : null,
+        image,
+        category
+      });
+      loadProducts(category, containerId);
+    });
+
+    container.appendChild(form);
+  }
+
+  // Load all categories (must match Firestore category exactly)
+  loadProducts("Wines", "wines");
+  loadProducts("Liquors", "liquors");
+  loadProducts("Essentials", "essentials");
+</script>
 </body>
 </html>
