@@ -1111,19 +1111,35 @@ showToast(name);
   };
 
  document.addEventListener("DOMContentLoaded", () => {
-    const profilePic = localStorage.getItem("profilePic"); // stored when user uploads
-    const avatar = document.getElementById("userAvatar");
-    const icon = document.getElementById("userIcon");
+  const profilePic = localStorage.getItem("profilePic");
+  const avatar = document.getElementById("userAvatar");
+  const icon = document.getElementById("userIcon");
+  const dropdown = document.getElementById("userDropdown");
 
-    if (profilePic) {
-      avatar.src = profilePic;
-      avatar.style.display = "block";
-      icon.style.display = "none";
-    } else {
-      avatar.style.display = "none";
-      icon.style.display = "block";
+  if (profilePic) {
+    avatar.src = profilePic;
+    avatar.style.display = "block";
+    icon.style.display = "none";
+  } else {
+    avatar.style.display = "none";
+    icon.style.display = "block";
+  }
+
+  // Toggle dropdown when avatar or icon is clicked
+  [avatar, icon].forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation(); // prevent body click from firing
+      dropdown.classList.toggle("hidden");
+    });
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!dropdown.contains(e.target) && !avatar.contains(e.target) && !icon.contains(e.target)) {
+      dropdown.classList.add("hidden");
     }
   });
+});
 // Example when marking an order complete
 function markOrderComplete(orderId) {
   const orders = JSON.parse(localStorage.getItem("orders")) || {};
