@@ -19,6 +19,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 .cart-item img{width:64px;height:64px;object-fit:cover;border-radius:8px;}
 .qty{display:inline-flex;align-items:center;border:1px solid #ddd;border-radius:10px;overflow:hidden;}
 .qty button{background:#f4f4f4;border:0;padding:4px 8px;cursor:pointer;}
+button remove {
+margin-left: 5px;}
 .qty span{min-width:30px;text-align:center;}
 .cart-footer{padding:12px;border-top:1px solid #eee;}
 .cart-footer .total{display:flex;justify-content:space-between;font-weight:800;margin-bottom:10px;}
@@ -118,6 +120,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
   .hamburger.active span:nth-child(1) {
     transform: rotate(45deg);
     top: 10px;
+  background: #fff;
   }
   .hamburger.active span:nth-child(2) {
     opacity: 0;
@@ -125,6 +128,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
   .hamburger.active span:nth-child(3) {
     transform: rotate(-45deg);
     top: 10px;
+    background: #fff;
   } 
 .empty-cart {
   text-align: center;
@@ -443,7 +447,7 @@ function renderCart(){
           <button onclick="decrease(${i})">-</button>
           <span>${item.qty}</span>
           <button onclick="increase(${i})">+</button>
-          <button style="margin-left:6px;background:#f44336;color:#fff;" onclick="removeItem(${i})">×</button>
+          <button class="remove" style="margin-left:6px;background:#f44336;color:#fff;" onclick="removeItem(${i})">remove</button>
         </div>
       `;
       list.appendChild(div);
