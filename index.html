@@ -153,7 +153,7 @@ margin-top:26px;
     position: absolute;
     height: 4px;
     width: 100%;
-    background: #333;
+    background: #fff;
     border-radius: 2px;
     transition: all 0.3s ease;
   }
@@ -625,11 +625,6 @@ flex-wrap: wrap;
   font-size: 14px;
   font-weight: bold;
 }
-.stock-msg {
-  color: red;
-  font-weight: bold;
-  margin-top: 5px;
-} 
 </style>
 </head>
 <body>
@@ -700,7 +695,7 @@ flex-wrap: wrap;
   <h1><span class="cta">Premium</span> Wines, Liquors & Everyday Essentials</h1>
   <p>Quality you trust • Prices you love • Fast local delivery</p>
 <div class="section"> 
-  <input type="text" id="searchInput" placeholder="🔍 Search products..." style="width:100%;max-width:400px;padding:10px;font-size:16px;margin-bottom:5px;border-radius:8px;border:1px solid #ccc; background:#bbb;">
+  <input type="text" id="searchInput" placeholder="🔍 Search products..." style="width:100%;max-width:400px;padding:10px;font-size:16px;margin-bottom:5px;border-radius:8px;border:1px solid #ccc; background:#fff;">
 </div>
 
 <div class="quick-sec">
@@ -735,16 +730,6 @@ flex-wrap: wrap;
  <!-- Toast container -->
   <div id="toast">✅ Item added to cart</div>
 
-  <script>
-    function addToCart() {
-      // your existing add-to-cart logic goes here
-
-      // show toast
-      let toast = document.getElementById("toast");
-      toast.className = "show";
-      setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2000);
-    }
-  </script>
 <section class="section" id="shop">
 <section class="shop">
   <h2>Our Shop</h2>
@@ -859,7 +844,7 @@ flex-wrap: wrap;
 <div class="socials">
   <a href="https://www.facebook.com/share/14ELUiTeANh/?mibextid=wwXIfr" class="facebook" class="facebook" data-label="Facebook"><i class="fab fa-facebook-f"></i></a>
   <a href="https://www.instagram.com/bixmax_store?igsh=d29xMTBlcTZ4N3I3" class="instagram" data-label="Instagram"><i class="fab fa-instagram"></i></a>
-  <a href=https://www.tiktok.com/@ongodbendminimart?_t=ZM-8z3qQmH7Api&_r=1" class="tiktok" data-label="TikTok"><i class="fab fa-tiktok"></i></a>
+  <a href="https://www.tiktok.com/@ongodbendminimart?_t=ZM-8z3qQmH7Api&_r=1" class="tiktok" data-label="TikTok"><i class="fab fa-tiktok"></i></a>
   <a href="#" class="x" data-label="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
 </div>
 <div class="footer" style="color:#fff;">
@@ -1042,8 +1027,11 @@ noResults.style.display = 'none';
         cart.push({ name, price, qty: 1, image });
       }
       saveCart(cart);
-    };
-
+    
+let toast = document.getElementById("toast");
+      toast.className = "show";
+      setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2000);
+};
     updateBadge();
 
     // Auth and dropdown
