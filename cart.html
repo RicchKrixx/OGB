@@ -452,7 +452,7 @@ function renderCart(){
       `;
       list.appendChild(div);
     });
-    document.getElementById("subtotal").textContent = "GH₵ "+subtotal;
+    document.getElementById("subtotal").textContent = "GH₵ "+subtotal.toFixed(2);
   }
 
   // ✅ Always show suggested products
