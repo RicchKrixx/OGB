@@ -566,66 +566,12 @@ flex-wrap: wrap;
       opacity: 1;
       bottom: 50px;
     }
-.newsletter {
-  background: #fff;
-  padding: 25px;
-  text-align: center;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  margin: 20px;
-}
 
-.newsletter h2 {
-  font-size: 20px;
-  margin-bottom: 10px;
-  color: #333;
+#userDropdown {
+  display: none;
 }
-
-.newsletter p {
-  font-size: 14px;
-  margin-bottom: 15px;
-  color: #555;
-}
-
-.newsletter form {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.newsletter input {
-  padding: 12px;
-  width: 250px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  outline: none;
-  transition: border 0.3s ease;
-}
-
-.newsletter input:focus {
-  border-color: #b8860b;
-}
-
-.newsletter button {
-  padding: 12px 18px;
-  background: #b8860b;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.newsletter button:hover {
-  background: #a0740a;
-}
-
-#newsletterMsg {
-  margin-top: 12px;
-  font-size: 14px;
-  font-weight: bold;
+#userDropdown.show {
+  display: block;
 }
 </style>
 </head>
@@ -1111,11 +1057,11 @@ showToast(name);
   };
 
  document.addEventListener("DOMContentLoaded", () => {
-  const profilePic = localStorage.getItem("profilePic"); // stored when user uploads
+  const profilePic = localStorage.getItem("profilePic");
   const avatar = document.getElementById("userAvatar");
   const icon = document.getElementById("userIcon");
   const dropdown = document.getElementById("userDropdown"); 
-  const trigger = document.getElementById("userTrigger"); // button/avatar that opens dropdown
+  const trigger = document.getElementById("userTrigger"); 
 
   if (profilePic) {  
     avatar.src = profilePic;  
@@ -1126,13 +1072,13 @@ showToast(name);
     icon.style.display = "block";  
   }
 
-  // Toggle dropdown on trigger click
+  // Toggle dropdown
   trigger.addEventListener("click", (e) => {
-    e.stopPropagation(); 
-    dropdown.classList.toggle("show"); 
+    e.stopPropagation();
+    dropdown.classList.toggle("show");
   });
 
-  // Close when clicking outside
+  // Close dropdown when clicking outside
   document.addEventListener("click", (e) => {
     if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
       dropdown.classList.remove("show");
