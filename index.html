@@ -842,45 +842,6 @@ function showToast(itemName) {
   }
 </style>
 
-<script type="module">
-  import { getFirestore, collection, addDoc, serverTimestamp } 
-    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-  const db = getFirestore();
-
-  // Toast function
-  function showToast(message) {
-    const toast = document.getElementById("toast");
-    toast.innerText = message;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 3000);
-  }
-
-  // Newsletter form submit
-  const form = document.getElementById("newsletterForm");
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("newsletterEmail").value.trim();
-
-    if (!email) {
-      showToast("Please enter a valid email.");
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "newsletter"), {
-        email: email,
-        subscribedAt: serverTimestamp()
-      });
-
-      form.reset();
-      showToast("Subscribed successfully 🎉");
-    } catch (error) {
-      console.error("Error subscribing: ", error);
-      showToast("Error. Try again!");
-    }
-  });
-</script>
 
 <div id="newsletterToast" class="toast"></div>
 <!-- FOOTER -->
@@ -930,6 +891,8 @@ function showToast(itemName) {
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp } 
+    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
@@ -1274,6 +1237,41 @@ function saveReview(orderId, rating, feedback) {
     alert("Thank you for your review!");
   }
 }
+
+const db = getFirestore();
+
+  // Toast function
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  }
+
+  // Newsletter form submit
+  const form = document.getElementById("newsletterForm");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("newsletterEmail").value.trim();
+
+    if (!email) {
+      showToast("Please enter a valid email.");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "newsletter"), {
+        email: email,
+        subscribedAt: serverTimestamp()
+      });
+
+      form.reset();
+      showToast("Subscribed successfully 🎉");
+    } catch (error) {
+      console.error("Error subscribing: ", error);
+      showToast("Error. Try again!");
+    }
+  });
 </script>
 </body>
 </html>
