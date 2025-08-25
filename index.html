@@ -728,7 +728,7 @@ flex-wrap: wrap;
   </section>
 </div>
  <!-- Toast container -->
-  <div id="toast">✅ Item added to cart</div>
+  <div id="toast"></div>
 
 <section class="section" id="shop">
 <section class="shop">
@@ -1029,8 +1029,12 @@ noResults.style.display = 'none';
       saveCart(cart);
     
 let toast = document.getElementById("toast");
-      toast.className = "show";
-      setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2000);
+  toast.textContent = "✅ " + itemName + " added to cart"; // update text
+  toast.className = "show";
+  setTimeout(() => { 
+    toast.className = toast.className.replace("show", ""); 
+  }, 2000);
+}
 };
     updateBadge();
 
