@@ -730,6 +730,17 @@ flex-wrap: wrap;
  <!-- Toast container -->
   <div id="toast"></div>
 
+<script>
+function showToast(itemName) {
+  let toast = document.getElementById("toast");
+  toast.textContent = "✅ " + itemName + " added to cart"; // update text
+  toast.className = "show";
+  setTimeout(() => { 
+    toast.className = toast.className.replace("show", ""); 
+  }, 2000);
+}
+</script>
+
 <section class="section" id="shop">
 <section class="shop">
   <h2>Our Shop</h2>
@@ -1028,13 +1039,7 @@ noResults.style.display = 'none';
       }
       saveCart(cart);
     
-let toast = document.getElementById("toast");
-  toast.textContent = "✅ " + itemName + " added to cart"; // update text
-  toast.className = "show";
-  setTimeout(() => { 
-    toast.className = toast.className.replace("show", ""); 
-  }, 2000);
-}
+showToast(item.name);
 };
     updateBadge();
 
