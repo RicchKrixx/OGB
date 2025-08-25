@@ -759,7 +759,7 @@ flex-wrap: wrap;
       autoLoad: true,
       showControls: true,
       compass: true,
-      title: "On God Bend-OGB",
+      title: "On God Bend",
       author: "Gadri Jasper",
       hfov: 110
   });
@@ -928,7 +928,7 @@ flex-wrap: wrap;
       <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
       <h3>${product.name}</h3>
       <div class="price">${priceHTML}</div>
-      <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}' '${product.image}', ${product.stock}')">Add to Cart</button>
+      <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}, '${product.stock}')">Add to Cart</button>
     `;
     container.appendChild(div);
   });
