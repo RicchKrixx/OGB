@@ -809,14 +809,80 @@ function showToast(itemName) {
   padding:10px 20px; margin:5px; border:none; border-radius:8px; cursor:pointer; background:#b8860b; color:white;
 }
 </style>
-<section class="newsletter">
-  <h2>📩 Subscribe to our Newsletter</h2>
-  <form id="newsletterForm">
-    <input type="email" id="newsletterEmail" placeholder="Enter your email" required>
-    <button type="submit">Subscribe</button>
-  </form>
-  <p id="newsletterMsg"></p>
-</section>
+<!-- Newsletter form -->
+<form id="newsletterForm" class="newsletter">
+  <input type="email" id="newsletterEmail" placeholder="Enter your email" required>
+  <button type="submit">Subscribe</button>
+</form>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<style>
+  .toast {
+    visibility: hidden;
+    min-width: 250px;
+    background: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 12px;
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.5s, bottom 0.5s;
+  }
+  .toast.show {
+    visibility: visible;
+    opacity: 1;
+    bottom: 50px;
+  }
+</style>
+
+<script type="module">
+  import { getFirestore, collection, addDoc, serverTimestamp } 
+    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  const db = getFirestore();
+
+  // Toast function
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  }
+
+  // Newsletter form submit
+  const form = document.getElementById("newsletterForm");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("newsletterEmail").value.trim();
+
+    if (!email) {
+      showToast("Please enter a valid email.");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "newsletter"), {
+        email: email,
+        subscribedAt: serverTimestamp()
+      });
+
+      form.reset();
+      showToast("Subscribed successfully 🎉");
+    } catch (error) {
+      console.error("Error subscribing: ", error);
+      showToast("Error. Try again!");
+    }
+  });
+</script>
+
+<div id="newsletterToast" class="toast"></div>
 <!-- FOOTER -->
 <footer>
 <!-- ABOUT -->
@@ -1114,26 +1180,6 @@ showToast(name);
     if (e.target === this) this.style.display = "none";
   };
 
-  // Newsletter form
-  const form = document.getElementById("newsletterForm");
-  const emailInput = document.getElementById("newsletterEmail");
-  const msg = document.getElementById("newsletterMsg");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    msg.textContent = "⏳ Subscribing...";
-    try {
-      await addDoc(collection(db, "newsletter"), {
-        email: emailInput.value,
-        date: serverTimestamp()
-      });
-      msg.textContent = "✅ Thanks for subscribing!";
-      form.reset();
-    } catch (error) {
-      console.error(error);
-      msg.textContent = "❌ Something went wrong. Try again!";
-    }
-  });
  document.addEventListener("DOMContentLoaded", () => {
     const profilePic = localStorage.getItem("profilePic"); // stored when user uploads
     const avatar = document.getElementById("userAvatar");
