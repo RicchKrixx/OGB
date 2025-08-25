@@ -1107,25 +1107,25 @@ let toast = document.getElementById("toast");
     if (e.target === this) this.style.display = "none";
   };
 
-  document.getElementById("newsletterForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    const emailInput = document.getElementById("newsletterEmail");
-    const msg = document.getElementById("newsletterMsg");
+  // Newsletter form
+  const form = document.getElementById("newsletterForm");
+  const emailInput = document.getElementById("newsletterEmail");
+  const msg = document.getElementById("newsletterMsg");
 
-    db.collection("newsletter").add({
-      email: emailInput.value,
-      date: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.textContent = "⏳ Subscribing...";
+    try {
+      await addDoc(collection(db, "newsletter"), {
+        email: emailInput.value,
+        date: serverTimestamp()
+      });
       msg.textContent = "✅ Thanks for subscribing!";
-      msg.style.color = "green";
-      emailInput.value = "";
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      msg.textContent = "❌ Something went wrong!";
-      msg.style.color = "red";
-    });
+      form.reset();
+    } catch (error) {
+      console.error(error);
+      msg.textContent = "❌ Something went wrong. Try again!";
+    }
   });
  document.addEventListener("DOMContentLoaded", () => {
     const profilePic = localStorage.getItem("profilePic"); // stored when user uploads
