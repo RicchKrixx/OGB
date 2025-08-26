@@ -390,7 +390,7 @@ hr{border:0;border-top:1px solid var(--border);margin:14px 0}
     window.logout = async ()=>{
       try{
         await signOut(auth);
-        location.href = "auth.html"; // your login/register page
+        location.href = "/OGB/auth/"; // your login/register page
       }catch(err){
         alert("Logout failed: " + err.message);
       }
