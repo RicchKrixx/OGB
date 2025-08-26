@@ -87,6 +87,22 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
   position: absolute; top: 20px; right: 30px;
   color: #fff; font-size: 30px; cursor: pointer;
 }
+/* New Order Overlay */
+#newOrderOverlay {
+  display: none;
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background: var(--brand);
+  color: #fff;
+  font-size: 40px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  cursor: pointer;
+  text-align: center;
+}
 </style>
 </head>
 <body>
@@ -109,7 +125,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 <!-- Modal for image preview -->
 <div id="imgModal"><span onclick="document.getElementById('imgModal').style.display='none'">&times;</span><img id="modalImg"/></div>
 
-
+<div id="newOrderOverlay" onclick="hideNewOrder()">🚨 NEW ORDER 🚨</div>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -227,7 +243,50 @@ function displayOrders(list){
   container.innerHTML="";
   list.forEach(doc=>renderOrder(doc));
 }
+const overlay = document.getElementById("newOrderOverlay");
+let lastSeenIds = new Set();
 
+// Show overlay
+function showNewOrder(){
+  overlay.style.display = "flex";
+  setTimeout(hideNewOrder, 3000); // auto-hide after 3s
+}
+
+// Hide overlay
+function hideNewOrder(){
+  overlay.style.display = "none";
+}
+
+// Modify snapshot listener
+db.collection("orders")
+  .orderBy("createdAt","desc")
+  .onSnapshot(snapshot=>{
+    container.innerHTML="";
+    if(snapshot.empty){
+      container.innerHTML=`<div style="text-align:center;padding:20px;color:#777;">📭 No orders yet</div>`;
+      return;
+    }
+
+    let newOrdersDetected = false;
+    allOrders = [];
+    snapshot.forEach(doc=>{
+      allOrders.push(doc);
+      if(!lastSeenIds.has(doc.id)){ 
+        newOrdersDetected = true; 
+        lastSeenIds.add(doc.id);
+      }
+    });
+
+    displayOrders(allOrders);
+
+    // if any new orders, show overlay
+    if(newOrdersDetected){
+      showNewOrder();
+    }
+  },err=>{
+    console.error(err);
+    container.innerHTML="<p>Failed to load orders.</p>";
+  });
 // Search filter
 searchBar.addEventListener("input", ()=>{
   const q = searchBar.value.toLowerCase();
@@ -240,6 +299,7 @@ searchBar.addEventListener("input", ()=>{
   });
   displayOrders(filtered);
 });
+
 </script>
 
 <script>
