@@ -185,7 +185,7 @@ function renderOrder(doc){
 
   const latlng = (o.latitude && o.longitude) ? ` (${o.latitude.toFixed(6)}, ${o.longitude.toFixed(6)})` : "";
 
-  let nextStatus = "Preparing";
+  let nextStatus = "Pending";
   const currentIndex = statusFlow.indexOf(o.status);
   if(currentIndex >= 0 && currentIndex < statusFlow.length-1){
     nextStatus = statusFlow[currentIndex+1];
@@ -245,6 +245,7 @@ function displayOrders(list){
 }
 const overlay = document.getElementById("newOrderOverlay");
 let lastSeenIds = new Set();
+let firstSnapshot = true; // 👈 flag to ignore initial load
 
 // Show overlay
 function showNewOrder(){
@@ -257,7 +258,6 @@ function hideNewOrder(){
   overlay.style.display = "none";
 }
 
-// Modify snapshot listener
 db.collection("orders")
   .orderBy("createdAt","desc")
   .onSnapshot(snapshot=>{
@@ -272,17 +272,20 @@ db.collection("orders")
     snapshot.forEach(doc=>{
       allOrders.push(doc);
       if(!lastSeenIds.has(doc.id)){ 
-        newOrdersDetected = true; 
+        if (!firstSnapshot) { // 👈 only count as "new" if not first load
+          newOrdersDetected = true;
+        }
         lastSeenIds.add(doc.id);
       }
     });
 
     displayOrders(allOrders);
 
-    // if any new orders, show overlay
     if(newOrdersDetected){
       showNewOrder();
     }
+
+    firstSnapshot = false; // after first load, turn off the flag
   },err=>{
     console.error(err);
     container.innerHTML="<p>Failed to load orders.</p>";
