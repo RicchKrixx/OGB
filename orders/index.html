@@ -218,61 +218,48 @@ function renderOrder(doc){
 
 // Store all orders for searching
 let allOrders = [];
-
-// Real-time listener
-db.collection("orders")
-  .orderBy("createdAt","desc")
-  .onSnapshot(snapshot=>{
-    container.innerHTML="";
-    if(snapshot.empty){
-      container.innerHTML=`<div style="text-align:center;padding:20px;color:#777;">📭 No orders yet</div>`;
-      return;
-    }
-    allOrders = [];
-    snapshot.forEach(doc=>{
-      allOrders.push(doc);
-    });
-    displayOrders(allOrders);
-  },err=>{
-    console.error(err);
-    container.innerHTML="<p>Failed to load orders.</p>";
-  });
-
-// Display orders (with optional filtering)
-function displayOrders(list){
-  container.innerHTML="";
-  list.forEach(doc=>renderOrder(doc));
-}
 const overlay = document.getElementById("newOrderOverlay");
 let lastSeenIds = new Set();
-let firstSnapshot = true; // 👈 flag to ignore initial load
+let firstSnapshot = true; // 👈 skip overlay on initial load
 
 // Show overlay
-function showNewOrder(){
+function showNewOrder() {
   overlay.style.display = "flex";
-  setTimeout(hideNewOrder, 3000); // auto-hide after 3s
+
+  // Auto-hide after 3 sec
+  const timeout = setTimeout(hideNewOrder, 3000);
+
+  // Also hide if clicked
+  overlay.onclick = () => {
+    hideNewOrder();
+    clearTimeout(timeout);
+  };
 }
 
 // Hide overlay
-function hideNewOrder(){
+function hideNewOrder() {
   overlay.style.display = "none";
 }
 
+// Real-time listener (only one!)
 db.collection("orders")
   .orderBy("createdAt","desc")
-  .onSnapshot(snapshot=>{
-    container.innerHTML="";
-    if(snapshot.empty){
-      container.innerHTML=`<div style="text-align:center;padding:20px;color:#777;">📭 No orders yet</div>`;
+  .onSnapshot(snapshot => {
+    container.innerHTML = "";
+    if (snapshot.empty) {
+      container.innerHTML = `<div style="text-align:center;padding:20px;color:#777;">📭 No orders yet</div>`;
       return;
     }
 
     let newOrdersDetected = false;
     allOrders = [];
-    snapshot.forEach(doc=>{
+
+    snapshot.forEach(doc => {
       allOrders.push(doc);
-      if(!lastSeenIds.has(doc.id)){ 
-        if (!firstSnapshot) { // 👈 only count as "new" if not first load
+
+      // Detect new orders (ignore first load)
+      if (!lastSeenIds.has(doc.id)) {
+        if (!firstSnapshot) {
           newOrdersDetected = true;
         }
         lastSeenIds.add(doc.id);
@@ -281,14 +268,14 @@ db.collection("orders")
 
     displayOrders(allOrders);
 
-    if(newOrdersDetected){
+    if (newOrdersDetected) {
       showNewOrder();
     }
 
-    firstSnapshot = false; // after first load, turn off the flag
-  },err=>{
+    firstSnapshot = false;
+  }, err => {
     console.error(err);
-    container.innerHTML="<p>Failed to load orders.</p>";
+    container.innerHTML = "<p>Failed to load orders.</p>";
   });
 // Search filter
 searchBar.addEventListener("input", ()=>{
