@@ -25,11 +25,14 @@ header{
 .nav{display:flex;gap:14px;}
 .nav a{padding:8px 10px;border-radius:8px;}
 .nav a:hover{background:rgba(255,255,255,.08);}
-.cart-btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff;border:0;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer;}
-.badge{background:#111;color:#fff;border-radius:999px;padding:2px 8px;font-size:12px;}
+
 /* Orders */
 .main{padding:20px; max-width:1000px;margin:0 auto;}
-h1{margin-bottom:20px;color:#111;}
+h1{margin-bottom:12px;color:#111;}
+#searchBar{
+  width:100%;padding:10px 14px;margin-bottom:20px;
+  border:1px solid #ccc;border-radius:8px;font-size:16px;
+}
 .order{background:#fff;padding:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);margin-bottom:16px;}
 .order h2{margin:0 0 10px;font-size:18px;color:#333;}
 .items p{margin:4px 0; display: flex; align-items: center; gap: 8px;}
@@ -47,17 +50,10 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
   cursor: pointer;
   transition: transform 0.2s;
 }
-.items img:hover {
-  transform: scale(1.1);
-}
+.items img:hover { transform: scale(1.1); }
 
 /* Buttons */
-.buttons {
-  margin-top: 8px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.buttons { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
 .buttons button {
   padding: 6px 12px;
   border: none;
@@ -71,7 +67,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 
 /* Status colors */
 .Preparing { background: #f0ad4e; }
-["On the way"] { background: #5bc0de; }
+.Ontheway { background: #5bc0de; }
 .Delivered { background: #5cb85c; }
 .Complete { background: #777; cursor: not-allowed; }
 
@@ -104,11 +100,13 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 <!-- ORDERS -->
 <div class="main">
   <h1>Received Orders</h1>
+  <input type="text" id="searchBar" placeholder="Search by OrderID, Name, Phone, or Email..."/>
   <div id="ordersContainer"></div>
 </div>
 
 <!-- Modal for image preview -->
 <div id="imgModal"><span onclick="document.getElementById('imgModal').style.display='none'">&times;</span><img id="modalImg"/></div>
+
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -126,9 +124,9 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-document.getElementById("year").textContent = new Date().getFullYear();
 
 const container = document.getElementById("ordersContainer");
+const searchBar = document.getElementById("searchBar");
 const statusFlow = ["Pending","Preparing","Ontheway","Delivered","Complete"];
 
 // Show image in modal
@@ -177,7 +175,9 @@ function renderOrder(doc){
     nextStatus = null;
   }
 
-  const statusBtnHTML = nextStatus ? `<button class="statusBtn ${nextStatus.replace(/\s/g,'')}" onclick="advanceStatus('${doc.id}','${nextStatus}')">${nextStatus}</button>` : `<span style="color:grey;font-weight:bold;">${o.status}</span>`;
+  const statusBtnHTML = nextStatus 
+    ? `<button class="statusBtn ${nextStatus}" onclick="advanceStatus('${doc.id}','${nextStatus}')">${nextStatus}</button>` 
+    : `<span style="color:grey;font-weight:bold;">${o.status}</span>`;
   const cancelBtnHTML = (o.status !== "Complete" && o.status !== "Cancelled") ? `<button class="cancel" onclick="cancelOrder('${doc.id}')">Cancel Order</button>` : "";
 
   div.innerHTML = `
@@ -195,9 +195,11 @@ function renderOrder(doc){
       ${cancelBtnHTML}
     </div>
   `;
-  container.prepend(div);
+  container.appendChild(div);
 }
 
+// Store all orders for searching
+let allOrders = [];
 
 // Real-time listener
 db.collection("orders")
@@ -208,12 +210,36 @@ db.collection("orders")
       container.innerHTML="<p>No orders yet.</p>";
       return;
     }
-    snapshot.forEach(doc=>renderOrder(doc));
+    allOrders = [];
+    snapshot.forEach(doc=>{
+      allOrders.push(doc);
+    });
+    displayOrders(allOrders);
   },err=>{
     console.error(err);
     container.innerHTML="<p>Failed to load orders.</p>";
   });
+
+// Display orders (with optional filtering)
+function displayOrders(list){
+  container.innerHTML="";
+  list.forEach(doc=>renderOrder(doc));
+}
+
+// Search filter
+searchBar.addEventListener("input", ()=>{
+  const q = searchBar.value.toLowerCase();
+  const filtered = allOrders.filter(doc=>{
+    const o = doc.data();
+    return doc.id.toLowerCase().includes(q) ||
+           (o.name && o.name.toLowerCase().includes(q)) ||
+           (o.phone && o.phone.toLowerCase().includes(q)) ||
+           (o.email && o.email.toLowerCase().includes(q));
+  });
+  displayOrders(filtered);
+});
 </script>
+
 <script>
 // Prevent screen from sleeping
 let wakeLock = null;
@@ -223,17 +249,18 @@ async function requestWakeLock() {
     wakeLock = await navigator.wakeLock.request("screen");
     console.log("Wake lock active");
 
-    // If the lock is released (e.g., tab switch), request it again
     wakeLock.addEventListener("release", () => {
       console.log("Wake lock released, re-requesting...");
       requestWakeLock();
     });
   } catch (err) {
     console.error(`${err.name}, ${err.message}`);
+    if (!("wakeLock" in navigator)) {
+      alert("Your browser does not support Wake Lock. Please keep screen awake manually.");
+    }
   }
 }
 
-// Try to activate wake lock when page is visible
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
     requestWakeLock();
@@ -242,8 +269,6 @@ document.addEventListener("visibilitychange", () => {
     wakeLock = null;
   }
 });
-
-// Request wake lock on page load
 requestWakeLock();
 </script>
 </body>
