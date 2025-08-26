@@ -593,7 +593,7 @@ flex-wrap: wrap;
   <a href="/#section">About</a>
   <a href="#">Contact</a>
 <div class="faq-buttons-container">
-  <a href="/faq/">
+  <a href="/OGB/faq/">
 <button class="faq-button">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
     <path
@@ -603,7 +603,7 @@ flex-wrap: wrap;
   <span class="tooltip">FAQ</span>
 </button>
 </a>
-<a href="/help/">
+<a href="/OGB/help/">
   <button class="faq-button">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
       <!-- Classic "i" info icon -->
@@ -617,7 +617,7 @@ flex-wrap: wrap;
 </div>
 </div>
 <div class="cart-icon">
-  <a href="/cart/" class="cart-btn">    
+  <a href="/OGB/cart/" class="cart-btn">    
     <i class="fas fa-shopping-bag"></i>
     <span id="cartCount">0</span>
   </a>
@@ -1031,11 +1031,11 @@ showToast(name);
       if (user) {
         dropdown.innerHTML = `
           <a href="#">Hello, ${user.displayName}</a>
-          <a href="dashboard.html">Dashboard</a>
+          <a href="/OGB/dashboard/">Dashboard</a>
           <a href="#" onclick="signOutUser()">Logout</a>
         `;
       } else {
-        dropdown.innerHTML = `<a href="auth.html">Login/Register</a>`;
+        dropdown.innerHTML = `<a href="/OGB/auth/">Login/Register</a>`;
       }
     }
 
