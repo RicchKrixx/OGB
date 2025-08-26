@@ -85,6 +85,32 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
   position: absolute; top: 20px; right: 30px;
   color: #fff; font-size: 30px; cursor: pointer;
 }
+
+/* 🔔 Fullscreen New Order Popup */
+#orderPopup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+  z-index: 9999;
+  display: none;
+  cursor: pointer;
+}
+@keyframes fadeInOut {
+  0% {opacity: 0;}
+  10% {opacity: 1;}
+  90% {opacity: 1;}
+  100% {opacity: 0;}
+}
+#orderPopup.show {
+  display: flex;
+  animation: fadeInOut 3s ease forwards;
+}
 </style>
 </head>
 <body>
@@ -100,108 +126,17 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 <!-- ORDERS -->
 <div class="main">
   <h1>Received Orders</h1>
-  <input type="text" id="searchBar" placeholder="Search by Order ID, Name, Phone, or Email..."/>
+  <input type="text" id="searchBar" placeholder="Search by OrderID, Name, Phone, or Email..."/>
   <div id="ordersContainer"></div>
 </div>
 
 <!-- Modal for image preview -->
 <div id="imgModal"><span onclick="document.getElementById('imgModal').style.display='none'">&times;</span><img id="modalImg"/></div>
 
-<!-- 🔔 Ringtone -->
-<audio id="ringtone" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" preload="auto"></audio>
+<!-- 🔔 Fullscreen New Order Popup -->
+<div id="orderPopup">🚨 New Order 🚨</div>
+<audio id="orderSound" src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" preload="auto"></audio>
 
-<!-- 🚨 New Order Alert Overlay -->
-<div id="newOrderOverlay" style="
-  display:none;position:fixed;z-index:2000;
-  top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,0.95);color:#fff;
-  overflow:auto;padding:40px;text-align:center;
-">
-  <h1 style="font-size:32px;color:#ff4444;">🚨 NEW ORDER RECEIVED 🚨</h1>
-  <div id="newOrderContent" style="margin:20px auto;max-width:600px;text-align:left;background:#222;padding:20px;border-radius:12px;"></div>
-  <button onclick="closeNewOrderOverlay()" style="margin-top:20px;padding:12px 24px;font-size:18px;border:none;border-radius:8px;background:#28a745;color:#fff;cursor:pointer;">
-    OK, Got it ✅
-  </button>
-</div>
-
-<script>
-const ringtone = document.getElementById("ringtone");
-const overlay = document.getElementById("newOrderOverlay");
-const newOrderContent = document.getElementById("newOrderContent");
-
-function closeNewOrderOverlay(){
-  overlay.style.display = "none";
-  ringtone.pause();
-  ringtone.currentTime = 0;
-}
-
-// Track latest order timestamp
-let latestOrderTime = null;
-
-// Real-time listener
-db.collection("orders")
-  .orderBy("createdAt","desc")
-  .onSnapshot(snapshot=>{
-    container.innerHTML="";
-    if(snapshot.empty){
-      container.innerHTML="<p>No orders yet.</p>";
-      return;
-    }
-
-    let freshOrders = [];
-    allOrders = [];
-    snapshot.forEach(doc=>{
-      allOrders.push(doc);
-
-      const data = doc.data();
-      const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : new Date();
-
-      if(!latestOrderTime || createdAt > latestOrderTime){
-        freshOrders.push({id: doc.id, data});
-      }
-    });
-
-    // Update latestOrderTime
-    const newestDoc = snapshot.docs[0];
-    if(newestDoc){
-      const newestTime = newestDoc.data().createdAt?.toDate ? newestDoc.data().createdAt.toDate() : new Date();
-      latestOrderTime = newestTime;
-    }
-
-    displayOrders(allOrders);
-
-    // 🚨 Show alert for new orders
-    if(freshOrders.length > 0){
-      const order = freshOrders[0]; // show first new one
-      showNewOrderOverlay(order.id, order.data);
-    }
-  },err=>{
-    console.error(err);
-    container.innerHTML="<p>Failed to load orders.</p>";
-  });
-
-function showNewOrderOverlay(orderId, o){
-  const itemsHTML = o.items.map(i=>{
-    const qty = i.qty||i.quantity||1;
-    return `<li>${i.name} x${qty} — GHS ${i.price*qty}</li>`;
-  }).join("");
-
-  newOrderContent.innerHTML = `
-    <h2>Order ID: ${orderId}</h2>
-    <p><b>Name:</b> ${o.name}</p>
-    <p><b>Phone:</b> ${o.phone}</p>
-    <p><b>Email:</b> ${o.email||"N/A"}</p>
-    <p><b>Address:</b> ${o.address}</p>
-    <p><b>Total:</b> GHS ${o.total}</p>
-    <p><b>Payment:</b> ${o.payMethod}</p>
-    <h3>Items:</h3>
-    <ul>${itemsHTML}</ul>
-  `;
-
-  overlay.style.display = "block";
-  ringtone.play().catch(err=>console.log("Autoplay blocked until user interacts with page"));
-}
-</script>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -295,6 +230,31 @@ function renderOrder(doc){
 
 // Store all orders for searching
 let allOrders = [];
+let seenOrders = new Set(); // 👀 Track orders already shown
+
+// 🔔 Show popup
+function showNewOrderPopup() {
+  const popup = document.getElementById("orderPopup");
+  const sound = document.getElementById("orderSound");
+
+  sound.currentTime = 0;
+  sound.play();
+
+  popup.classList.add("show");
+
+  // stop sound if user clicks popup
+  popup.onclick = () => {
+    sound.pause();
+    sound.currentTime = 0;
+    popup.classList.remove("show");
+  };
+
+  setTimeout(() => {
+    popup.classList.remove("show");
+    sound.pause();
+    sound.currentTime = 0;
+  }, 3000);
+}
 
 // Real-time listener
 db.collection("orders")
@@ -308,6 +268,11 @@ db.collection("orders")
     allOrders = [];
     snapshot.forEach(doc=>{
       allOrders.push(doc);
+      // 🔔 If new order detected, show popup
+      if (!seenOrders.has(doc.id)) {
+        showNewOrderPopup();
+        seenOrders.add(doc.id);
+      }
     });
     displayOrders(allOrders);
   },err=>{
@@ -338,12 +303,10 @@ searchBar.addEventListener("input", ()=>{
 <script>
 // Prevent screen from sleeping
 let wakeLock = null;
-
 async function requestWakeLock() {
   try {
     wakeLock = await navigator.wakeLock.request("screen");
     console.log("Wake lock active");
-
     wakeLock.addEventListener("release", () => {
       console.log("Wake lock released, re-requesting...");
       requestWakeLock();
@@ -355,7 +318,6 @@ async function requestWakeLock() {
     }
   }
 }
-
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
     requestWakeLock();
