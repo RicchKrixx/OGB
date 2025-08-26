@@ -66,10 +66,12 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 .cancel { background: #d9534f; }
 
 /* Status colors */
+.Pending { background: #ff9800; }
 .Preparing { background: #f0ad4e; }
 .Ontheway { background: #5bc0de; }
 .Delivered { background: #5cb85c; }
 .Complete { background: #777; cursor: not-allowed; }
+.Cancelled { background: #999; cursor: not-allowed; }
 
 /* Lightbox modal */
 #imgModal {
@@ -177,7 +179,7 @@ function renderOrder(doc){
 
   const statusBtnHTML = nextStatus 
     ? `<button class="statusBtn ${nextStatus}" onclick="advanceStatus('${doc.id}','${nextStatus}')">${nextStatus}</button>` 
-    : `<span style="color:grey;font-weight:bold;">${o.status}</span>`;
+    : `<span class="${o.status}" style="padding:6px 12px;border-radius:6px;color:#fff;font-weight:bold;">${o.status}</span>`;
   const cancelBtnHTML = (o.status !== "Complete" && o.status !== "Cancelled") ? `<button class="cancel" onclick="cancelOrder('${doc.id}')">Cancel Order</button>` : "";
 
   div.innerHTML = `
@@ -185,11 +187,11 @@ function renderOrder(doc){
     <p><b>Name:</b> ${o.name}</p>
     <p><b>Phone:</b> ${o.phone}</p>
     <p><b>Email:</b> ${o.email || "N/A"}</p>
-    <p><b>Address:</b> ${o.address}${latlng}</p>
-    <p><b>Date:</b> ${o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString() : o.createdAt}</p>
+    <p><b>Address:</b> ${o.address || "N/A"}${latlng}</p>
+    <p><b>Date:</b> ${o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString() : "N/A"}</p>
     <div class="items"><b>Items:</b>${itemsHTML}</div>
     <p class="total">Total: GHS ${o.total}</p>
-    <p class="status"><b>Payment:</b> ${o.payMethod} | <b>Status:</b> ${o.status}</p>
+    <p class="status"><b>Payment:</b> ${o.payMethod || "N/A"} | <b>Status:</b> ${o.status}</p>
     <div class="buttons">
       ${statusBtnHTML}
       ${cancelBtnHTML}
@@ -207,7 +209,7 @@ db.collection("orders")
   .onSnapshot(snapshot=>{
     container.innerHTML="";
     if(snapshot.empty){
-      container.innerHTML="<p>No orders yet.</p>";
+      container.innerHTML=`<div style="text-align:center;padding:20px;color:#777;">📭 No orders yet</div>`;
       return;
     }
     allOrders = [];
@@ -251,7 +253,7 @@ async function requestWakeLock() {
 
     wakeLock.addEventListener("release", () => {
       console.log("Wake lock released, re-requesting...");
-      requestWakeLock();
+      if (!wakeLock) requestWakeLock();
     });
   } catch (err) {
     console.error(`${err.name}, ${err.message}`);
