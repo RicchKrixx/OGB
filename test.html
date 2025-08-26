@@ -1,219 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Products Edit - OGB</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .accordion {
-      background: #fff;
-      color: #333;
-      cursor: pointer;
-      padding: 15px;
-      width: 100%;
-      border: none;
-      outline: none;
-      transition: 0.3s;
-      font-size: 18px;
-      font-weight: bold;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .accordion.active {
-      background: #0077ff;
-      color: #fff;
-    }
-    .panel {
-      padding: 15px;
-      background: #fff;
-      display: none;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .product {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f9f9f9;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-    .product img {
-      width: 50px;
-      height: 50px;
-      border-radius: 6px;
-      margin-right: 10px;
-      object-fit: cover;
-    }
-    .product-info {
-      flex: 1;
-    }
-    .product-actions button {
-      margin-left: 5px;
-      padding: 6px 10px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .edit-btn { background: #0077ff; color: #fff; }
-    .delete-btn { background: #ff3b3b; color: #fff; }
-    .add-form {
-      margin-top: 15px;
-      padding: 10px;
-      border-top: 1px solid #ddd;
-    }
-    .add-form input {
-      padding: 6px;
-      margin: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    .add-form button {
-      padding: 6px 12px;
-      background: #28a745;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Orders • On God Bend Mini Mart</title>
+<style>
+:root {
+  --brand: #b8860b; 
+  --brand-dark: #8b6508;
+  --ink: #1f1f1f;
+  --bg: #f7f7f9;
+  --card: #ffffff;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+a{color:inherit;text-decoration:none;}
+/* Header */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;background:#111;color:#fff;
+}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand img{height:90px;width:auto;border-radius:6px;}
+.nav{display:flex;gap:14px;}
+.nav a{padding:8px 10px;border-radius:8px;}
+.nav a:hover{background:rgba(255,255,255,.08);}
+
+/* Orders */
+.main{padding:20px; max-width:1000px;margin:0 auto;}
+h1{margin-bottom:12px;color:#111;}
+#searchBar{
+  width:100%;padding:10px 14px;margin-bottom:20px;
+  border:1px solid #ccc;border-radius:8px;font-size:16px;
+}
+.order{background:#fff;padding:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);margin-bottom:16px;}
+.order h2{margin:0 0 10px;font-size:18px;color:#333;}
+.items p{margin:4px 0; display: flex; align-items: center; gap: 8px;}
+.total{font-weight:bold;margin-top:8px;}
+.status{font-weight:bold;margin-top:4px;}
+/* Footer */
+footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top:26px;}
+
+/* Product images */
+.items img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.items img:hover { transform: scale(1.1); }
+
+/* Buttons */
+.buttons { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+.buttons button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #fff;
+}
+.statusBtn { font-weight: bold; }
+.cancel { background: #d9534f; }
+
+/* Status colors */
+.Preparing { background: #f0ad4e; }
+.Ontheway { background: #5bc0de; }
+.Delivered { background: #5cb85c; }
+.Complete { background: #777; cursor: not-allowed; }
+
+/* Lightbox modal */
+#imgModal {
+  display: none; position: fixed; z-index: 1000;
+  top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.8);
+  justify-content: center; align-items: center;
+}
+#imgModal img {
+  max-width: 90%; max-height: 90%; border-radius: 10px;
+}
+#imgModal span {
+  position: absolute; top: 20px; right: 30px;
+  color: #fff; font-size: 30px; cursor: pointer;
+}
+</style>
 </head>
 <body>
-  <h1>Products Editor</h1>
 
-  <button class="accordion">🍷 Wines</button>
-  <div class="panel" id="wines"></div>
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="Logo"/>
+  </div>
+  <nav class="nav">OGB ORDERS📥</nav>
+</header>
 
-  <button class="accordion">🥃 Liquors</button>
-  <div class="panel" id="liquors"></div>
+<!-- ORDERS -->
+<div class="main">
+  <h1>Received Orders</h1>
+  <input type="text" id="searchBar" placeholder="Search by Order ID, Name, Phone, or Email..."/>
+  <div id="ordersContainer"></div>
+</div>
 
-  <button class="accordion">🛒 Everyday Essentials</button>
-  <div class="panel" id="essentials"></div>
+<!-- Modal for image preview -->
+<div id="imgModal"><span onclick="document.getElementById('imgModal').style.display='none'">&times;</span><img id="modalImg"/></div>
 
-  <!-- Firebase -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-  import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } 
-    from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+<!-- Footer -->
+<footer>
+  &copy; <span id="year"></span> On God Bend Mini Mart
+</footer>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
-    authDomain: "ongod-5073e.firebaseapp.com",
-    projectId: "ongod-5073e",
-    storageBucket: "ongod-5073e.firebasestorage.app",
-    messagingSenderId: "439687837026",
-    appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
-    measurementId: "G-1TVP0X3J62"
-  };
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+  authDomain: "ongod-5073e.firebaseapp.com",
+  projectId: "ongod-5073e",
+  storageBucket: "ongod-5073e.firebasestorage.app",
+  messagingSenderId: "439687837026",
+  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+  measurementId: "G-1TVP0X3J62"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+document.getElementById("year").textContent = new Date().getFullYear();
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+const container = document.getElementById("ordersContainer");
+const searchBar = document.getElementById("searchBar");
+const statusFlow = ["Pending","Preparing","Ontheway","Delivered","Complete"];
 
-  // Accordion toggle
-  document.querySelectorAll(".accordion").forEach(btn => {
-    btn.addEventListener("click", function() {
-      this.classList.toggle("active");
-      const panel = this.nextElementSibling;
-      panel.style.display = panel.style.display === "block" ? "none" : "block";
-    });
-  });
+// Show image in modal
+function showImage(src){
+  document.getElementById("modalImg").src = src;
+  document.getElementById("imgModal").style.display = "flex";
+}
 
-  // Render products by category
-  async function loadProducts(category, containerId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = "<p>Loading...</p>";
+// Advance status button
+function advanceStatus(orderId,newStatus){
+  const docRef = db.collection("orders").doc(orderId);
+  docRef.update({ status: newStatus }).then(()=>{
+    console.log(`Order ${orderId} updated to ${newStatus}`);
+  }).catch(err=>console.error(err));
+}
 
-    const q = query(collection(db, "products"), where("category", "==", category));
-    const snapshot = await getDocs(q);
+// Cancel order
+function cancelOrder(orderId){
+  if(confirm("Are you sure you want to cancel this order?")){
+    const docRef = db.collection("orders").doc(orderId);
+    docRef.update({ status: "Cancelled" }).then(()=>{
+      console.log(`Order ${orderId} cancelled`);
+    }).catch(err=>console.error(err));
+  }
+}
 
-    container.innerHTML = "";
-    snapshot.forEach(docSnap => {
-      const product = docSnap.data();
-      const div = document.createElement("div");
-      div.className = "product";
-      div.innerHTML = `
-        <img src="${product.image || 'https://via.placeholder.com/50'}" />
-        <div class="product-info">
-          <strong>${product.name}</strong><br>
-          ${product.originalPrice ? `<span style="text-decoration: line-through; color: gray;">GH₵${product.originalPrice}</span> ` : ""}
-          GH₵${product.price}
-        </div>
-        <div class="product-actions">
-          <button class="edit-btn">Edit</button>
-          <button class="delete-btn">Delete</button>
-        </div>
-      `;
+// Render orders
+function renderOrder(doc){
+  const o = doc.data();
+  const div = document.createElement("div");
+  div.className = "order";
 
-      // Delete
-      div.querySelector(".delete-btn").addEventListener("click", async () => {
-        await deleteDoc(doc(db, "products", docSnap.id));
-        loadProducts(category, containerId);
-      });
+  const itemsHTML = o.items.map(i=>{
+    const img = i.image ? `<img src="${i.image}" alt="${i.name}" onclick="showImage('${i.image}')"/>` : "";
+    const qty = i.qty||i.quantity||1;
+    return `<p>${img} ${i.name} x${qty} — GHS ${i.price*qty}</p>`;
+  }).join("");
 
-      // Edit
-      div.querySelector(".edit-btn").addEventListener("click", async () => {
-        const newName = prompt("Enter new name", product.name);
-        const newPrice = prompt("Enter new price", product.price);
-        const newOriginal = prompt("Enter original price (optional)", product.originalPrice || "");
-        await updateDoc(doc(db, "products", docSnap.id), {
-          name: newName,
-          price: Number(newPrice),
-          originalPrice: newOriginal ? Number(newOriginal) : null
-        });
-        loadProducts(category, containerId);
-      });
+  const latlng = (o.latitude && o.longitude) ? ` (${o.latitude.toFixed(6)}, ${o.longitude.toFixed(6)})` : "";
 
-      container.appendChild(div);
-    });
-
-    // Add new product form
-    const form = document.createElement("div");
-    form.className = "add-form";
-    form.innerHTML = `
-      <h4>Add New ${category}</h4>
-      <input type="text" placeholder="Name" id="${containerId}-name" />
-      <input type="number" placeholder="Price" id="${containerId}-price" />
-      <input type="number" placeholder="Original Price (optional)" id="${containerId}-original" />
-      <input type="text" placeholder="Image URL" id="${containerId}-image" />
-      <button>Add</button>
-    `;
-
-    form.querySelector("button").addEventListener("click", async () => {
-      const name = document.getElementById(`${containerId}-name`).value;
-      const price = document.getElementById(`${containerId}-price`).value;
-      const original = document.getElementById(`${containerId}-original`).value;
-      const image = document.getElementById(`${containerId}-image`).value;
-      if(!name || !price) return alert("Please fill all required fields");
-      await addDoc(collection(db, "products"), {
-        name,
-        price: Number(price),
-        originalPrice: original ? Number(original) : null,
-        image,
-        category
-      });
-      loadProducts(category, containerId);
-    });
-
-    container.appendChild(form);
+  let nextStatus = "Preparing";
+  const currentIndex = statusFlow.indexOf(o.status);
+  if(currentIndex >= 0 && currentIndex < statusFlow.length-1){
+    nextStatus = statusFlow[currentIndex+1];
+  } else if(o.status === "Complete" || o.status === "Cancelled"){
+    nextStatus = null;
   }
 
-  // Load all categories (must match Firestore category exactly)
-  loadProducts("Wines", "wines");
-  loadProducts("Liquors", "liquors");
-  loadProducts("Essentials", "essentials");
+  const statusBtnHTML = nextStatus 
+    ? `<button class="statusBtn ${nextStatus}" onclick="advanceStatus('${doc.id}','${nextStatus}')">${nextStatus}</button>` 
+    : `<span style="color:grey;font-weight:bold;">${o.status}</span>`;
+  const cancelBtnHTML = (o.status !== "Complete" && o.status !== "Cancelled") ? `<button class="cancel" onclick="cancelOrder('${doc.id}')">Cancel Order</button>` : "";
+
+  div.innerHTML = `
+    <h2>Order ID: ${doc.id}</h2>
+    <p><b>Name:</b> ${o.name}</p>
+    <p><b>Phone:</b> ${o.phone}</p>
+    <p><b>Email:</b> ${o.email || "N/A"}</p>
+    <p><b>Address:</b> ${o.address}${latlng}</p>
+    <p><b>Date:</b> ${o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString() : o.createdAt}</p>
+    <div class="items"><b>Items:</b>${itemsHTML}</div>
+    <p class="total">Total: GHS ${o.total}</p>
+    <p class="status"><b>Payment:</b> ${o.payMethod} | <b>Status:</b> ${o.status}</p>
+    <div class="buttons">
+      ${statusBtnHTML}
+      ${cancelBtnHTML}
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+// Store all orders for searching
+let allOrders = [];
+
+// Real-time listener
+db.collection("orders")
+  .orderBy("createdAt","desc")
+  .onSnapshot(snapshot=>{
+    container.innerHTML="";
+    if(snapshot.empty){
+      container.innerHTML="<p>No orders yet.</p>";
+      return;
+    }
+    allOrders = [];
+    snapshot.forEach(doc=>{
+      allOrders.push(doc);
+    });
+    displayOrders(allOrders);
+  },err=>{
+    console.error(err);
+    container.innerHTML="<p>Failed to load orders.</p>";
+  });
+
+// Display orders (with optional filtering)
+function displayOrders(list){
+  container.innerHTML="";
+  list.forEach(doc=>renderOrder(doc));
+}
+
+// Search filter
+searchBar.addEventListener("input", ()=>{
+  const q = searchBar.value.toLowerCase();
+  const filtered = allOrders.filter(doc=>{
+    const o = doc.data();
+    return doc.id.toLowerCase().includes(q) ||
+           (o.name && o.name.toLowerCase().includes(q)) ||
+           (o.phone && o.phone.toLowerCase().includes(q)) ||
+           (o.email && o.email.toLowerCase().includes(q));
+  });
+  displayOrders(filtered);
+});
+</script>
+
+<script>
+// Prevent screen from sleeping
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    wakeLock = await navigator.wakeLock.request("screen");
+    console.log("Wake lock active");
+
+    wakeLock.addEventListener("release", () => {
+      console.log("Wake lock released, re-requesting...");
+      requestWakeLock();
+    });
+  } catch (err) {
+    console.error(`${err.name}, ${err.message}`);
+    if (!("wakeLock" in navigator)) {
+      alert("Your browser does not support Wake Lock. Please keep screen awake manually.");
+    }
+  }
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    requestWakeLock();
+  } else if (wakeLock !== null) {
+    wakeLock.release();
+    wakeLock = null;
+  }
+});
+requestWakeLock();
 </script>
 </body>
 </html>
