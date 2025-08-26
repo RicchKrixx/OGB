@@ -98,10 +98,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
   <div class="brand">
     <img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="Logo"/>
   </div>
-  <nav class="nav">
-    <a href="index.html#products">Shop</a>
-    <a href="index.html#contact">Contact</a>
-  </nav>
+  <nav class="nav">OGB ORDERS📥</nav>
 </header>
 
 <!-- ORDERS -->
@@ -112,11 +109,6 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 
 <!-- Modal for image preview -->
 <div id="imgModal"><span onclick="document.getElementById('imgModal').style.display='none'">&times;</span><img id="modalImg"/></div>
-
-<!-- FOOTER -->
-<footer>
-  © <span id="year"></span> On God Bend Mini Mart, Wine & Liquor — All Rights Reserved.
-</footer>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -221,6 +213,36 @@ db.collection("orders")
     console.error(err);
     container.innerHTML="<p>Failed to load orders.</p>";
   });
+// Prevent screen from sleeping
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    wakeLock = await navigator.wakeLock.request("screen");
+    console.log("Wake lock active");
+
+    // If the lock is released (e.g., tab switch), request it again
+    wakeLock.addEventListener("release", () => {
+      console.log("Wake lock released, re-requesting...");
+      requestWakeLock();
+    });
+  } catch (err) {
+    console.error(`${err.name}, ${err.message}`);
+  }
+}
+
+// Try to activate wake lock when page is visible
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    requestWakeLock();
+  } else if (wakeLock !== null) {
+    wakeLock.release();
+    wakeLock = null;
+  }
+});
+
+// Request wake lock on page load
+requestWakeLock();
 </script>
 </body>
 </html>
