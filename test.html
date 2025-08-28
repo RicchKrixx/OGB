@@ -394,34 +394,6 @@ button:hover { background: var(--brand-2); }
     sampleLink.textContent = sample; sampleLink.href = sample; sampleLink.target = '_blank';
 
     if (qp){ orderIdInput.value = qp; fetchAndListen(qp); }
-  </script>  <!--
-  ===================== FIRESTORE SHAPE (example) =====================
-  Collection: orders
-  Document ID: OGB2482011  (this is the Order ID users will enter)
-  Fields:
-    status: "Pending"            // one of: received | Preparing | Ontheway | Delivered
-    createdAt: Timestamp             // Firestore Timestamp
-    currency: "GHS"                 // optional (defaults to GHS)
-    total: 250                       // number
-    paymentMethod: "Pay on Delivery"// or "Paystack"
-    customer: { name: "John Doe", phone: "+233555000111" }
-    items: [
-      { name: "Premium Wine", qty: 2, price: 80, total: 160 },
-      { name: "Fruit Juice",  qty: 1, price: 90, total: 90 }
-    ]
-    // Timestamps for steps (optional)
-    timestamps: {
-      received: Timestamp,
-      processing: Timestamp,
-      out_for_delivery: Timestamp,
-      delivered: Timestamp
-    }
-    // ETA (choose one style)
-    etaMinutes: 45
-    // or
-    etaSeconds: 2700
-    // or
-    etaTimestamp: Timestamp // estimated arrival time
-  =====================================================================
-  --></body>
+  </script>
+</body>
 </html>
