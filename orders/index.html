@@ -255,23 +255,28 @@ function renderOrder(doc){
 // 🔔 Show popup
 function showNewOrderPopup() {
   const popup = document.getElementById("orderPopup");
-  const sound = document.getElementById("orderSound");
 
-  sound.currentTime = 0;
-  sound.play();
+  if (soundEnabled) {
+    sound.currentTime = 0;
+    sound.play().catch(err => console.warn("Play blocked:", err));
+  }
 
   popup.classList.add("show");
 
   popup.onclick = () => {
-    sound.pause();
-    sound.currentTime = 0;
+    if (soundEnabled) {
+      sound.pause();
+      sound.currentTime = 0;
+    }
     popup.classList.remove("show");
   };
 
   setTimeout(() => {
     popup.classList.remove("show");
-    sound.pause();
-    sound.currentTime = 0;
+    if (soundEnabled) {
+      sound.pause();
+      sound.currentTime = 0;
+    }
   }, 10000);
 }
 
