@@ -1,169 +1,193 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advanced Real-Time Order Tracking • On God Bend Mini Mart</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<style>
-:root {
-  --brand: #b8860b;
-  --bg: #f9f9f9;
-  --text: #333;
-  --text-light: #777;
-  --completed-line: #b8860b;
-  --line-bg: #ddd;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OGB • Order Tracking</title>
+  <meta name="color-scheme" content="light" />
+  <style>
+    :root {
+      --brand: #b8860b;        /* OGB gold */
+      --brand-2: #8b6508;      /* dark gold */
+      --ink: #1f1f1f;          /* text */
+      --muted: #6b7280;        /* gray-500 */
+      --bg: #f6f7fb;           /* page bg */
+      --card: #ffffff;         /* card bg */
+      --ok: #16a34a;           /* green */
+      --warn: #f59e0b;         /* amber */
+      --danger: #ef4444;       /* red */
+      --line: #e5e7eb;         /* gray-200 */
+      --shadow: 0 10px 30px rgba(0,0,0,.06);
+      --radius: 16px;
+    }* { box-sizing: border-box; }
+html, body { height: 100%; }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  margin: 0; padding: 0;
-  background: var(--bg);
-  color: var(--text);
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  color: var(--ink);
+  background: radial-gradient(80% 50% at 50% 0%, #fff 0%, var(--bg) 100%);
 }
 
-.container {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: linear-gradient(180deg, var(--brand), var(--brand-2));
+  color: #fff;
+  padding: 18px 16px;
+  box-shadow: var(--shadow);
+}
+.wrap { max-width: 1024px; margin: 0 auto; }
+.brand {
+  display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .3px;
+}
+.brand .logo {
+  width: 36px; height: 36px; border-radius: 10px; background: #fff2; display: grid; place-items: center; font-size: 18px;
+  border: 1px solid #fff3;
 }
 
-h2 { color: var(--brand); text-align: center; margin-bottom: 20px; }
+main { padding: 28px 16px 48px; }
+.grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 860px){ .grid { grid-template-columns: 1.1fr .9fr; } }
 
-.search-box {
-  text-align: center; margin-bottom: 30px;
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid #f1f5f9; }
+
+.search-card { padding: 18px; display: grid; gap: 14px; }
+.search-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+input[type="text"] {
+  padding: 14px 14px; border-radius: 12px; border: 1px solid var(--line); outline: none; font-size: 16px; background: #fff;
 }
-
-.search-box input { padding: 10px; font-size: 16px; width: 250px; border-radius: 8px; border: 1px solid #ccc; }
-.search-box button { padding: 10px 20px; margin-left: 10px; background: var(--brand); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-
-.order-details {
-  background: #f5f5f5;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 30px;
-  display: none;
+input[type="text"]:focus { border-color: var(--brand); box-shadow: 0 0 0 3px #b8860b22; }
+button {
+  appearance: none; border: 0; cursor: pointer; padding: 14px 16px; border-radius: 12px; font-weight: 700; color: #fff; background: var(--brand);
+  box-shadow: 0 6px 16px rgba(184,134,11,.25);
 }
+button:hover { background: var(--brand-2); }
+.hint { color: var(--muted); font-size: 14px; }
 
-.order-details p { margin: 5px 0; font-size: 16px; }
+.result-card { padding: 0; overflow: hidden; display: none; }
+.result-head { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 18px; background: #fafafa; border-bottom: 1px solid var(--line); }
+.meta { font-size: 12px; color: var(--muted); }
+.meta .v { display: block; font-size: 18px; font-weight: 800; color: var(--ink); margin-top: 4px; }
 
-.tracker {
-  display: flex;
-  justify-content: space-between;
-  position: relative;
-  margin-bottom: 30px;
-  overflow-x: auto;
-  padding-bottom: 10px;
-}
+.content { display: grid; grid-template-columns: 1fr; gap: 18px; padding: 18px; }
+@media (min-width: 860px){ .content { grid-template-columns: 1fr; } }
 
-.tracker::before {
-  content: '';
-  position: absolute;
-  top: 14px;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: var(--line-bg);
-  z-index: 0;
-  border-radius: 2px;
-}
+/* PROGRESS TRACKER */
+.tracker { position: relative; padding: 8px 0 4px; }
+.track-line { position: absolute; left: 17px; top: 8px; bottom: 8px; width: 3px; background: #e9e9ef; border-radius: 2px; }
+.step { display: grid; grid-template-columns: 34px 1fr; gap: 12px; position: relative; padding: 10px 0; }
+.dot { width: 22px; height: 22px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #e9e9ef; background: #cfd8e3; }
+.step.completed .dot { background: var(--brand-2); box-shadow: 0 0 0 2px #e1c37b; }
+.step.active .dot { background: var(--brand); animation: ping 1.6s infinite; box-shadow: 0 0 0 2px #e1c37b; }
+.label { margin-top: 2px; }
+.label .t { font-weight: 700; }
+.label .s { color: var(--muted); font-size: 13px; }
+.time { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
-.step {
-  text-align: center;
-  width: 25%;
-  min-width: 100px;
-  position: relative;
-  z-index: 1;
-  transition: transform 0.3s;
-}
+@keyframes ping { 0% { box-shadow: 0 0 0 2px #e1c37b, 0 0 0 0 rgba(184,134,11,.35); } 70% { box-shadow: 0 0 0 2px #e1c37b, 0 0 0 14px rgba(184,134,11,0); } 100% { box-shadow: 0 0 0 2px #e1c37b, 0 0 0 0 rgba(184,134,11,0); } }
 
-.step .circle {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: #ddd; margin: 0 auto 8px auto;
-  line-height: 28px; color: #fff; font-weight: bold;
-  transition: all 0.3s;
-}
+/* ORDER SUMMARY */
+.summary { padding: 18px; border-top: 1px dashed var(--line); }
+.summary h3 { margin: 0 0 10px; font-size: 18px; }
+.row { display: flex; justify-content: space-between; gap: 10px; margin: 6px 0; font-size: 14px; }
+.items { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.item { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); }
+.item:first-child { border-top: 0; }
 
-.step.completed .circle { background: var(--brand); transform: scale(1.2); }
-.step.current .circle { border: 2px solid var(--brand); transform: scale(1.4); }
+/* SIDECARD (ETA + TIPS) */
+.side-card { padding: 18px; }
+.badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 999px; background: #fff7e6; color: #92400e; border: 1px solid #fde68a; font-weight: 700; font-size: 12px; }
+.eta { font-weight: 800; font-size: 28px; margin: 10px 0 6px; }
+.countdown { font-size: 13px; color: var(--muted); }
+.tips { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); color: var(--muted); font-size: 14px; }
 
-.step p { font-size: 14px; color: var(--text-light); transition: color 0.3s; }
-.step.completed p { color: var(--text); font-weight: 600; }
-.step.current p { color: var(--brand); font-weight: 700; }
+/* STATES */
+.loading { display: none; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; }
+.loading .spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #e5e7eb; border-top-color: var(--brand); animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg);} }
 
-.status-msg { text-align: center; font-size: 18px; margin-bottom: 20px; }
+.error { display: none; padding: 12px; background: #fef2f2; color: #7f1d1d; border: 1px solid #fecaca; border-radius: 12px; }
+.empty { padding: 14px; color: var(--muted); text-align: center; }
 
-.cancel-btn {
-  display: block; width: 200px; margin: 0 auto;
-  padding: 10px 20px; background: #e74c3c; color: #fff;
-  border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
-  transition: background 0.3s;
-}
-.cancel-btn:hover { background: #c0392b; }
+.toolbar { display: flex; gap: 8px; }
+.btn-line { background: #fff; color: var(--brand-2); border: 1px solid #e6e1d3; box-shadow: none; }
 
-/* Arrow between steps */
-.step::after {
-  content: '';
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  height: 4px;
-  width: 100%;
-  background: var(--line-bg);
-  z-index: -1;
-}
+.foot { text-align: center; font-size: 12px; color: #9ca3af; margin-top: 18px; }
+.a { color: var(--brand-2); text-decoration: none; }
 
-.step:last-child::after { display: none; }
-.step.completed::after { background: var(--completed-line); }
-</style>
+  </style>
 </head>
 <body>
-
-<div class="container">
-  <h2>Track Your Order</h2>
-
-  <div class="search-box">
-    <input type="text" id="orderIdInput" placeholder="Enter your Order ID">
-    <button onclick="startTracking()">Track</button>
-  </div>
-
-  <div class="order-details" id="orderDetails">
-    <p><strong>Order ID:</strong> <span id="orderId"></span></p>
-    <p><strong>Customer:</strong> <span id="customerName"></span></p>
-    <p><strong>Date:</strong> <span id="orderDate"></span></p>
-
-    <div class="tracker" id="tracker">
-      <div class="step" data-step="Processing">
-        <div class="circle">1</div>
-        <p>Pending</p>
+  <header>
+    <div class="wrap brand">
+      <div class="logo">🛒</div>
+      <div>OGB • Order Tracking</div>
+    </div>
+  </header>  <main class="wrap">
+    <div class="grid">
+      <!-- LEFT: Search + Result -->
+      <section class="card">
+        <div class="search-card">
+          <div class="toolbar">
+            <input id="orderIdInput" type="text" placeholder="Enter your Order ID (e.g., OGB2482011)" />
+            <button id="trackBtn">Track</button>
+          </div>
+          <div class="hint">Tip: You can link directly like <span id="sampleLink" class="a"></span></div>
+          <div id="loading" class="loading"><span class="spin"></span> Fetching order…</div>
+          <div id="error" class="error">Order not found. Please check your Order ID.</div>
+        </div><div id="result" class="result-card">
+      <div class="result-head">
+        <div class="meta">ORDER NUMBER <span class="v" id="vOrderId">—</span></div>
+        <div class="meta">PLACED ON <span class="v" id="vPlaced">—</span></div>
       </div>
-      <div class="step" data-step="Preparing">
-        <div class="circle">2</div>
-        <p>Preparing</p>
-      </div>
-      <div class="step" data-step="On the way">
-        <div class="circle">3</div>
-        <p>On the way</p>
-      </div>
-      <div class="step" data-step="Delivered">
-        <div class="circle">4</div>
-        <p>Delivered</p>
+
+      <div class="content">
+        <div>
+          <div class="tracker" id="tracker">
+            <div class="track-line"></div>
+            <!-- Steps will be injected here -->
+          </div>
+
+          <div class="summary">
+            <h3>Order Summary</h3>
+            <div class="row"><span>Customer</span><strong id="vCustomer">—</strong></div>
+            <div class="row"><span>Phone</span><strong id="vPhone">—</strong></div>
+            <div class="row"><span>Payment</span><strong id="vPayment">—</strong></div>
+            <div class="items" id="items"></div>
+            <div class="row" style="margin-top:10px"><span>Total</span><strong id="vTotal">—</strong></div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <p class="status-msg" id="statusMsg"></p>
-    <button class="cancel-btn" onclick="cancelOrder()">Cancel Order</button>
-  </div>
+    <div class="foot">Having trouble? Contact <a class="a" href="tel:+233000000000">OGB Support</a></div>
+  </section>
+
+  <!-- RIGHT: ETA + Tips -->
+  <aside class="card side-card">
+    <span class="badge">⏱️ Live ETA</span>
+    <div class="eta" id="vEta">—</div>
+    <div class="countdown" id="vCountdown">Waiting for order…</div>
+    <div class="tips">
+      • Keep your phone on. The rider may call you.<br/>
+      • You’ll receive SMS/WhatsApp updates for major status changes.<br/>
+      • Share the tracking link with a friend or family member.
+    </div>
+    <div style="margin-top:14px; display:flex; gap:8px;">
+      <button id="copyLink" class="btn-line">Copy Link</button>
+      <button id="refresh" class="btn-line">Refresh</button>
+    </div>
+  </aside>
 </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script>
-const firebaseConfig = {
+  </main>  <script type="module">
+    // -------- Firebase (Modular SDK) --------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, getDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // 1) Replace these with your Firebase project's values
+     const firebaseConfig = {
   apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
   authDomain: "ongod-5073e.firebaseapp.com",
   projectId: "ongod-5073e",
@@ -172,62 +196,219 @@ const firebaseConfig = {
   appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
   measurementId: "G-1TVP0X3J62"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 
-let unsubscribe = null;
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-function startTracking() {
-  const orderId = document.getElementById('orderIdInput').value.trim();
-  if(!orderId) return alert("Please enter an Order ID");
+    // -------- DOM Helpers --------
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  if(unsubscribe) unsubscribe();
+    const orderIdInput = $("#orderIdInput");
+    const trackBtn = $("#trackBtn");
+    const resultCard = $("#result");
+    const loadingEl = $("#loading");
+    const errorEl = $("#error");
 
-  unsubscribe = db.collection('Orders').where('orderId', '==', orderId)
-    .onSnapshot(snapshot => {
-      if(snapshot.empty) { 
-        alert("Order not found!"); 
-        document.getElementById('orderDetails').style.display = 'none';
-        return; 
-      }
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        document.getElementById('orderId').innerText = data.orderId;
-        document.getElementById('customerName').innerText = data.customerName;
+    const vOrderId = $("#vOrderId");
+    const vPlaced = $("#vPlaced");
+    const vCustomer = $("#vCustomer");
+    const vPhone = $("#vPhone");
+    const vPayment = $("#vPayment");
+    const vTotal = $("#vTotal");
+    const vEta = $("#vEta");
+    const vCountdown = $("#vCountdown");
+    const trackerEl = $("#tracker");
+    const itemsEl = $("#items");
 
-        // Handle Firestore timestamp
-        const orderDate = data.date && data.date.toDate ? data.date.toDate().toLocaleString() : data.date;
-        document.getElementById('orderDate').innerText = orderDate;
+    const refreshBtn = $("#refresh");
+    const copyBtn = $("#copyLink");
+    const sampleLink = $("#sampleLink");
 
-        document.getElementById('orderDetails').style.display = 'block';
-        updateTracker(data.status);
-      });
-    }, err => console.error(err));
-}
+    // status steps (must match Firestore `timestamps` keys)
+const STEPS = [
+  { key: "Pending", title: "Pending", sub: "We got your order." },
+  { key: "Preparing", title: "Preparing", sub: "Packaging your items." },
+  { key: "Ontheway", title: "Out for Delivery", sub: "Rider is on the way." },
+  { key: "Delivered", title: "Delivered", sub: "Order delivered." },
+  { key: "Complete", title: "Completed", sub: "Order completed." }
+];
 
-function updateTracker(status) {
-  const steps = document.querySelectorAll('.step');
-  const statusMsg = document.getElementById('statusMsg');
-  const statusOrder = ["Processing","Preparing","On the way","Delivered"];
-  let index = statusOrder.indexOf(status);
+function buildTracker(currentKey, timestamps = {}) {
+  trackerEl.innerHTML = '';
+  const currentIndex = Math.max(0, STEPS.findIndex(s => s.key === currentKey));
 
-  steps.forEach((step, idx) => {
-    step.classList.remove('completed','current');
-    if(idx < index) step.classList.add('completed');
-    if(idx === index) step.classList.add('current');
-    step.querySelector('.circle').innerHTML = idx < index ? '<i class="fas fa-check"></i>' : (idx+1);
+  STEPS.forEach((s, i) => {
+    const st = document.createElement('div');
+    st.className =
+      'step' +
+      (i < currentIndex ? ' completed' : i === currentIndex ? ' active' : '');
+
+    // Get timestamp from Firestore
+    const ts = timestamps[s.key] || null;
+
+    st.innerHTML = `
+      <div class="dot"></div>
+      <div class="label">
+        <div class="t">${s.title}</div>
+        <div class="s">${s.sub}</div>
+        <div class="time">${formatDate(ts)}</div>
+      </div>`;
+    trackerEl.appendChild(st);
   });
-
-  statusMsg.innerText = `Current Status: ${status}`;
-
-  // Scroll current step into view (mobile-friendly)
-  const currentStep = document.querySelector('.step.current');
-  if(currentStep) currentStep.scrollIntoView({behavior: 'smooth', inline: 'center'});
 }
 
-function cancelOrder() {
-  alert("Order cancellation requested! Implement backend logic here.");
-}
-</script>
-</body>
+    function renderItems(items=[]) {
+      itemsEl.innerHTML = '';
+      if (!items.length){ itemsEl.innerHTML = '<div class="empty">No items</div>'; return; }
+      items.forEach(it => {
+        const row = document.createElement('div');
+        row.className = 'item';
+        const name = `${it.name || 'Item'} × ${it.qty || 1}`;
+        const price = formatMoney(it.total ?? (it.price||0) * (it.qty||1));
+        row.innerHTML = `<div>${name}</div><div><strong>${price}</strong></div>`;
+        itemsEl.appendChild(row);
+      });
+    }
+
+    function startCountdown(seconds){
+      if (countdownTimer) clearInterval(countdownTimer);
+      if (!seconds || seconds <= 0){ vCountdown.textContent = 'ETA not available'; return; }
+      let left = seconds;
+      const tick = () => {
+        if (left <= 0){ vCountdown.textContent = 'Arriving soon'; clearInterval(countdownTimer); return; }
+        const h = Math.floor(left/3600).toString().padStart(2,'0');
+        const m = Math.floor((left%3600)/60).toString().padStart(2,'0');
+        const s = Math.floor(left%60).toString().padStart(2,'0');
+        vCountdown.textContent = `${h}:${m}:${s}`;
+        left--;
+      };
+      tick();
+      countdownTimer = setInterval(tick, 1000);
+    }
+
+    async function fetchAndListen(orderId){
+      // clean previous subscription
+      if (unsub) { unsub(); unsub = null; }
+
+      setLoading(true); clearError(); resultCard.style.display = 'none';
+
+      const ref = doc(db, 'orders', orderId);
+      const snap = await getDoc(ref);
+      if (!snap.exists()){
+        setLoading(false);
+        setError('Order not found. Please check your Order ID.');
+        return;
+      }
+
+      // live listener
+      unsub = onSnapshot(ref, (docSnap) => {
+        const data = docSnap.data();
+        setLoading(false); clearError(); resultCard.style.display = 'block';
+
+        vOrderId.textContent = orderId;
+        vPlaced.textContent = formatDate(data.createdAt);
+        vCustomer.textContent = data.customer?.name || '—';
+        vPhone.textContent = data.customer?.phone || '—';
+        vPayment.textContent = (data.paymentMethod || '—').toString();
+
+        const currency = data.currency || 'GHS';
+        vTotal.textContent = formatMoney(Number(data.total || 0), currency);
+
+        buildTracker(data.status || 'Pending', data.timestamps || {});
+        renderItems(Array.isArray(data.items) ? data.items : []);
+
+        // ETA: supports either etaMinutes OR etaSeconds OR etaTimestamp
+        if (typeof data.etaSeconds === 'number'){
+          vEta.textContent = `${Math.ceil(data.etaSeconds/60)} min`;
+          startCountdown(data.etaSeconds);
+        } else if (typeof data.etaMinutes === 'number'){
+          vEta.textContent = `${data.etaMinutes} min`;
+          startCountdown(Math.max(0, data.etaMinutes*60));
+        } else if (data.etaTimestamp){
+          try {
+            const etaDate = data.etaTimestamp instanceof Timestamp ? data.etaTimestamp.toDate() : new Date(data.etaTimestamp);
+            const secs = Math.max(0, Math.floor((etaDate.getTime() - Date.now())/1000));
+            vEta.textContent = secs > 0 ? `${Math.ceil(secs/60)} min` : 'Now';
+            startCountdown(secs);
+          } catch { vEta.textContent = '—'; vCountdown.textContent = 'ETA not available'; }
+        } else {
+          vEta.textContent = '—';
+          vCountdown.textContent = 'ETA not available';
+        }
+      }, (err) => {
+        setLoading(false);
+        setError('Failed to subscribe to updates. Please retry.');
+        console.error(err);
+      });
+    }
+
+    function setParam(orderId){
+      const url = new URL(location.href);
+      url.searchParams.set('orderId', orderId);
+      history.replaceState(null, '', url);
+    }
+
+    function getParam(){ return new URL(location.href).searchParams.get('orderId'); }
+
+    // UI handlers
+    trackBtn.addEventListener('click', () => {
+      const id = orderIdInput.value.trim();
+      if (!id) return;
+      setParam(id); fetchAndListen(id);
+    });
+
+    orderIdInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter'){ trackBtn.click(); }
+    });
+
+    refreshBtn.addEventListener('click', () => {
+      const id = orderIdInput.value.trim() || getParam();
+      if (id) fetchAndListen(id);
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      const id = orderIdInput.value.trim() || getParam();
+      if (!id) return;
+      const url = `${location.origin}${location.pathname}?orderId=${encodeURIComponent(id)}`;
+      try { await navigator.clipboard.writeText(url); copyBtn.textContent = 'Copied!'; setTimeout(()=>copyBtn.textContent='Copy Link', 1200); }
+      catch { alert(url); }
+    });
+
+    // Deep-link on load
+    const qp = getParam();
+    const sample = `${location.origin}${location.pathname}?orderId=OGB123456`;
+    sampleLink.textContent = sample; sampleLink.href = sample; sampleLink.target = '_blank';
+
+    if (qp){ orderIdInput.value = qp; fetchAndListen(qp); }
+  </script>  <!--
+  ===================== FIRESTORE SHAPE (example) =====================
+  Collection: orders
+  Document ID: OGB2482011  (this is the Order ID users will enter)
+  Fields:
+    status: "pending"            // one of: received | preparing | Ontheway | delivered
+    createdAt: Timestamp             // Firestore Timestamp
+    currency: "GHS"                 // optional (defaults to GHS)
+    total: 250                       // number
+    paymentMethod: "Pay on Delivery"// or "Paystack"
+    customer: { name: "John Doe", phone: "+233555000111" }
+    items: [
+      { name: "Premium Wine", qty: 2, price: 80, total: 160 },
+      { name: "Fruit Juice",  qty: 1, price: 90, total: 90 }
+    ]
+    // Timestamps for steps (optional)
+    timestamps: {
+      received: Timestamp,
+      processing: Timestamp,
+      out_for_delivery: Timestamp,
+      delivered: Timestamp
+    }
+    // ETA (choose one style)
+    etaMinutes: 45
+    // or
+    etaSeconds: 2700
+    // or
+    etaTimestamp: Timestamp // estimated arrival time
+  =====================================================================
+  --></body>
 </html>
