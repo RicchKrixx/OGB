@@ -276,7 +276,9 @@ function submitOrder(e){
     status:"Pending",
     createdAt:firebase.firestore.FieldValue.serverTimestamp()
   };
-
+timestamps: {
+  Pending: firebase.firestore.FieldValue.serverTimestamp()
+}
   // Attach userId if logged in
   if(currentUser){
     order.userId = currentUser.uid;
