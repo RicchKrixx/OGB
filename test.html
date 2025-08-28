@@ -2,106 +2,137 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Track Order • OGB</title>
   <style>
+    :root {
+      --brand: #b8860b;   /* OGB gold */
+      --brand-dark: #8b6508;
+      --ink: #1f1f1f;
+      --bg: #f7f7f9;
+      --card: #ffffff;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      background: #f9f9f9;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 0;
+      color: var(--ink);
     }
+
     header {
-      background: #2e7d32; /* OGB green */
+      background: var(--brand);
       color: white;
-      padding: 15px;
       text-align: center;
-      font-size: 20px;
+      padding: 1rem;
+      font-size: 1.2rem;
       font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
-    .container {
-      max-width: 500px; margin: 30px auto;
-      background: #fff; padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+    main {
+      max-width: 500px;
+      margin: 2rem auto;
+      padding: 1rem;
     }
-    .order-info {
-      display: flex; justify-content: space-between;
-      margin-bottom: 20px; color: #555;
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      text-align: center;
     }
-    .step {
-      display: flex; align-items: center; margin: 20px 0;
+
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 1rem;
+      margin-bottom: 1rem;
     }
-    .step-icon {
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      border: 2px solid #ccc;
-      margin-right: 15px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px;
-    }
-    .step.active .step-icon,
-    .step.done .step-icon {
-      background: #2e7d32;
-      color: #fff;
-      border-color: #2e7d32;
-    }
-    .step-text {
-      font-size: 16px; color: #444;
-    }
-    .step small {
-      display: block; color: #888; font-size: 13px;
-    }
-    #searchBox {
-      width: 100%; padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc; border-radius: 6px;
-    }
+
     button {
-      width: 100%; padding: 10px;
-      border: none; border-radius: 6px;
-      background: #2e7d32; color: #fff;
-      font-size: 16px; cursor: pointer;
+      width: 100%;
+      padding: 0.9rem;
+      background: var(--brand);
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: var(--brand-dark);
+    }
+
+    .status {
+      margin-top: 1.5rem;
+      text-align: left;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      margin: 0.8rem 0;
+    }
+
+    .circle {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--brand);
+      margin-right: 10px;
+      position: relative;
+    }
+
+    .circle.active {
+      background: var(--brand);
+    }
+
+    .details {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #fafafa;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.4;
     }
   </style>
 </head>
 <body>
-  <header>Track Order (OGB)</header>
-  <div class="container">
-    <input type="text" id="searchBox" placeholder="Enter your Order ID">
-    <button onclick="trackOrder()">Track</button>
+  <header>OGB • Order Tracking</header>
+  <main>
+    <div class="card">
+      <h2>Track Your Order</h2>
+      <p>Enter your Order ID below to see the status</p>
+      <input id="orderIdInput" type="text" placeholder="Enter Order ID" />
+      <button onclick="trackOrder()">Track Order</button>
 
-    <div id="tracking" style="display:none;">
-      <div class="order-info">
-        <div>Order: <span id="orderId"></span></div>
-        <div>ETA: <span id="eta"></span></div>
-      </div>
-
-      <div id="steps">
-        <div class="step" id="step1">
-          <div class="step-icon">1</div>
-          <div class="step-text">Order Placed<small>We have received your order.</small></div>
+      <div id="result" style="display:none;">
+        <div class="status">
+          <h3>Status</h3>
+          <div class="step"><div class="circle" id="s1"></div> Processing</div>
+          <div class="step"><div class="circle" id="s2"></div> Preparing</div>
+          <div class="step"><div class="circle" id="s3"></div> On the Way</div>
+          <div class="step"><div class="circle" id="s4"></div> Delivered</div>
         </div>
-        <div class="step" id="step2">
-          <div class="step-icon">2</div>
-          <div class="step-text">Order Confirmed<small>Your order has been confirmed.</small></div>
-        </div>
-        <div class="step" id="step3">
-          <div class="step-icon">3</div>
-          <div class="step-text">Order Processed<small>We are preparing your order.</small></div>
-        </div>
-        <div class="step" id="step4">
-          <div class="step-icon">4</div>
-          <div class="step-text">Ready to Pickup<small>Your order is ready for pickup.</small></div>
-        </div>
+        <div class="details" id="orderDetails"></div>
       </div>
     </div>
-  </div>
+  </main>
 
-  <script type="module">
-    // --- Firebase Setup for OGB ---
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+  <script>
+    // TODO: Replace with your Firebase config
      const firebaseConfig = {
   apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
   authDomain: "ongod-5073e.firebaseapp.com",
@@ -111,42 +142,46 @@
   appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
   measurementId: "G-1TVP0X3J62"
 };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
     async function trackOrder() {
-      const id = document.getElementById("searchBox").value.trim();
-      if (!id) return alert("Enter Order ID");
+      const orderId = document.getElementById("orderIdInput").value.trim();
+      if (!orderId) return alert("Enter a valid Order ID");
 
-      const ref = doc(db, "orders", id);
-      const snap = await getDoc(ref);
+      try {
+        const doc = await db.collection("orders").doc(orderId).get();
+        if (!doc.exists) {
+          alert("Order not found");
+          return;
+        }
+        const data = doc.data();
+        document.getElementById("result").style.display = "block";
 
-      if (!snap.exists()) {
-        alert("Order not found!");
-        return;
+        // update status circles
+        const steps = ["s1","s2","s3","s4"];
+        steps.forEach((id, index) => {
+          const el = document.getElementById(id);
+          if (index < data.step) {
+            el.classList.add("active");
+          } else {
+            el.classList.remove("active");
+          }
+        });
+
+        // show details
+        document.getElementById("orderDetails").innerHTML = `
+          <strong>Order ID:</strong> ${orderId}<br>
+          <strong>Name:</strong> ${data.name}<br>
+          <strong>Items:</strong> ${data.items}<br>
+          <strong>Total:</strong> GHS ${data.total}<br>
+          <strong>Placed:</strong> ${data.date}
+        `;
+      } catch (e) {
+        console.error(e);
+        alert("Error fetching order");
       }
-
-      const data = snap.data();
-      document.getElementById("tracking").style.display = "block";
-      document.getElementById("orderId").innerText = id;
-      document.getElementById("eta").innerText = data.eta || "30 min";
-
-      // Reset steps
-      document.querySelectorAll(".step").forEach(step => {
-        step.classList.remove("active","done");
-      });
-
-      // Highlight steps based on order status
-      const statusOrder = ["placed", "confirmed", "processed", "ready"];
-      let currentStep = statusOrder.indexOf(data.status);
-
-      statusOrder.forEach((st, index) => {
-        const stepEl = document.getElementById("step"+(index+1));
-        if (index < currentStep) stepEl.classList.add("done");
-        if (index === currentStep) stepEl.classList.add("active");
-      });
     }
-    window.trackOrder = trackOrder;
   </script>
 </body>
 </html>
