@@ -251,6 +251,18 @@ function renderOrder(doc){
   container.appendChild(div);
 }
 
+// Advance status button
+function advanceStatus(orderId,newStatus){
+  const updateData = {
+    status: newStatus,
+    [`timestamps.${newStatus}`]: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  db.collection("orders").doc(orderId).update(updateData)
+    .then(()=>console.log(`Order ${orderId} updated to ${newStatus}`))
+    .catch(err=>console.error(err));
+}
+
 // 🔔 Show popup
 function showNewOrderPopup() {
   const popup = document.getElementById("orderPopup");
