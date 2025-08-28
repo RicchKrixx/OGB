@@ -90,12 +90,12 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 #orderPopup {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.9);
+  background:var(--brand);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 2.9rem;
   font-weight: bold;
   z-index: 9999;
   display: none;
@@ -121,6 +121,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
     <img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="Logo"/>
   </div>
   <nav class="nav">OGB ORDERS📥</nav>
+  <button id="enableSound">🔔</button>
 </header>
 
 <!-- ORDERS -->
@@ -134,8 +135,8 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 <div id="imgModal"><span onclick="document.getElementById('imgModal').style.display='none'">&times;</span><img id="modalImg"/></div>
 
 <!-- 🔔 Fullscreen New Order Popup -->
-<div id="orderPopup">🚨 New Order 🚨</div>
-<audio id="orderSound" src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" preload="auto"></audio>
+<div id="orderPopup">🚨New Order🚨</div>
+<audio id="orderSound" src="bell-ringing-03a.mp3" preload="auto"></audio>
 
 
 <!-- Firebase -->
@@ -155,6 +156,30 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+const sound = document.getElementById("orderSound");
+let soundEnabled = false;
+let allOrders = []; // 🔧 moved global so search works
+
+document.getElementById("enableSound").addEventListener("click", async () => {
+  try {
+    // Try to play once, then stop immediately
+    await sound.play();
+    await new Promise(r => setTimeout(r,200));
+    sound.pause();
+    sound.currentTime = 0;
+
+    soundEnabled = true;
+    const btn = document.getElementById("enableSound");
+    btn.innerText = "✅ Sound Enabled";
+    btn.disabled = true;
+    btn.style.display = "none"; // 🔧 hide after enabling
+    console.log("Sound alerts enabled");
+  } catch (err) {
+    console.error("Failed to enable sound:", err);
+    alert("⚠️ Please click again to allow sound.");
+  }
+});
+
 const container = document.getElementById("ordersContainer");
 const searchBar = document.getElementById("searchBar");
 const statusFlow = ["Pending","Preparing","Ontheway","Delivered","Complete"];
@@ -167,19 +192,17 @@ function showImage(src){
 
 // Advance status button
 function advanceStatus(orderId,newStatus){
-  const docRef = db.collection("orders").doc(orderId);
-  docRef.update({ status: newStatus }).then(()=>{
-    console.log(`Order ${orderId} updated to ${newStatus}`);
-  }).catch(err=>console.error(err));
+  db.collection("orders").doc(orderId).update({ status: newStatus })
+    .then(()=>console.log(`Order ${orderId} updated to ${newStatus}`))
+    .catch(err=>console.error(err));
 }
 
 // Cancel order
 function cancelOrder(orderId){
   if(confirm("Are you sure you want to cancel this order?")){
-    const docRef = db.collection("orders").doc(orderId);
-    docRef.update({ status: "Cancelled" }).then(()=>{
-      console.log(`Order ${orderId} cancelled`);
-    }).catch(err=>console.error(err));
+    db.collection("orders").doc(orderId).update({ status: "Cancelled" })
+      .then(()=>console.log(`Order ${orderId} cancelled`))
+      .catch(err=>console.error(err));
   }
 }
 
@@ -228,59 +251,73 @@ function renderOrder(doc){
   container.appendChild(div);
 }
 
-// Store all orders for searching
-let allOrders = [];
-let seenOrders = new Set(); // 👀 Track orders already shown
-
 // 🔔 Show popup
 function showNewOrderPopup() {
   const popup = document.getElementById("orderPopup");
-  const sound = document.getElementById("orderSound");
 
-  sound.currentTime = 0;
-  sound.play();
+  if (soundEnabled) {
+    sound.currentTime = 0;
+    sound.play().catch(err => console.warn("Play blocked:", err));
+  }
 
   popup.classList.add("show");
 
-  // stop sound if user clicks popup
   popup.onclick = () => {
-    sound.pause();
-    sound.currentTime = 0;
+    if (soundEnabled) {
+      sound.pause();
+      sound.currentTime = 0;
+    }
     popup.classList.remove("show");
   };
 
   setTimeout(() => {
     popup.classList.remove("show");
-    sound.pause();
-    sound.currentTime = 0;
-  }, 3000);
+    if (soundEnabled) {
+      sound.pause();
+      sound.currentTime = 0;
+    }
+  }, 10000);
 }
 
+// --- New order detection baseline ---
+let baselineTime = null;
+
+// First snapshot: set baseline
+db.collection("orders").orderBy("createdAt","desc").limit(1).get().then(snap=>{
+  if(!snap.empty){
+    baselineTime = snap.docs[0].data().createdAt?.toDate() || new Date();
+  } else {
+    baselineTime = new Date();
+  }
+});
+
 // Real-time listener
-db.collection("orders")
-  .orderBy("createdAt","desc")
+db.collection("orders").orderBy("createdAt","desc")
   .onSnapshot(snapshot=>{
     container.innerHTML="";
     if(snapshot.empty){
       container.innerHTML="<p>No orders yet.</p>";
       return;
     }
-    allOrders = [];
+
+    allOrders = []; // 🔧 reset global
     snapshot.forEach(doc=>{
       allOrders.push(doc);
-      // 🔔 If new order detected, show popup
-      if (!seenOrders.has(doc.id)) {
+
+      const orderTime = doc.data().createdAt?.toDate();
+      if(orderTime && baselineTime && orderTime > baselineTime){
         showNewOrderPopup();
-        seenOrders.add(doc.id);
+        baselineTime = orderTime;
       }
     });
+
     displayOrders(allOrders);
   },err=>{
     console.error(err);
     container.innerHTML="<p>Failed to load orders.</p>";
   });
 
-// Display orders (with optional filtering)
+// Display orders
 function displayOrders(list){
   container.innerHTML="";
   list.forEach(doc=>renderOrder(doc));
