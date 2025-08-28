@@ -121,9 +121,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
     <img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="Logo"/>
   </div>
   <nav class="nav">OGB ORDERS📥</nav>
-<button id="enableSound">
-  🔔
-</button>
+  <button id="enableSound" style="background:#111; font-weight:bold; font-size:24px;"">🔔</button>
 </header>
 
 <!-- ORDERS -->
@@ -160,19 +158,22 @@ const db = firebase.firestore();
 
 const sound = document.getElementById("orderSound");
 let soundEnabled = false;
+let allOrders = []; // 🔧 moved global so search works
 
 document.getElementById("enableSound").addEventListener("click", async () => {
   try {
     // Try to play once, then stop immediately
     await sound.play();
+    await new Promise(r => setTimeout(r,200));
     sound.pause();
     sound.currentTime = 0;
 
     soundEnabled = true;
-    document.getElementById("enableSound").innerText = "✅ Sound Enabled";
-    document.getElementById("enableSound").disabled = true;
-    document.getElementById("enableSound").style.opacity = "0.6";
-    alert("Sound alerts enabled! You’ll now hear a bell when new orders arrive.");
+    const btn = document.getElementById("enableSound");
+    btn.innerText = "✅ Sound Enabled";
+    btn.disabled = true;
+    btn.style.display = "none"; // 🔧 hide after enabling
+    console.log("Sound alerts enabled");
   } catch (err) {
     console.error("Failed to enable sound:", err);
     alert("⚠️ Please click again to allow sound.");
@@ -191,19 +192,17 @@ function showImage(src){
 
 // Advance status button
 function advanceStatus(orderId,newStatus){
-  const docRef = db.collection("orders").doc(orderId);
-  docRef.update({ status: newStatus }).then(()=>{
-    console.log(`Order ${orderId} updated to ${newStatus}`);
-  }).catch(err=>console.error(err));
+  db.collection("orders").doc(orderId).update({ status: newStatus })
+    .then(()=>console.log(`Order ${orderId} updated to ${newStatus}`))
+    .catch(err=>console.error(err));
 }
 
 // Cancel order
 function cancelOrder(orderId){
   if(confirm("Are you sure you want to cancel this order?")){
-    const docRef = db.collection("orders").doc(orderId);
-    docRef.update({ status: "Cancelled" }).then(()=>{
-      console.log(`Order ${orderId} cancelled`);
-    }).catch(err=>console.error(err));
+    db.collection("orders").doc(orderId).update({ status: "Cancelled" })
+      .then(()=>console.log(`Order ${orderId} cancelled`))
+      .catch(err=>console.error(err));
   }
 }
 
@@ -281,9 +280,9 @@ function showNewOrderPopup() {
 }
 
 // --- New order detection baseline ---
-let baselineTime = null; // latest order time when page loads
+let baselineTime = null;
 
-// First snapshot: set baseline only
+// First snapshot: set baseline
 db.collection("orders").orderBy("createdAt","desc").limit(1).get().then(snap=>{
   if(!snap.empty){
     baselineTime = snap.docs[0].data().createdAt?.toDate() || new Date();
@@ -293,8 +292,7 @@ db.collection("orders").orderBy("createdAt","desc").limit(1).get().then(snap=>{
 });
 
 // Real-time listener
-db.collection("orders")
-  .orderBy("createdAt","desc")
+db.collection("orders").orderBy("createdAt","desc")
   .onSnapshot(snapshot=>{
     container.innerHTML="";
     if(snapshot.empty){
@@ -302,15 +300,14 @@ db.collection("orders")
       return;
     }
 
-    let allOrders = [];
+    allOrders = []; // 🔧 reset global
     snapshot.forEach(doc=>{
       allOrders.push(doc);
 
-      // 🔔 Only show popup if order is newer than baseline
       const orderTime = doc.data().createdAt?.toDate();
       if(orderTime && baselineTime && orderTime > baselineTime){
         showNewOrderPopup();
-        baselineTime = orderTime; // move baseline forward
+        baselineTime = orderTime;
       }
     });
 
@@ -320,7 +317,7 @@ db.collection("orders")
     container.innerHTML="<p>Failed to load orders.</p>";
   });
 
-// Display orders (with optional filtering)
+// Display orders
 function displayOrders(list){
   container.innerHTML="";
   list.forEach(doc=>renderOrder(doc));
