@@ -328,7 +328,7 @@ button:hover { background: var(--brand-2); }
         const currency = data.currency || 'GHS';
         vTotal.textContent = formatMoney(Number(data.total || 0), currency);
 
-        buildTracker(data.status || 'received', data.timestamps || {});
+        buildTracker(data.status || 'Pending', data.timestamps || {});
         renderItems(Array.isArray(data.items) ? data.items : []);
 
         // ETA: supports either etaMinutes OR etaSeconds OR etaTimestamp
@@ -399,7 +399,7 @@ button:hover { background: var(--brand-2); }
   Collection: orders
   Document ID: OGB2482011  (this is the Order ID users will enter)
   Fields:
-    status: "pending"            // one of: received | preparing | Ontheway | delivered
+    status: "Pending"            // one of: received | Preparing | Ontheway | Delivered
     createdAt: Timestamp             // Firestore Timestamp
     currency: "GHS"                 // optional (defaults to GHS)
     total: 250                       // number
