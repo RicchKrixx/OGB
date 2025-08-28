@@ -227,10 +227,11 @@ button:hover { background: var(--brand-2); }
 
     // status steps (keys expected in Firestore's `status` field)
     const STEPS = [
-      { key: "pending", title: "Pending", sub: "We got your order." },
-      { key: "preparing", title: "Preparing", sub: "Packaging your items." },
+      { key: "Pending", title: "Pending", sub: "We got your order." },
+      { key: "Preparing", title: "Preparing", sub: "Packaging your items." },
       { key: "Ontheway", title: "Out for Delivery", sub: "Rider is on the way." },
-      { key: "delivered", title: "Delivered", sub: "Order delivered." }
+      { key: "Delivered", title: "Delivered", sub: "Order delivered." },
+{ key: "Complete", title: "Completed", sub: "Order completed." }
     ];
 
     let unsub = null; // onSnapshot unsubscribe
