@@ -190,12 +190,7 @@ function showImage(src){
   document.getElementById("imgModal").style.display = "flex";
 }
 
-// Advance status button
-function advanceStatus(orderId,newStatus){
-  db.collection("orders").doc(orderId).update({ status: newStatus })
-    .then(()=>console.log(`Order ${orderId} updated to ${newStatus}`))
-    .catch(err=>console.error(err));
-}
+
 
 // Cancel order
 function cancelOrder(orderId){
