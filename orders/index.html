@@ -90,12 +90,12 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 #orderPopup {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.9);
+  background:var(--brand);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 2.9rem;
   font-weight: bold;
   z-index: 9999;
   display: none;
@@ -134,7 +134,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 <div id="imgModal"><span onclick="document.getElementById('imgModal').style.display='none'">&times;</span><img id="modalImg"/></div>
 
 <!-- 🔔 Fullscreen New Order Popup -->
-<div id="orderPopup">🚨 New Order 🚨</div>
+<div id="orderPopup">🚨New Order🚨</div>
 <audio id="orderSound" src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" preload="auto"></audio>
 
 
