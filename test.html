@@ -331,25 +331,8 @@ button:hover { background: var(--brand-2); }
         buildTracker(data.status || 'Pending', data.timestamps || {});
         renderItems(Array.isArray(data.items) ? data.items : []);
 
-        // ETA: supports either etaMinutes OR etaSeconds OR etaTimestamp
-        if (typeof data.etaSeconds === 'number'){
-          vEta.textContent = `${Math.ceil(data.etaSeconds/60)} min`;
-          startCountdown(data.etaSeconds);
-        } else if (typeof data.etaMinutes === 'number'){
-          vEta.textContent = `${data.etaMinutes} min`;
-          startCountdown(Math.max(0, data.etaMinutes*60));
-        } else if (data.etaTimestamp){
-          try {
-            const etaDate = data.etaTimestamp instanceof Timestamp ? data.etaTimestamp.toDate() : new Date(data.etaTimestamp);
-            const secs = Math.max(0, Math.floor((etaDate.getTime() - Date.now())/1000));
-            vEta.textContent = secs > 0 ? `${Math.ceil(secs/60)} min` : 'Now';
-            startCountdown(secs);
-          } catch { vEta.textContent = '—'; vCountdown.textContent = 'ETA not available'; }
-        } else {
-          vEta.textContent = '—';
-          vCountdown.textContent = 'ETA not available';
-        }
-      }, (err) => {
+   updateEta(data);
+ (err) => {
         setLoading(false);
         setError('Failed to subscribe to updates. Please retry.');
         console.error(err);
