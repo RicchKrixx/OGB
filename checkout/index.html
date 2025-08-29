@@ -243,6 +243,14 @@ firebase.auth().onAuthStateChanged(user => {
   currentUser = user;
 });
 
+// Estimate ETA in minutes based on distance
+function calculateETA(customerLat, customerLng) {
+  const distance = getDistanceKm(shopLat, shopLng, customerLat, customerLng);
+  const avgSpeed = 30; // km/h (adjust for your city traffic)
+  let etaMinutes = Math.round((distance / avgSpeed) * 60);
+  if (etaMinutes < 10) etaMinutes = 10; // minimum ETA
+  return etaMinutes;
+}
 // Submit order
 function submitOrder(e){
   e.preventDefault();
@@ -262,23 +270,21 @@ function submitOrder(e){
   const grand = subtotal + deliveryFee;
 
   const order = {
-    name:document.getElementById("name").value,
-    phone:document.getElementById("phone").value,
-    email:document.getElementById("email").value,
-    address:document.getElementById("address").value,
-    latitude:lat,
-    longitude:lng,
-    items:cart,
-    subtotal,
-    deliveryFee,
-    total:grand,
-    payMethod:document.querySelector('input[name="pay"]:checked').value,
-    status:"Pending",
-    createdAt:firebase.firestore.FieldValue.serverTimestamp()
-  };
-timestamps: {
-  Pending: firebase.firestore.FieldValue.serverTimestamp()
-}
+  name: document.getElementById("name").value,
+  phone: document.getElementById("phone").value,
+  email: document.getElementById("email").value,
+  address: document.getElementById("address").value,
+  latitude: lat,
+  longitude: lng,
+  items: cart,
+  subtotal,
+  deliveryFee,
+  total: grand,
+  payMethod: document.querySelector('input[name="pay"]:checked').value,
+  status: "Pending",
+  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  etaMinutes: (!isNaN(lat) && !isNaN(lng)) ? calculateETA(lat, lng) : 45 // fallback 45
+};
   // Attach userId if logged in
   if(currentUser){
     order.userId = currentUser.uid;
