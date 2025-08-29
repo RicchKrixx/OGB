@@ -299,7 +299,29 @@ button:hover { background: var(--brand-2); }
       tick();
       countdownTimer = setInterval(tick, 1000);
     }
+function updateEta(data) {
+  if (!data) return;
+  
+  // Prefer etaSeconds > etaMinutes > etaTimestamp
+  let seconds = 0;
+  if (typeof data.etaSeconds === 'number') seconds = data.etaSeconds;
+  else if (typeof data.etaMinutes === 'number') seconds = data.etaMinutes * 60;
+  else if (data.etaTimestamp){
+    try {
+      const etaDate = data.etaTimestamp instanceof Timestamp ? data.etaTimestamp.toDate() : new Date(data.etaTimestamp);
+      seconds = Math.max(0, Math.floor((etaDate.getTime() - Date.now())/1000));
+    } catch { seconds = 0; }
+  }
 
+  // Update ETA display
+  if (seconds > 0){
+    vEta.textContent = `${Math.ceil(seconds/60)} min`;
+    startCountdown(seconds);
+  } else {
+    vEta.textContent = '—';
+    vCountdown.textContent = 'ETA not available';
+  }
+}
     async function fetchAndListen(orderId){
       // clean previous subscription
       if (unsub) { unsub(); unsub = null; }
