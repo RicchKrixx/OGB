@@ -337,28 +337,46 @@ function updateEta(data) {
       }
 
       // live listener
-      unsub = onSnapshot(ref, (docSnap) => {
-  const data = docSnap.data();
-  setLoading(false); clearError(); resultCard.style.display = 'block';
+      unsub = onSnapshot(ref, (docSnap) => {  
+    const data = docSnap.data();  
+    setLoading(false); clearError(); resultCard.style.display = 'block';  
 
-  vOrderId.textContent = orderId;
-  vPlaced.textContent = formatDate(data.createdAt);
-  vCustomer.textContent = data.customer?.name || '—';
-  vPhone.textContent = data.customer?.phone || '—';
-  vPayment.textContent = (data.paymentMethod || '—').toString();
+    vOrderId.textContent = orderId;  
+    vPlaced.textContent = formatDate(data.createdAt);  
+    vCustomer.textContent = data.customer?.name || '—';  
+    vPhone.textContent = data.customer?.phone || '—';  
+    vPayment.textContent = (data.paymentMethod || '—').toString();  
 
-  const currency = data.currency || 'GHS';
-  vTotal.textContent = formatMoney(Number(data.total || 0), currency);
+    const currency = data.currency || 'GHS';  
+    vTotal.textContent = formatMoney(Number(data.total || 0), currency);  
 
-  buildTracker(data.status || 'Pending', data.timestamps || {});
-  renderItems(Array.isArray(data.items) ? data.items : []);
-  updateEta(data);
+    buildTracker(data.status || 'Pending', data.timestamps || {});  
+    renderItems(Array.isArray(data.items) ? data.items : []);  
 
-}, (err) => {
-  setLoading(false);
-  setError('Failed to subscribe to updates. Please retry.');
-  console.error(err);
-});
+    // ETA: supports either etaMinutes OR etaSeconds OR etaTimestamp  
+    if (typeof data.etaSeconds === 'number'){  
+      vEta.textContent = `${Math.ceil(data.etaSeconds/60)} min`;  
+      startCountdown(data.etaSeconds);  
+    } else if (typeof data.etaMinutes === 'number'){  
+      vEta.textContent = `${data.etaMinutes} min`;  
+      startCountdown(Math.max(0, data.etaMinutes*60));  
+    } else if (data.etaTimestamp){  
+      try {  
+        const etaDate = data.etaTimestamp instanceof Timestamp ? data.etaTimestamp.toDate() : new Date(data.etaTimestamp);  
+        const secs = Math.max(0, Math.floor((etaDate.getTime() - Date.now())/1000));  
+        vEta.textContent = secs > 0 ? `${Math.ceil(secs/60)} min` : 'Now';  
+        startCountdown(secs);  
+      } catch { vEta.textContent = '—'; vCountdown.textContent = 'ETA not available'; }  
+    } else {  
+      vEta.textContent = '—';  
+      vCountdown.textContent = 'ETA not available';  
+    }  
+  }, (err) => {  
+    setLoading(false);  
+    setError('Failed to subscribe to updates. Please retry.');  
+    console.error(err);  
+  });  
+}  
     function setParam(orderId){
       const url = new URL(location.href);
       url.searchParams.set('orderId', orderId);
