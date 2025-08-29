@@ -299,9 +299,7 @@ button:hover { background: var(--brand-2); }
       tick();
       countdownTimer = setInterval(tick, 1000);
     }
-function updateEta(data) {
-  if (!data) return;
-  
+
     async function fetchAndListen(orderId){
       // clean previous subscription
       if (unsub) { unsub(); unsub = null; }
