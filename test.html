@@ -344,12 +344,12 @@ button:hover { background: var(--brand-2); }
       catch { alert(url); }
     });
 
-   
-// Deep-link on load
-const qp = getParam();
-const sample = `${location.origin}${location.pathname}?orderId=${orderId}`;
-sampleLink.textContent = sample; sampleLink.href = sample; sampleLink.target = '_blank';
 
+   
+    // Deep-link on load
+    const qp = getParam();
+    const sample = `${location.origin}${location.pathname}?orderId=${orderId}`;
+    sampleLink.textContent = sample; sampleLink.href = sample; sampleLink.target = '_blank';
 
     if (qp){ orderIdInput.value = qp; fetchAndListen(qp); }
   </script>
