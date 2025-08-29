@@ -1,353 +1,327 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Checkout • On God Bend Mini Mart</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<script src="https://js.paystack.co/v1/inline.js"></script>
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+<meta charset="utf-8"/>  
+<meta name="viewport" content="width=device-width,initial-scale=1"/>  
+<title>Checkout • On God Bend Mini Mart</title>  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">  
+<script src="https://js.paystack.co/v1/inline.js"></script>  <style>  
+:root{--brand:#b8860b;--brand-dark:#8b6508;--ink:#1f1f1f;--bg:#f7f7f9;--card:#fff;}  
+*{box-sizing:border-box;}  
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}  
+a{color:inherit;text-decoration:none;}  
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#111;color:#fff;}  
+.brand img{height:90px;width:auto;border-radius:6px;}  
+.nav{display:flex;gap:14px;}  
+.nav a{padding:8px 10px;border-radius:8px;}  
+.nav a:hover{background:rgba(255,255,255,.08);}  
+#checkout{padding:26px 16px;max-width:900px;margin:0 auto 26px;}  
+form.checkout{background:#fff;border-radius:16px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06);}  
+.fields{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}  
+input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;}  
+.order-summary{margin-top:16px;background:#fafafa;border-radius:12px;padding:12px;}  
+.pay-row{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0;}  
+.place{width:100%;background:#111;color:#fff;border:0;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer;}  
+.note{font-size:12px;color:#666;}  
+.success{background:#e9ffe9;border:1px solid #a7e7a7;color:#0a5d0a;padding:12px;border-radius:12px;margin-top:12px;display:none;}  
+footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top:26px;}  
+.cart-btn{font-size:30px;text-decoration:none;display:inline-flex;align-items:center;color:#fff;border:0;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer;position:relative;}  
+#cartCount{position:absolute;top:-3px;right:-3px;background:var(--brand);font-size:12px;font-weight:bold;border-radius:50%;padding:2px 6px;color:#fff;line-height:1;}  
+/* Hamburger */  
+.hamburger{display:block;width:30px;height:25px;margin:20px;position:relative;cursor:pointer;z-index:2001;color:white;}  
+.hamburger span{position:absolute;height:4px;width:100%;background:#333;border-radius:2px;transition:all 0.3s ease;}  
+.hamburger span:nth-child(1){top:0;}  
+.hamburger span:nth-child(2){top:10px;}  
+.hamburger span:nth-child(3){top:20px;}  
+.menu{position:fixed;top:40px;right:-250px;width:250px;height:auto;background:#f1f1f1;box-shadow:-2px 0 5px rgba(0,0,0,0.3);transition:right 0.3s ease;padding-top:60px;border-radius:8px;z-index:2000;}  
+.menu a{display:block;padding:15px 25px;text-decoration:none;color:#333;font-size:18px;}  
+.menu a:hover{background:#ddd;}  
+.menu.active{right:0;}  
+.hamburger.active span:nth-child(1){transform:rotate(45deg);top:10px;}  
+.hamburger.active span:nth-child(2){opacity:0;}  
+.hamburger.active span:nth-child(3){transform:rotate(-45deg);top:10px;}  
+  
+#loaderOverlay {  
+  position: fixed;  
+  top: 0; left: 0;  
+  width: 100%; height: 100%;  
+  background: rgba(255,255,255,0.9);  
+  display: none;  
+  align-items: center;  
+  justify-content: center;  
+  flex-direction: column;  
+  z-index: 9999;  
+}  
+.spinner {  
+  border: 4px solid #f3f3f3;  
+  border-top: 4px solid #b8860b;  
+  border-radius: 50%;  
+  width: 40px;  
+  height: 40px;  
+  animation: spin 1s linear infinite;  
+}  
+@keyframes spin {   
+  0% { transform: rotate(0deg); }   
+  100% { transform: rotate(360deg); }   
+}  
+#loaderOverlay p {  
+  margin-top: 12px;  
+  font-weight: 600;  
+  color: #333;  
+}  
+.place:disabled {  
+  background: #ccc;  
+  cursor: not-allowed;  
+}  
+.place:not(:disabled) {  
+  background: var(--brand);  
+}  
+.place:not(:disabled):hover {  
+  background: var(--brand-dark);  
+}  
+</style>  </head>  
+<body>  
+<header>  
+ <div class="brand"><img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="Logo"/></div>  
+  <nav class="nav">  
+    <div class="hamburger" id="hamburger" style="color: white;">  
+      <span></span><span></span><span></span>  
+    </div>  
+    <div class="menu" id="menu">  
+      <a href="index.html">Home</a>  
+      <a href="#">Shop</a>  
+      <a href="#">About</a>  
+      <a href="#">Contact</a>  
+    </div>  
+    <div class="cart-icon">  
+      <a href="/cart/" class="cart-btn"><i class="fas fa-shopping-bag"></i><span id="cartCount">0</span></a>  
+    </div>  
+  </nav>  
+</header>  <section id="checkout" class="section">  
+  <h2>Checkout</h2>  
+  <form class="checkout" onsubmit="return submitOrder(event)">  
+    <div class="fields">  
+      <div><label>Full Name</label><input id="name" required /></div>  
+      <div><label>Phone</label><input id="phone" required /></div>  
+      <div><label>Email</label><input id="email" type="email" placeholder="(optional)" /></div>  
+      <div style="grid-column:1/-1"><label>Delivery Address</label><input id="address" required /></div>  
+    </div>  
+    <!-- Hidden lat/lng -->  
+    <input type="hidden" id="latitude">  
+    <input type="hidden" id="longitude">  <div class="order-summary" id="orderSummary"></div>  
 
-<style>
-:root{--brand:#b8860b;--brand-dark:#8b6508;--ink:#1f1f1f;--bg:#f7f7f9;--card:#fff;}
-*{box-sizing:border-box;}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
-a{color:inherit;text-decoration:none;}
-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#111;color:#fff;}
-.brand img{height:90px;width:auto;border-radius:6px;}
-.nav{display:flex;gap:14px;}
-.nav a{padding:8px 10px;border-radius:8px;}
-.nav a:hover{background:rgba(255,255,255,.08);}
-#checkout{padding:26px 16px;max-width:900px;margin:0 auto 26px;}
-form.checkout{background:#fff;border-radius:16px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06);}
-.fields{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
-input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;}
-.order-summary{margin-top:16px;background:#fafafa;border-radius:12px;padding:12px;}
-.pay-row{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0;}
-.place{width:100%;background:#111;color:#fff;border:0;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer;}
-.note{font-size:12px;color:#666;}
-.success{background:#e9ffe9;border:1px solid #a7e7a7;color:#0a5d0a;padding:12px;border-radius:12px;margin-top:12px;display:none;}
-footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top:26px;}
-.cart-btn{font-size:30px;text-decoration:none;display:inline-flex;align-items:center;color:#fff;border:0;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer;position:relative;}
-#cartCount{position:absolute;top:-3px;right:-3px;background:var(--brand);font-size:12px;font-weight:bold;border-radius:50%;padding:2px 6px;color:#fff;line-height:1;}
-/* Hamburger */
-.hamburger{display:block;width:30px;height:25px;margin:20px;position:relative;cursor:pointer;z-index:2001;color:white;}
-.hamburger span{position:absolute;height:4px;width:100%;background:#333;border-radius:2px;transition:all 0.3s ease;}
-.hamburger span:nth-child(1){top:0;}
-.hamburger span:nth-child(2){top:10px;}
-.hamburger span:nth-child(3){top:20px;}
-.menu{position:fixed;top:40px;right:-250px;width:250px;height:auto;background:#f1f1f1;box-shadow:-2px 0 5px rgba(0,0,0,0.3);transition:right 0.3s ease;padding-top:60px;border-radius:8px;z-index:2000;}
-.menu a{display:block;padding:15px 25px;text-decoration:none;color:#333;font-size:18px;}
-.menu a:hover{background:#ddd;}
-.menu.active{right:0;}
-.hamburger.active span:nth-child(1){transform:rotate(45deg);top:10px;}
-.hamburger.active span:nth-child(2){opacity:0;}
-.hamburger.active span:nth-child(3){transform:rotate(-45deg);top:10px;}
+<div class="pay-row">  
+  <label><input type="radio" name="pay" value="pod" checked /> Pay on Delivery</label>  
+  <label><input type="radio" name="pay" value="paystack" /> Pay with Paystack</label>  
+</div>  
+<button class="place" id="placeOrderBtn" type="submit" disabled>Place Order</button>  
+<div class="success" id="successBox"></div>
 
-#loaderOverlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(255,255,255,0.9);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  z-index: 9999;
-}
-.spinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #b8860b;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin { 
-  0% { transform: rotate(0deg); } 
-  100% { transform: rotate(360deg); } 
-}
-#loaderOverlay p {
-  margin-top: 12px;
-  font-weight: 600;
-  color: #333;
-}
-.place:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-.place:not(:disabled) {
-  background: var(--brand);
-}
-.place:not(:disabled):hover {
-  background: var(--brand-dark);
-}
-</style>
-</head>
-<body>
-<header>
- <div class="brand"><img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="Logo"/></div>
-  <nav class="nav">
-    <div class="hamburger" id="hamburger" style="color: white;">
-      <span></span><span></span><span></span>
-    </div>
-    <div class="menu" id="menu">
-      <a href="index.html">Home</a>
-      <a href="#">Shop</a>
-      <a href="#">About</a>
-      <a href="#">Contact</a>
-    </div>
-    <div class="cart-icon">
-      <a href="/cart/" class="cart-btn"><i class="fas fa-shopping-bag"></i><span id="cartCount">0</span></a>
-    </div>
-  </nav>
-</header>
-
-<section id="checkout" class="section">
-  <h2>Checkout</h2>
-  <form class="checkout" onsubmit="return submitOrder(event)">
-    <div class="fields">
-      <div><label>Full Name</label><input id="name" required /></div>
-      <div><label>Phone</label><input id="phone" required /></div>
-      <div><label>Email</label><input id="email" type="email" placeholder="(optional)" /></div>
-      <div style="grid-column:1/-1"><label>Delivery Address</label><input id="address" required /></div>
-    </div>
-    <!-- Hidden lat/lng -->
-    <input type="hidden" id="latitude">
-    <input type="hidden" id="longitude">
-
-    <div class="order-summary" id="orderSummary"></div>
-
-    <div class="pay-row">
-      <label><input type="radio" name="pay" value="pod" checked /> Pay on Delivery</label>
-      <label><input type="radio" name="pay" value="paystack" /> Pay with Paystack</label>
-    </div>
-    <button class="place" id="placeOrderBtn" type="submit" disabled>Place Order</button>
-    <div class="success" id="successBox"></div>
-  </form>
-</section>
-<div id="loaderOverlay">
-  <div class="spinner"></div>
-  <p>Processing your order...</p>
-</div>
-
-<footer>
-  © <span id="year"></span> On God Bend OGB — All Rights Reserved.
-</footer>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script>
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
-  authDomain: "ongod-5073e.firebaseapp.com",
-  projectId: "ongod-5073e",
-  storageBucket: "ongod-5073e.firebasestorage.app",
-  messagingSenderId: "439687837026",
-  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
-  measurementId: "G-1TVP0X3J62"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// Shop coordinates
-const shopLat = 5.595930;
-const shopLng = -0.134657;
-const feePerKm = 3.52;
-
-// Helpers
-function getCart(){ return JSON.parse(localStorage.getItem("cart"))||[]; }
-function updateBadge(){
-  let cart=getCart();
-  let qty=cart.reduce((sum,i)=>sum+(i.qty||1),0);
-  document.getElementById("cartCount").textContent=qty;
-}
-document.getElementById("year").textContent=new Date().getFullYear();
-updateBadge();
-
-// Haversine distance
-function getDistanceKm(lat1, lon1, lat2, lon2){
-  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
-  const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-
-// Render order summary
-function renderOrderSummary(){
-  const summary = document.getElementById("orderSummary");
-  const cart = getCart();
-  const btn = document.getElementById("placeOrderBtn");
-
-  btn.disabled = true;
-  btn.textContent = "Please wait…";
-
-  if(cart.length===0){
-    summary.innerHTML="<p>Cart is empty.</p>";
-    return;
-  }
-
-  let subtotal = 0;
-  cart.forEach(i => subtotal += i.price * i.qty);
-
-  summary.innerHTML = `
-    <b>Order Summary:</b><br/>
-    ${cart.map(i=>`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}`).join("<br/>")}
-    <br/><br/>Subtotal: GH₵ ${subtotal}
-    <br/>Delivery: <span id="deliveryFee">Calculating…</span>
-    <br/><b>Total: <span id="grandTotal">Hang on…</span></b>
-  `;
-
-  const lat = parseFloat(document.getElementById("latitude").value);
-  const lng = parseFloat(document.getElementById("longitude").value);
-
-  if(!isNaN(lat)&&!isNaN(lng)){
-    const dist = getDistanceKm(shopLat, shopLng, lat, lng);
-    const deliveryFee = Math.round(dist*feePerKm);
-    const grand = subtotal + deliveryFee;
-
-    document.getElementById("deliveryFee").textContent = "GH₵ " + deliveryFee;
-    document.getElementById("grandTotal").textContent = "GH₵ " + grand;
-
-    btn.disabled = false;
-    btn.textContent = document.querySelector("input[name='pay']:checked").value==="paystack" 
-      ? "Pay Now" 
-      : "Place Order";
-  }
-}
-renderOrderSummary();
-
-// Geolocation
-if(navigator.geolocation){
-  navigator.geolocation.getCurrentPosition(pos=>{
-    document.getElementById("latitude").value = pos.coords.latitude;
-    document.getElementById("longitude").value = pos.coords.longitude;
-    renderOrderSummary();
-  }, ()=>{
-    document.getElementById("deliveryFee").textContent = "Enter address to calculate";
-    document.getElementById("grandTotal").textContent = "—";
-  });
-}
-
-// Paystack toggle
-const placeOrderBtn = document.getElementById("placeOrderBtn");
-document.querySelectorAll("input[name='pay']").forEach(radio=>{
-  radio.addEventListener("change",()=>{
-    placeOrderBtn.textContent = radio.value==="paystack" ? "Pay Now" : "Place Order";
-  });
-});
-
-// Wait for auth to initialize
-let currentUser = null;
-firebase.auth().onAuthStateChanged(user => {
-  currentUser = user;
-});
-
-// Estimate ETA in minutes based on distance
-function calculateETA(customerLat, customerLng) {
-  const distance = getDistanceKm(shopLat, shopLng, customerLat, customerLng);
-  const avgSpeed = 30; // km/h (adjust for your city traffic)
-  let etaMinutes = Math.round((distance / avgSpeed) * 60);
-  if (etaMinutes < 10) etaMinutes = 10; // minimum ETA
-  return etaMinutes;
-}
-// Submit order
-function submitOrder(e){
-  e.preventDefault();
-  const cart = getCart();
-  if(cart.length===0){alert("Cart is empty."); return false;}
-
-  document.getElementById("loaderOverlay").style.display = "flex";
-
-  const subtotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
-  const lat = parseFloat(document.getElementById("latitude").value);
-  const lng = parseFloat(document.getElementById("longitude").value);
-  let deliveryFee = 0;
-  if(!isNaN(lat)&&!isNaN(lng)){
-    const dist = getDistanceKm(shopLat,shopLng,lat,lng);
-    deliveryFee = Math.round(dist*feePerKm);
-  }
-  const grand = subtotal + deliveryFee;
-// Calculate ETA in seconds and timestamp
-const etaSeconds = (!isNaN(lat) && !isNaN(lng)) ? calculateETA(lat, lng) * 60 : 45 * 60; // fallback 45 mins
-const etaTimestamp = new Date(Date.now() + etaSeconds * 1000);
-  const order = {
-  name: document.getElementById("name").value,
-  phone: document.getElementById("phone").value,
-  email: document.getElementById("email").value,
-  address: document.getElementById("address").value,
-  latitude: lat,
-  longitude: lng,
-  items: cart,
-  subtotal,
-  deliveryFee,
-  total: grand,
-  payMethod: document.querySelector('input[name="pay"]:checked').value,
-  status: "Pending",
-  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-  etaMinutes: (!isNaN(lat) && !isNaN(lng)) ? calculateETA(lat, lng) : 45,
-  etaSeconds: etaSeconds,
-  etaTimestamp: firebase.firestore.Timestamp.fromDate(etaTimestamp)
-};
-  // Attach userId if logged in
-  if(currentUser){
-    order.userId = currentUser.uid;
-    if(!order.email) order.email = currentUser.email;
-  }
-
-  const saveAndRedirect = () => {
-    db.collection("orders").add(order).then(docRef=>{
-   
-    docRef.update({ orderId: docRef.id });
-      localStorage.removeItem("cart");
-      updateBadge();
-      setTimeout(()=>{
-        window.location.href = "thankyou.html?orderId=" + docRef.id;
-      }, 1000);
-    }).catch(err=>{
-      document.getElementById("loaderOverlay").style.display = "none";
-      console.error(err);
-      alert("Failed to submit order.");
-    });
-  };
-
-  if(order.payMethod==="paystack"){
-    let handler = PaystackPop.setup({
-      key:'pk_live_55fc4deb5da6100b52f981f9f754dc0249e7752f',
-      email:order.email||"customer@example.com",
-      amount:order.total*100,
-      currency:"GHS",
-      onClose:()=>{
-        document.getElementById("loaderOverlay").style.display = "none";
-        alert('Payment cancelled.');
-      },
-      callback:response=>{
-        order.status="Pending";
-        saveAndRedirect();
-      }
-    });
-    handler.openIframe();
-  } else {
-    saveAndRedirect();
-  }
-
-  return false;
-}
-</script>
-<script>
-const hamburger=document.getElementById('hamburger');
-const menu=document.getElementById('menu');
-hamburger.addEventListener('click',e=>{
-  e.stopPropagation();
-  hamburger.classList.toggle('active');
-  menu.classList.toggle('active');
-});
-document.addEventListener('click',e=>{
-  if(!menu.contains(e.target)&&!hamburger.contains(e.target)){
-    menu.classList.remove('active');
-    hamburger.classList.remove('active');
-  }
-});
-</script>
-</body>
+  </form>  
+</section>  
+<div id="loaderOverlay">  
+  <div class="spinner"></div>  
+  <p>Processing your order...</p>  
+</div>  <footer>  
+  © <span id="year"></span> On God Bend OGB — All Rights Reserved.  
+</footer>  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>  <script>  
+// Firebase config  
+const firebaseConfig = {  
+  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",  
+  authDomain: "ongod-5073e.firebaseapp.com",  
+  projectId: "ongod-5073e",  
+  storageBucket: "ongod-5073e.firebasestorage.app",  
+  messagingSenderId: "439687837026",  
+  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",  
+  measurementId: "G-1TVP0X3J62"  
+};  
+firebase.initializeApp(firebaseConfig);  
+const db = firebase.firestore();  
+  
+// Shop coordinates  
+const shopLat = 5.595930;  
+const shopLng = -0.134657;  
+const feePerKm = 3.52;  
+  
+// Helpers  
+function getCart(){ return JSON.parse(localStorage.getItem("cart"))||[]; }  
+function updateBadge(){  
+  let cart=getCart();  
+  let qty=cart.reduce((sum,i)=>sum+(i.qty||1),0);  
+  document.getElementById("cartCount").textContent=qty;  
+}  
+document.getElementById("year").textContent=new Date().getFullYear();  
+updateBadge();  
+  
+// Haversine distance  
+function getDistanceKm(lat1, lon1, lat2, lon2){  
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;  
+  const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;  
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));  
+}  
+  
+// Render order summary  
+function renderOrderSummary(){  
+  const summary = document.getElementById("orderSummary");  
+  const cart = getCart();  
+  const btn = document.getElementById("placeOrderBtn");  
+  
+  btn.disabled = true;  
+  btn.textContent = "Please wait…";  
+  
+  if(cart.length===0){  
+    summary.innerHTML="<p>Cart is empty.</p>";  
+    return;  
+  }  
+  
+  let subtotal = 0;  
+  cart.forEach(i => subtotal += i.price * i.qty);  
+  
+  summary.innerHTML = `  
+    <b>Order Summary:</b><br/>  
+    ${cart.map(i=>`${i.name} x${i.qty} — GH₵ ${i.price*i.qty}`).join("<br/>")}  
+    <br/><br/>Subtotal: GH₵ ${subtotal}  
+    <br/>Delivery: <span id="deliveryFee">Calculating…</span>  
+    <br/><b>Total: <span id="grandTotal">Hang on…</span></b>  
+  `;  
+  
+  const lat = parseFloat(document.getElementById("latitude").value);  
+  const lng = parseFloat(document.getElementById("longitude").value);  
+  
+  if(!isNaN(lat)&&!isNaN(lng)){  
+    const dist = getDistanceKm(shopLat, shopLng, lat, lng);  
+    const deliveryFee = Math.round(dist*feePerKm);  
+    const grand = subtotal + deliveryFee;  
+  
+    document.getElementById("deliveryFee").textContent = "GH₵ " + deliveryFee;  
+    document.getElementById("grandTotal").textContent = "GH₵ " + grand;  
+  
+    btn.disabled = false;  
+    btn.textContent = document.querySelector("input[name='pay']:checked").value==="paystack"   
+      ? "Pay Now"   
+      : "Place Order";  
+  }  
+}  
+renderOrderSummary();  
+  
+// Geolocation  
+if(navigator.geolocation){  
+  navigator.geolocation.getCurrentPosition(pos=>{  
+    document.getElementById("latitude").value = pos.coords.latitude;  
+    document.getElementById("longitude").value = pos.coords.longitude;  
+    renderOrderSummary();  
+  }, ()=>{  
+    document.getElementById("deliveryFee").textContent = "Enter address to calculate";  
+    document.getElementById("grandTotal").textContent = "—";  
+  });  
+}  
+  
+// Paystack toggle  
+const placeOrderBtn = document.getElementById("placeOrderBtn");  
+document.querySelectorAll("input[name='pay']").forEach(radio=>{  
+  radio.addEventListener("change",()=>{  
+    placeOrderBtn.textContent = radio.value==="paystack" ? "Pay Now" : "Place Order";  
+  });  
+});  
+  
+// Wait for auth to initialize  
+let currentUser = null;  
+firebase.auth().onAuthStateChanged(user => {  
+  currentUser = user;  
+});  
+  
+// Submit order  
+function submitOrder(e){  
+  e.preventDefault();  
+  const cart = getCart();  
+  if(cart.length===0){alert("Cart is empty."); return false;}  
+  
+  document.getElementById("loaderOverlay").style.display = "flex";  
+  
+  const subtotal = cart.reduce((s,i)=>s+i.price*i.qty,0);  
+  const lat = parseFloat(document.getElementById("latitude").value);  
+  const lng = parseFloat(document.getElementById("longitude").value);  
+  let deliveryFee = 0;  
+  if(!isNaN(lat)&&!isNaN(lng)){  
+    const dist = getDistanceKm(shopLat,shopLng,lat,lng);  
+    deliveryFee = Math.round(dist*feePerKm);  
+  }  
+  const grand = subtotal + deliveryFee;  
+  
+  const order = {  
+    name:document.getElementById("name").value,  
+    phone:document.getElementById("phone").value,  
+    email:document.getElementById("email").value,  
+    address:document.getElementById("address").value,  
+    latitude:lat,  
+    longitude:lng,  
+    items:cart,  
+    subtotal,  
+    deliveryFee,  
+    total:grand,  
+    payMethod:document.querySelector('input[name="pay"]:checked').value,  
+    status:"Pending",  
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()  
+  };  
+timestamps: {  
+  Pending: firebase.firestore.FieldValue.serverTimestamp()  
+}  
+  // Attach userId if logged in  
+  if(currentUser){  
+    order.userId = currentUser.uid;  
+    if(!order.email) order.email = currentUser.email;  
+  }  
+  
+  const saveAndRedirect = () => {  
+    db.collection("orders").add(order).then(docRef=>{  
+  
+    docRef.update({ orderId: docRef.id });  
+      localStorage.removeItem("cart");  
+      updateBadge();  
+      setTimeout(()=>{  
+        window.location.href = "thankyou.html?orderId=" + docRef.id;  
+      }, 1000);  
+    }).catch(err=>{  
+      document.getElementById("loaderOverlay").style.display = "none";  
+      console.error(err);  
+      alert("Failed to submit order.");  
+    });  
+  };  
+  
+  if(order.payMethod==="paystack"){  
+    let handler = PaystackPop.setup({  
+      key:'pk_live_55fc4deb5da6100b52f981f9f754dc0249e7752f',  
+      email:order.email||"customer@example.com",  
+      amount:order.total*100,  
+      currency:"GHS",  
+      onClose:()=>{  
+        document.getElementById("loaderOverlay").style.display = "none";  
+        alert('Payment cancelled.');  
+      },  
+      callback:response=>{  
+        order.status="Pending";  
+        saveAndRedirect();  
+      }  
+    });  
+    handler.openIframe();  
+  } else {  
+    saveAndRedirect();  
+  }  
+  
+  return false;  
+}  
+</script>  <script>  
+const hamburger=document.getElementById('hamburger');  
+const menu=document.getElementById('menu');  
+hamburger.addEventListener('click',e=>{  
+  e.stopPropagation();  
+  hamburger.classList.toggle('active');  
+  menu.classList.toggle('active');  
+});  
+document.addEventListener('click',e=>{  
+  if(!menu.contains(e.target)&&!hamburger.contains(e.target)){  
+    menu.classList.remove('active');  
+    hamburger.classList.remove('active');  
+  }  
+});  
+</script>  </body>  
 </html>
