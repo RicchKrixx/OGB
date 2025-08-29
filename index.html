@@ -823,7 +823,51 @@ function showToast(itemName) {
 <div class="footer" style="color:#fff;">
   © <span id="year"></span> On God Bend OGB — All Rights Reserved.
 </footer>
+<!-- Back to Top Button -->
+<button id="backToTop" title="Go to top">↑</button>
 
+<style>
+  #backToTop {
+    display: none; /* Hidden by default */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    background: var(--brand, #b8860b); /* uses OGB gold if available */
+    color: white;
+    cursor: pointer;
+    padding: 12px 16px;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: opacity 0.3s ease, transform 0.2s ease;
+  }
+  #backToTop:hover {
+    background: var(--brand-2, #8b6508); /* darker gold on hover */
+    transform: scale(1.1);
+  }
+</style>
+
+<script>
+  // Get button
+  const backToTopBtn = document.getElementById("backToTop");
+
+  // Show when scroll down 200px
+  window.onscroll = function() {
+    if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+      backToTopBtn.style.display = "block";
+    } else {
+      backToTopBtn.style.display = "none";
+    }
+  };
+
+  // Scroll to top smoothly
+  backToTopBtn.onclick = function() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+</script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
