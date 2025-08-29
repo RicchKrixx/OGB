@@ -345,65 +345,33 @@ button:hover { background: var(--brand-2); }
     });
 
 
-   
-    function setParam(orderId){
-  const url = new URL(location.href);
-  url.searchParams.set('orderId', orderId);
-  history.replaceState(null, '', url);
-}
 
-// -------- Get orderId from query string --------
-function getParam(name = "orderId") {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(name);
-}
-
-// UI handlers
-trackBtn.addEventListener('click', () => {
-  const id = orderIdInput.value.trim();
-  if (!id) return;
-  setParam(id);
-  fetchAndListen(id);
-});
-
-orderIdInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter'){ trackBtn.click(); }
-});
-
-refreshBtn.addEventListener('click', () => {
-  const id = orderIdInput.value.trim() || getParam();
-  if (id) fetchAndListen(id);
-});
-
-copyBtn.addEventListener('click', async () => {
-  const id = orderIdInput.value.trim() || getParam();
-  if (!id) return;
-  const url = `${location.origin}${location.pathname}?orderId=${encodeURIComponent(id)}`;
-  try {
-    await navigator.clipboard.writeText(url);
-    copyBtn.textContent = 'Copied!';
-    setTimeout(()=>copyBtn.textContent='Copy Link', 1200);
-  } catch {
-    alert(url);
+  // Function to get URL parameter
+  function getParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
   }
-});
 
-// -------- Deep-link on load --------
-const orderId = getParam(); 
-const sampleLink = document.getElementById("sampleLink");
+  // On load
+  window.addEventListener("DOMContentLoaded", () => {
+    const orderId = getParam("orderId"); // get ?orderId=xxx from URL
+    const sampleLink = document.getElementById("sampleLink"); // make sure this element exists
 
-let sample = `${location.origin}${location.pathname}`;
-if (orderId) {
-  sample += `?orderId=${orderId}`;
-} else {
-  sample += `?orderId=*******`; // show placeholder if none
-}
+    // If orderId is present, show the actual deep link
+    if (orderId) {
+      const link = `${location.origin}${location.pathname}?orderId=${orderId}`;
+      sampleLink.textContent = link;
+      sampleLink.href = link;
+      sampleLink.target = "_blank";
+    } else {
+      // fallback example link if no orderId in URL
+      const link = `${location.origin}${location.pathname}?orderId=123456`;
+      sampleLink.textContent = link;
+      sampleLink.href = link;
+      sampleLink.target = "_blank";
+    }
+  });
 
-sampleLink.textContent = sample;
-sampleLink.href = sample;
-sampleLink.target = "_blank";
-
-// Auto-load tracking if orderId is in URL
 if (orderId) {
   orderIdInput.value = orderId;
   fetchAndListen(orderId);
