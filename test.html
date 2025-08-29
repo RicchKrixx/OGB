@@ -119,7 +119,7 @@ button:hover { background: var(--brand-2); }
 <body>
   <header>
     <div class="wrap brand">
-      <div class="logo">🛒</div>
+      <div class="logo"><img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="On God Bend"/></div>
       <div>OGB • Order Tracking</div>
     </div>
   </header>  <main class="wrap">
@@ -348,7 +348,7 @@ button:hover { background: var(--brand-2); }
 
     // Deep-link on load
     const qp = getParam();
-    const sample = `${location.origin}${location.pathname}?orderId=OGB123456`;
+    const sample = `${location.origin}${location.pathname}?orderId=orderId`;
     sampleLink.textContent = sample; sampleLink.href = sample; sampleLink.target = '_blank';
 
     if (qp){ orderIdInput.value = qp; fetchAndListen(qp); }
