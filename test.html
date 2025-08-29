@@ -98,8 +98,6 @@ button:hover { background: var(--brand-2); }
 /* SIDECARD (ETA + TIPS) */
 .side-card { padding: 18px; }
 .badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 999px; background: #fff7e6; color: #92400e; border: 1px solid #fde68a; font-weight: 700; font-size: 12px; }
-.eta { font-weight: 800; font-size: 28px; margin: 10px 0 6px; }
-.countdown { font-size: 13px; color: var(--muted); }
 .tips { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); color: var(--muted); font-size: 14px; }
 
 /* STATES */
@@ -164,11 +162,8 @@ button:hover { background: var(--brand-2); }
     <div class="foot">Having trouble? Contact <a class="a" href="tel:+233000000000">OGB Support</a></div>
   </section>
 
-  <!-- RIGHT: ETA + Tips -->
+  <!-- Tips -->
   <aside class="card side-card">
-    <span class="badge">⏱️ Live ETA</span>
-    <div class="eta" id="vEta">—</div>
-    <div class="countdown" id="vCountdown">Waiting for order…</div>
     <div class="tips">
       • Keep your phone on. The rider may call you.<br/>
       • You’ll receive SMS/WhatsApp updates for major status changes.<br/>
@@ -216,8 +211,6 @@ button:hover { background: var(--brand-2); }
     const vPhone = $("#vPhone");
     const vPayment = $("#vPayment");
     const vTotal = $("#vTotal");
-    const vEta = $("#vEta");
-    const vCountdown = $("#vCountdown");
     const trackerEl = $("#tracker");
     const itemsEl = $("#items");
 
@@ -284,22 +277,6 @@ button:hover { background: var(--brand-2); }
       });
     }
 
-    function startCountdown(seconds){
-      if (countdownTimer) clearInterval(countdownTimer);
-      if (!seconds || seconds <= 0){ vCountdown.textContent = 'ETA not available'; return; }
-      let left = seconds;
-      const tick = () => {
-        if (left <= 0){ vCountdown.textContent = 'Arriving soon'; clearInterval(countdownTimer); return; }
-        const h = Math.floor(left/3600).toString().padStart(2,'0');
-        const m = Math.floor((left%3600)/60).toString().padStart(2,'0');
-        const s = Math.floor(left%60).toString().padStart(2,'0');
-        vCountdown.textContent = `${h}:${m}:${s}`;
-        left--;
-      };
-      tick();
-      countdownTimer = setInterval(tick, 1000);
-    }
-
     async function fetchAndListen(orderId){
       // clean previous subscription
       if (unsub) { unsub(); unsub = null; }
@@ -331,25 +308,7 @@ button:hover { background: var(--brand-2); }
     buildTracker(data.status || 'Pending', data.timestamps || {});  
     renderItems(Array.isArray(data.items) ? data.items : []);  
 
-    // ETA: supports either etaMinutes OR etaSeconds OR etaTimestamp  
-    if (typeof data.etaSeconds === 'number'){  
-      vEta.textContent = `${Math.ceil(data.etaSeconds/60)} min`;  
-      startCountdown(data.etaSeconds);  
-    } else if (typeof data.etaMinutes === 'number'){  
-      vEta.textContent = `${data.etaMinutes} min`;  
-      startCountdown(Math.max(0, data.etaMinutes*60));  
-    } else if (data.etaTimestamp){  
-      try {  
-        const etaDate = data.etaTimestamp instanceof Timestamp ? data.etaTimestamp.toDate() : new Date(data.etaTimestamp);  
-        const secs = Math.max(0, Math.floor((etaDate.getTime() - Date.now())/1000));  
-        vEta.textContent = secs > 0 ? `${Math.ceil(secs/60)} min` : 'Now';  
-        startCountdown(secs);  
-      } catch { vEta.textContent = '—'; vCountdown.textContent = 'ETA not available'; }  
-    } else {  
-      vEta.textContent = '—';  
-      vCountdown.textContent = 'ETA not available';  
-    }  
-  }, (err) => {  
+     (err) => {  
     setLoading(false);  
     setError('Failed to subscribe to updates. Please retry.');  
     console.error(err);  
