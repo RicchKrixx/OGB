@@ -346,10 +346,30 @@ button:hover { background: var(--brand-2); }
 
 
    
-    // Deep-link on load
-    const qp = getParam();
-    const sample = `${location.origin}${location.pathname}?orderId=ghjjnnh`;
-    sampleLink.textContent = sample; sampleLink.href = sample; sampleLink.target = '_blank';
+    // -------- Get orderId from query string --------
+function getParam(name = "orderId") {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
+// Deep-link on load
+const orderId = getParam(); 
+const sampleLink = document.getElementById("sampleLink");
+
+let sample = `${location.origin}${location.pathname}`;
+if (orderId) {
+  sample += `?orderId=${orderId}`;
+}
+
+sampleLink.textContent = sample;
+sampleLink.href = sample;
+sampleLink.target = "_blank";
+
+// Auto-load tracking if orderId is in URL
+if (orderId) {
+  orderIdInput.value = orderId;
+  fetchAndListen(orderId);
+}
 
     if (qp){ orderIdInput.value = qp; fetchAndListen(qp); }
   </script>
