@@ -130,14 +130,13 @@ button:hover { background: var(--brand-2); }
           <div class="toolbar">
             <input id="orderIdInput" type="text" placeholder="Enter your Order ID (e.g., OGB2482011)" />
             <button id="trackBtn">Track</button>
-          </div>
-          <div class="hint">Tip: You can link directly like <span id="sampleLink" class="a"></span></div>
+          </div>          
           <div id="loading" class="loading"><span class="spin"></span> Fetching order…</div>
           <div id="error" class="error">Order not found. Please check your Order ID.</div>
         </div><div id="result" class="result-card">
       <div class="result-head">
-        <div class="meta">ORDER NUMBER <span class="v" id="vOrderId">—</span></div>
-        <div class="meta">PLACED ON <span class="v" id="vPlaced">—</span></div>
+        <div class="meta">ORDER ID<span class="v" id="vOrderId">—</span></div>
+        <div class="meta">PLACED ON<span class="v" id="vPlaced">—</span></div>
       </div>
 
       <div class="content">
@@ -220,7 +219,7 @@ button:hover { background: var(--brand-2); }
 
     // status steps (keys expected in Firestore's `status` field)
     const STEPS = [
-      { key: "Pending", title: "Pending", sub: "We got your order." },
+      { key: "Pending", title: "Order received", sub: "We got your order." },
       { key: "Preparing", title: "Preparing", sub: "Packaging your items." },
       { key: "Ontheway", title: "Out for Delivery", sub: "Rider is on the way." },
       { key: "Delivered", title: "Delivered", sub: "Order delivered." },
