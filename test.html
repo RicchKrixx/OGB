@@ -346,19 +346,57 @@ button:hover { background: var(--brand-2); }
 
 
    
-    // -------- Get orderId from query string --------
+    function setParam(orderId){
+  const url = new URL(location.href);
+  url.searchParams.set('orderId', orderId);
+  history.replaceState(null, '', url);
+}
+
+// -------- Get orderId from query string --------
 function getParam(name = "orderId") {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get(name);
 }
 
-// Deep-link on load
+// UI handlers
+trackBtn.addEventListener('click', () => {
+  const id = orderIdInput.value.trim();
+  if (!id) return;
+  setParam(id);
+  fetchAndListen(id);
+});
+
+orderIdInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter'){ trackBtn.click(); }
+});
+
+refreshBtn.addEventListener('click', () => {
+  const id = orderIdInput.value.trim() || getParam();
+  if (id) fetchAndListen(id);
+});
+
+copyBtn.addEventListener('click', async () => {
+  const id = orderIdInput.value.trim() || getParam();
+  if (!id) return;
+  const url = `${location.origin}${location.pathname}?orderId=${encodeURIComponent(id)}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    copyBtn.textContent = 'Copied!';
+    setTimeout(()=>copyBtn.textContent='Copy Link', 1200);
+  } catch {
+    alert(url);
+  }
+});
+
+// -------- Deep-link on load --------
 const orderId = getParam(); 
 const sampleLink = document.getElementById("sampleLink");
 
 let sample = `${location.origin}${location.pathname}`;
 if (orderId) {
   sample += `?orderId=${orderId}`;
+} else {
+  sample += `?orderId=*******`; // show placeholder if none
 }
 
 sampleLink.textContent = sample;
@@ -370,7 +408,6 @@ if (orderId) {
   orderIdInput.value = orderId;
   fetchAndListen(orderId);
 }
-
   </script>
 </body>
 </html>
