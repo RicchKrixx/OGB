@@ -308,7 +308,7 @@ button:hover { background: var(--brand-2); }
     buildTracker(data.status || 'Pending', data.timestamps || {});  
     renderItems(Array.isArray(data.items) ? data.items : []);  
 
-     (err) => {  
+    }, (err) => {  
     setLoading(false);  
     setError('Failed to subscribe to updates. Please retry.');  
     console.error(err);  
