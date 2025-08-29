@@ -268,7 +268,9 @@ function submitOrder(e){
     deliveryFee = Math.round(dist*feePerKm);
   }
   const grand = subtotal + deliveryFee;
-
+// Calculate ETA in seconds and timestamp
+const etaSeconds = (!isNaN(lat) && !isNaN(lng)) ? calculateETA(lat, lng) * 60 : 45 * 60; // fallback 45 mins
+const etaTimestamp = new Date(Date.now() + etaSeconds * 1000);
   const order = {
   name: document.getElementById("name").value,
   phone: document.getElementById("phone").value,
@@ -283,7 +285,9 @@ function submitOrder(e){
   payMethod: document.querySelector('input[name="pay"]:checked').value,
   status: "Pending",
   createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-  etaMinutes: (!isNaN(lat) && !isNaN(lng)) ? calculateETA(lat, lng) : 45 // fallback 45
+  etaMinutes: (!isNaN(lat) && !isNaN(lng)) ? calculateETA(lat, lng) : 45,
+  etaSeconds: etaSeconds,
+  etaTimestamp: firebase.firestore.Timestamp.fromDate(etaTimestamp)
 };
   // Attach userId if logged in
   if(currentUser){
