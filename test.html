@@ -338,29 +338,27 @@ function updateEta(data) {
 
       // live listener
       unsub = onSnapshot(ref, (docSnap) => {
-        const data = docSnap.data();
-        setLoading(false); clearError(); resultCard.style.display = 'block';
+  const data = docSnap.data();
+  setLoading(false); clearError(); resultCard.style.display = 'block';
 
-        vOrderId.textContent = orderId;
-        vPlaced.textContent = formatDate(data.createdAt);
-        vCustomer.textContent = data.customer?.name || '—';
-        vPhone.textContent = data.customer?.phone || '—';
-        vPayment.textContent = (data.paymentMethod || '—').toString();
+  vOrderId.textContent = orderId;
+  vPlaced.textContent = formatDate(data.createdAt);
+  vCustomer.textContent = data.customer?.name || '—';
+  vPhone.textContent = data.customer?.phone || '—';
+  vPayment.textContent = (data.paymentMethod || '—').toString();
 
-        const currency = data.currency || 'GHS';
-        vTotal.textContent = formatMoney(Number(data.total || 0), currency);
+  const currency = data.currency || 'GHS';
+  vTotal.textContent = formatMoney(Number(data.total || 0), currency);
 
-        buildTracker(data.status || 'Pending', data.timestamps || {});
-        renderItems(Array.isArray(data.items) ? data.items : []);
+  buildTracker(data.status || 'Pending', data.timestamps || {});
+  renderItems(Array.isArray(data.items) ? data.items : []);
+  updateEta(data);
 
-   updateEta(data);
- (err) => {
-        setLoading(false);
-        setError('Failed to subscribe to updates. Please retry.');
-        console.error(err);
-      });
-    }
-
+}, (err) => {
+  setLoading(false);
+  setError('Failed to subscribe to updates. Please retry.');
+  console.error(err);
+});
     function setParam(orderId){
       const url = new URL(location.href);
       url.searchParams.set('orderId', orderId);
