@@ -281,7 +281,7 @@
         await addDoc(usersRef, { uid: user.uid, username: name.toLowerCase(), email });
 
         alert("Signup successful!");
-        window.location.href = "index.html";
+        window.location.href = "/";
       } catch (error) {
         const msg = error.message.replace(/^Firebase:\s*/, '');
         alert(msg);
@@ -307,7 +307,7 @@
 
         await signInWithEmailAndPassword(auth, emailToLogin, password);
         alert("Login successful!");
-        window.location.href = "index.html";
+        window.location.href = "/";
       } catch (error) {
         const msg = error.message.replace(/^Firebase:\s*/, '');
         alert(msg);
@@ -341,7 +341,7 @@
     }
 
     alert(`Welcome ${user.displayName || "User"}!`);
-    window.location.href = "index.html";
+    window.location.href = "/";
   } catch (error) {
     const msg = error.message.replace(/^Firebase:\s*/, '');
     alert("Error: " + msg);
