@@ -87,10 +87,9 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
       <span></span><span></span><span></span>  
     </div>  
     <div class="menu" id="menu">  
-      <a href="index.html">Home</a>  
-      <a href="#">Shop</a>  
-      <a href="#">About</a>  
-      <a href="#">Contact</a>  
+      <a href="index.html">Home</a>   
+      <a href="/about/">About</a>  
+      <a href="/contact/">Contact</a>  
     </div>  
     <div class="cart-icon">  
       <a href="/cart/" class="cart-btn"><i class="fas fa-shopping-bag"></i><span id="cartCount">0</span></a>  
@@ -279,7 +278,7 @@ timestamps: {
       localStorage.removeItem("cart");  
       updateBadge();  
       setTimeout(()=>{  
-        window.location.href = "/OGB/thankyou/?orderId=" + docRef.id;  
+        window.location.href = "/thankyou/?orderId=" + docRef.id;  
       }, 1000);  
     }).catch(err=>{  
       document.getElementById("loaderOverlay").style.display = "none";  
