@@ -296,7 +296,7 @@ button:hover { background: var(--brand-2); }
 
     vOrderId.textContent = orderId;  
     vPlaced.textContent = formatDate(data.createdAt);  
-    vCustomer.textContent = data.customer?.name || 'name';  
+    vCustomer.textContent = ${data.customer?.name || '-'};  
     vPhone.textContent = data.customer?.phone || '—';  
     vPayment.textContent = (data.paymentMethod || '—').toString();  
 
