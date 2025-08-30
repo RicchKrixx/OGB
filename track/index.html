@@ -304,7 +304,12 @@ button:hover { background: var(--brand-2); }
         itemsEl.appendChild(row);
       });
     }
-
+// Show "Order Complete" banner when status is Complete
+    if (data.status === "Complete") {
+      showOrderComplete(orderId);
+    } else {
+      document.getElementById("orderCompleteBanner").classList.add("hidden");
+    }
     async function fetchAndListen(orderId){
       // clean previous subscription
       if (unsub) { unsub(); unsub = null; }
@@ -406,30 +411,38 @@ orderIdInput.addEventListener('input', () => {
   const id = orderIdInput.value.trim();
   updateSampleLink(id || null);
 });
-// Assume you already track order status (Processing → Preparing → On the way → Completed)
 
-// Example: when status is "Completed"
+
 function showOrderComplete(orderId) {
-  document.getElementById("orderCompleteBanner").classList.remove("hidden");
-
-  // Load old order data
-  const orders = JSON.parse(localStorage.getItem("orders")) || {};
-  const order = orders[orderId];
+  const banner = document.getElementById("orderCompleteBanner");
+  banner.classList.remove("hidden");
 
   document.getElementById("reorderBtn").onclick = function() {
+    // Try to load from localStorage orders
+    const orders = JSON.parse(localStorage.getItem("orders")) || {};
+    const order = orders[orderId];
+
+    let cart = null;
     if (order && order.cart) {
-      localStorage.setItem("cart", JSON.stringify(order.cart));
-      alert("Items added to cart again! Redirecting to checkout...");
-      window.location.href = "checkout.html"; 
+      cart = order.cart;
     } else {
-      alert("No order data found.");
+      // fallback: grab items shown on the page
+      cart = [];
+      document.querySelectorAll("#items .item").forEach(el => {
+        const name = el.querySelector("div").textContent;
+        const qty = parseInt(name.split("×")[1] || "1");
+        cart.push({ name, qty });
+      });
+    }
+
+    if (cart && cart.length) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert("Items added to cart again! Redirecting to checkout...");
+      window.location.href = "checkout.html";
+    } else {
+      alert("No items found to reorder.");
     }
   };
-}
-
-// Example trigger when order is complete
-if (orderStatus === "Completed") {
-  showOrderComplete(orderId);
 }
   </script>
 </body>
