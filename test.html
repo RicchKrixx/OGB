@@ -348,7 +348,7 @@ button:hover { background: var(--brand-2); }
 
       // Deep-link on load
     const qp = getParam();
-    const sample = `${location.origin}${location.pathname}?orderId=OGB123456`;
+    const sample = `${location.origin}${location.pathname}?orderId=${encodeURIComponent(id)}`;
     sampleLink.textContent = sample; sampleLink.href = sample; sampleLink.target = '_blank';
 
     if (qp){ orderIdInput.value = qp; fetchAndListen(qp); }
