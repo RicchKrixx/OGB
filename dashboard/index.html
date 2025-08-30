@@ -385,12 +385,12 @@ hr{border:0;border-top:1px solid var(--border);margin:14px 0}
 
     // ------- Global actions
     window.refreshOrders = ()=> loadUserAndOrders();
-    window.goHome = ()=> location.href = "index.html";
+    window.goHome = ()=> location.href = "/";
 
     window.logout = async ()=>{
       try{
         await signOut(auth);
-        location.href = "/OGB/auth/"; // your login/register page
+        location.href = "/auth/"; // your login/register page
       }catch(err){
         alert("Logout failed: " + err.message);
       }
@@ -405,7 +405,7 @@ hr{border:0;border-top:1px solid var(--border);margin:14px 0}
         // Optional: clear local profile pic
         localStorage.removeItem('profilePic');
         alert("Account deleted.");
-        location.href = "index.html";
+        location.href = "/";
       }catch(err){
         if(err.code === 'auth/requires-recent-login'){
           alert("Please log out and sign in again, then retry delete.");
