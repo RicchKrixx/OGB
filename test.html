@@ -372,7 +372,10 @@ if (id) {
 } else {
   updateSampleLink(null); // ensures link hidden and no '?orderId=null'
 }
-
+orderIdInput.addEventListener('input', () => {
+  const id = orderIdInput.value.trim();
+  updateSampleLink(id || null);
+});
   </script>
 </body>
 </html>
