@@ -304,12 +304,7 @@ button:hover { background: var(--brand-2); }
         itemsEl.appendChild(row);
       });
     }
-// Show "Order Complete" banner when status is Complete
-    if (data.status === "Complete") {
-      showOrderComplete(orderId);
-    } else {
-      document.getElementById("orderCompleteBanner").classList.add("hidden");
-    }
+
     async function fetchAndListen(orderId){
       // clean previous subscription
       if (unsub) { unsub(); unsub = null; }
@@ -340,6 +335,12 @@ button:hover { background: var(--brand-2); }
 
     buildTracker(data.status || 'Pending', data.timestamps || {});  
     renderItems(Array.isArray(data.items) ? data.items : []);  
+// Show "Order Complete" banner when status is Complete
+    if (data.status === "Complete") {
+      showOrderComplete(orderId);
+    } else {
+      document.getElementById("orderCompleteBanner").classList.add("hidden");
+    }
 
     }, (err) => {  
     setLoading(false);  
