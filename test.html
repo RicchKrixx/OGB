@@ -312,11 +312,6 @@ button:hover { background: var(--brand-2); }
     console.error(err);  
   });  
 }  
-    function setParam(orderId){
-      const url = new URL(location.href);
-      url.searchParams.set('orderId', orderId);
-      history.replaceState(null, '', url);
-    }
 
     function getParam(){ return new URL(location.href).searchParams.get('orderId'); }
 
@@ -379,7 +374,7 @@ if (id) {
 } else {
   updateSampleLink(null); // ensures link hidden and no '?orderId=null'
 }
- if (id){ orderIdInput.value = id; fetchAndListen(id); }
+
   </script>
 </body>
 </html>
