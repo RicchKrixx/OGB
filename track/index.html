@@ -438,8 +438,8 @@ function showOrderComplete(orderId) {
 
     if (cart && cart.length) {
       localStorage.setItem("cart", JSON.stringify(cart));
-      alert("Items added to cart again! Redirecting to checkout...");
-      window.location.href = "checkout.html";
+      alert("Items added to cart again! Redirecting to Checkout...");
+      window.location.href = "/checkout/";
     } else {
       alert("No items found to reorder.");
     }
