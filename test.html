@@ -296,9 +296,9 @@ button:hover { background: var(--brand-2); }
 
     vOrderId.textContent = orderId;  
     vPlaced.textContent = formatDate(data.createdAt);  
-    vCustomer.textContent = ${data.customer?.name || '-'};  
-    vPhone.textContent = data.customer?.phone || '—';  
-    vPayment.textContent = (data.paymentMethod || '—').toString();  
+    vCustomer.textContent = data.name || '–';  
+    vPhone.textContent = data.phone || '—';  
+    vPayment.textContent = (data.payMethod || '—').toString();  
 
     const currency = data.currency || 'GHS';  
     vTotal.textContent = formatMoney(Number(data.total || 0), currency);  
