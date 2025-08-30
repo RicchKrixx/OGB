@@ -260,7 +260,7 @@ function submitOrder(e){
     total:grand,  
     payMethod:document.querySelector('input[name="pay"]:checked').value,  
     status:"Pending",  
-    createdAt:firebase.firestore.FieldValue.serverTimestamp()  
+    createdAt:firebase.firestore.FieldValue.serverTimestamp(),  
     
 timestamps: {  
   Pending: firebase.firestore.FieldValue.serverTimestamp()  
