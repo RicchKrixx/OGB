@@ -170,7 +170,11 @@ button:hover { background: var(--brand-2); }
             <div class="track-line"></div>
             <!-- Steps will be injected here -->
           </div>
-
+<div id="orderCompleteBanner" class="hidden banner">
+  <h2>🎉 Order Complete!</h2>
+  <p>Thank you for shopping with us.</p>
+  <button id="reorderBtn">Reorder</button>
+</div>
           <div class="summary">
             <h3>Order Summary</h3>
             <div class="row"><span>Customer</span><strong id="vCustomer">—</strong></div>
@@ -199,11 +203,7 @@ button:hover { background: var(--brand-2); }
     </div>
   </aside>
 </div>
-<div id="orderCompleteBanner" class="hidden banner">
-  <h2>🎉 Order Complete!</h2>
-  <p>Thank you for shopping with us.</p>
-  <button id="reorderBtn">Reorder</button>
-</div>
+
   </main>  <script type="module">
     // -------- Firebase (Modular SDK) --------
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
