@@ -109,6 +109,35 @@ button:hover { background: var(--brand-2); }
 .nav { display:flex; gap:14px; }
 .nav a { padding:8px 10px; border-radius:8px; }
 .nav a:hover { background: rgba(255,255,255,.08); }
+.banner {
+  text-align: center;
+  background: var(--brand, #b8860b);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px auto;
+  max-width: 500px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+.banner h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+.banner button {
+  background: white;
+  color: var(--brand, #b8860b);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.banner button:hover {
+  background: #f1f1f1;
+}
+.hidden {
+  display: none;
+}
   </style>
 </head>
 <body>
@@ -170,58 +199,11 @@ button:hover { background: var(--brand-2); }
     </div>
   </aside>
 </div>
-<div id="reviewSection" style="display:none; margin-top:20px; padding:15px; border:1px solid #ddd; border-radius:10px;">
-  <h3>Rate & Review</h3>
-  <div id="stars" style="font-size:24px; cursor:pointer;">
-    ★★★★★
-  </div>
-  <textarea id="reviewText" placeholder="Write your review..." 
-    style="width:100%; height:80px; margin-top:10px; padding:8px; border-radius:6px; border:1px solid #ccc;"></textarea>
-  <button id="submitReview" 
-    style="margin-top:10px; padding:10px 20px; background:#28a745; color:#fff; border:none; border-radius:6px; cursor:pointer;">
-    Submit Review
-  </button>
+<div id="orderCompleteBanner" class="hidden banner">
+  <h2>🎉 Order Complete!</h2>
+  <p>Thank you for shopping with us.</p>
+  <button id="reorderBtn">Reorder</button>
 </div>
-
-<script>
-// Review logic
-let selectedRating = 0;
-const starsDiv = document.getElementById("stars");
-const reviewText = document.getElementById("reviewText");
-
-starsDiv.addEventListener("click", e => {
-  if (e.target.textContent === "★") {
-    selectedRating = [...starsDiv.textContent].indexOf("★", e.offsetX / 24) + 1;
-  }
-  starsDiv.textContent = "★★★★★".split("").map((s,i)=> i < selectedRating ? "★" : "☆").join("");
-});
-
-// Show review section ONLY when status is Completed
-function showReviewSectionIfComplete(status, orderId) {
-  if(status === "Complete"){
-    document.getElementById("reviewSection").style.display = "block";
-    document.getElementById("submitReview").onclick = async () => {
-      const review = reviewText.value.trim();
-      if(selectedRating === 0 || review === ""){
-        alert("Please add a rating and review");
-        return;
-      }
-
-      // Save to Firestore under the order
-      await db.collection("orders").doc(orderId).update({
-        review: {
-          rating: selectedRating,
-          text: review,
-          timestamp: new Date().toISOString()
-        }
-      });
-
-      alert("Thank you for your feedback!");
-      document.getElementById("reviewSection").style.display = "none";
-    }
-  }
-}
-</script>
   </main>  <script type="module">
     // -------- Firebase (Modular SDK) --------
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -424,6 +406,31 @@ orderIdInput.addEventListener('input', () => {
   const id = orderIdInput.value.trim();
   updateSampleLink(id || null);
 });
+// Assume you already track order status (Processing → Preparing → On the way → Completed)
+
+// Example: when status is "Completed"
+function showOrderComplete(orderId) {
+  document.getElementById("orderCompleteBanner").classList.remove("hidden");
+
+  // Load old order data
+  const orders = JSON.parse(localStorage.getItem("orders")) || {};
+  const order = orders[orderId];
+
+  document.getElementById("reorderBtn").onclick = function() {
+    if (order && order.cart) {
+      localStorage.setItem("cart", JSON.stringify(order.cart));
+      alert("Items added to cart again! Redirecting to checkout...");
+      window.location.href = "checkout.html"; 
+    } else {
+      alert("No order data found.");
+    }
+  };
+}
+
+// Example trigger when order is complete
+if (orderStatus === "Completed") {
+  showOrderComplete(orderId);
+}
   </script>
 </body>
 </html>
