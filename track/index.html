@@ -37,14 +37,7 @@ header {
   padding: 18px 16px;
   box-shadow: var(--shadow);
 }
-.wrap { max-width: 1024px; margin: 0 auto; }
-.brand {
-  display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .3px;
-}
-.brand .logo {
-  width: 36px; height: 36px; border-radius: 10px; background: #fff2; display: grid; place-items: center; font-size: 18px;
-  border: 1px solid #fff3;
-}
+
 
 main { padding: 28px 16px 48px; }
 .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
@@ -98,8 +91,6 @@ button:hover { background: var(--brand-2); }
 /* SIDECARD (ETA + TIPS) */
 .side-card { padding: 18px; }
 .badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 999px; background: #fff7e6; color: #92400e; border: 1px solid #fde68a; font-weight: 700; font-size: 12px; }
-.eta { font-weight: 800; font-size: 28px; margin: 10px 0 6px; }
-.countdown { font-size: 13px; color: var(--muted); }
 .tips { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); color: var(--muted); font-size: 14px; }
 
 /* STATES */
@@ -116,12 +107,17 @@ button:hover { background: var(--brand-2); }
 .foot { text-align: center; font-size: 12px; color: #9ca3af; margin-top: 18px; }
 .a { color: var(--brand-2); text-decoration: none; }
 
+.brand { display:flex; align-items:center; gap:10px; }
+.brand img { height:90px; border-radius:6px; }
+.nav { display:flex; gap:14px; }
+.nav a { padding:8px 10px; border-radius:8px; }
+.nav a:hover { background: rgba(255,255,255,.08); }
   </style>
 </head>
 <body>
   <header>
-    <div class="wrap brand">
-      <div class="logo">🛒</div>
+    <div class="brand">
+      <img src="https://i.postimg.cc/bJRyWDhS/file-000000003574620aa7b29924f4c1965a.png" alt="On God Bend"/>
       <div>OGB • Order Tracking</div>
     </div>
   </header>  <main class="wrap">
@@ -132,14 +128,14 @@ button:hover { background: var(--brand-2); }
           <div class="toolbar">
             <input id="orderIdInput" type="text" placeholder="Enter your Order ID (e.g., OGB2482011)" />
             <button id="trackBtn">Track</button>
-          </div>
-          <div class="hint">Tip: You can link directly like <span id="sampleLink" class="a"></span></div>
+          </div>   
+<div id="sampleLink"></div>     
           <div id="loading" class="loading"><span class="spin"></span> Fetching order…</div>
           <div id="error" class="error">Order not found. Please check your Order ID.</div>
         </div><div id="result" class="result-card">
       <div class="result-head">
-        <div class="meta">ORDER NUMBER <span class="v" id="vOrderId">—</span></div>
-        <div class="meta">PLACED ON <span class="v" id="vPlaced">—</span></div>
+        <div class="meta">ORDER ID<span class="v" id="vOrderId">—</span></div>
+        <div class="meta">PLACED ON<span class="v" id="vPlaced">—</span></div>
       </div>
 
       <div class="content">
@@ -164,11 +160,8 @@ button:hover { background: var(--brand-2); }
     <div class="foot">Having trouble? Contact <a class="a" href="tel:+233000000000">OGB Support</a></div>
   </section>
 
-  <!-- RIGHT: ETA + Tips -->
+  <!-- Tips -->
   <aside class="card side-card">
-    <span class="badge">⏱️ Live ETA</span>
-    <div class="eta" id="vEta">—</div>
-    <div class="countdown" id="vCountdown">Waiting for order…</div>
     <div class="tips">
       • Keep your phone on. The rider may call you.<br/>
       • You’ll receive SMS/WhatsApp updates for major status changes.<br/>
@@ -216,8 +209,6 @@ button:hover { background: var(--brand-2); }
     const vPhone = $("#vPhone");
     const vPayment = $("#vPayment");
     const vTotal = $("#vTotal");
-    const vEta = $("#vEta");
-    const vCountdown = $("#vCountdown");
     const trackerEl = $("#tracker");
     const itemsEl = $("#items");
 
@@ -225,38 +216,51 @@ button:hover { background: var(--brand-2); }
     const copyBtn = $("#copyLink");
     const sampleLink = $("#sampleLink");
 
-    // status steps (must match Firestore `timestamps` keys)
-const STEPS = [
-  { key: "Pending", title: "Pending", sub: "We got your order." },
-  { key: "Preparing", title: "Preparing", sub: "Packaging your items." },
-  { key: "Ontheway", title: "Out for Delivery", sub: "Rider is on the way." },
-  { key: "Delivered", title: "Delivered", sub: "Order delivered." },
-  { key: "Complete", title: "Completed", sub: "Order completed." }
-];
+    // status steps (keys expected in Firestore's `status` field)
+    const STEPS = [
+      { key: "Pending", title: "Order received", sub: "We got your order." },
+      { key: "Preparing", title: "Preparing", sub: "Packaging your items." },
+      { key: "Ontheway", title: "Out for Delivery", sub: "Rider is on the way." },
+      { key: "Delivered", title: "Delivered", sub: "Order delivered." },
+{ key: "Complete", title: "Completed", sub: "Order completed." }
+    ];
 
-function buildTracker(currentKey, timestamps = {}) {
-  trackerEl.innerHTML = '';
-  const currentIndex = Math.max(0, STEPS.findIndex(s => s.key === currentKey));
+    let unsub = null; // onSnapshot unsubscribe
+    let countdownTimer = null;
 
-  STEPS.forEach((s, i) => {
-    const st = document.createElement('div');
-    st.className =
-      'step' +
-      (i < currentIndex ? ' completed' : i === currentIndex ? ' active' : '');
+    function setLoading(yes){ loadingEl.style.display = yes ? 'flex' : 'none'; }
+    function setError(msg){ errorEl.textContent = msg; errorEl.style.display = 'block'; }
+    function clearError(){ errorEl.style.display = 'none'; }
 
-    // Get timestamp from Firestore
-    const ts = timestamps[s.key] || null;
+    function formatMoney(n, currency = 'GHS'){
+      try { return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(n); }
+      catch { return `${currency} ${(+n).toFixed(2)}` }
+    }
 
-    st.innerHTML = `
-      <div class="dot"></div>
-      <div class="label">
-        <div class="t">${s.title}</div>
-        <div class="s">${s.sub}</div>
-        <div class="time">${formatDate(ts)}</div>
-      </div>`;
-    trackerEl.appendChild(st);
-  });
-}
+    function formatDate(ts){
+      if (!ts) return '—';
+      try {
+        const d = ts instanceof Timestamp ? ts.toDate() : new Date(ts);
+        return d.toLocaleString();
+      } catch { return '—'; }
+    }
+
+    function buildTracker(currentKey, timestamps={}){
+      trackerEl.innerHTML = '';
+      const currentIndex = Math.max(0, STEPS.findIndex(s => s.key === currentKey));
+      STEPS.forEach((s, i) => {
+        const st = document.createElement('div');
+        st.className = 'step' + (i < currentIndex ? ' completed' : i === currentIndex ? ' active' : '');
+        st.innerHTML = `
+          <div class="dot"></div>
+          <div class="label">
+            <div class="t">${s.title}</div>
+            <div class="s">${s.sub}</div>
+            <div class="time">${formatDate(timestamps?.[s.key])}</div>
+          </div>`;
+        trackerEl.appendChild(st);
+      });
+    }
 
     function renderItems(items=[]) {
       itemsEl.innerHTML = '';
@@ -269,22 +273,6 @@ function buildTracker(currentKey, timestamps = {}) {
         row.innerHTML = `<div>${name}</div><div><strong>${price}</strong></div>`;
         itemsEl.appendChild(row);
       });
-    }
-
-    function startCountdown(seconds){
-      if (countdownTimer) clearInterval(countdownTimer);
-      if (!seconds || seconds <= 0){ vCountdown.textContent = 'ETA not available'; return; }
-      let left = seconds;
-      const tick = () => {
-        if (left <= 0){ vCountdown.textContent = 'Arriving soon'; clearInterval(countdownTimer); return; }
-        const h = Math.floor(left/3600).toString().padStart(2,'0');
-        const m = Math.floor((left%3600)/60).toString().padStart(2,'0');
-        const s = Math.floor(left%60).toString().padStart(2,'0');
-        vCountdown.textContent = `${h}:${m}:${s}`;
-        left--;
-      };
-      tick();
-      countdownTimer = setInterval(tick, 1000);
     }
 
     async function fetchAndListen(orderId){
@@ -302,47 +290,28 @@ function buildTracker(currentKey, timestamps = {}) {
       }
 
       // live listener
-      unsub = onSnapshot(ref, (docSnap) => {
-        const data = docSnap.data();
-        setLoading(false); clearError(); resultCard.style.display = 'block';
+      unsub = onSnapshot(ref, (docSnap) => {  
+    const data = docSnap.data();  
+    setLoading(false); clearError(); resultCard.style.display = 'block';  
 
-        vOrderId.textContent = orderId;
-        vPlaced.textContent = formatDate(data.createdAt);
-        vCustomer.textContent = data.customer?.name || '—';
-        vPhone.textContent = data.customer?.phone || '—';
-        vPayment.textContent = (data.paymentMethod || '—').toString();
+    vOrderId.textContent = orderId;  
+    vPlaced.textContent = formatDate(data.createdAt);  
+    vCustomer.textContent = data.name || '–';  
+    vPhone.textContent = data.phone || '—';  
+    vPayment.textContent = (data.payMethod || '—').toString();  
 
-        const currency = data.currency || 'GHS';
-        vTotal.textContent = formatMoney(Number(data.total || 0), currency);
+    const currency = data.currency || 'GHS';  
+    vTotal.textContent = formatMoney(Number(data.total || 0), currency);  
 
-        buildTracker(data.status || 'Pending', data.timestamps || {});
-        renderItems(Array.isArray(data.items) ? data.items : []);
+    buildTracker(data.status || 'Pending', data.timestamps || {});  
+    renderItems(Array.isArray(data.items) ? data.items : []);  
 
-        // ETA: supports either etaMinutes OR etaSeconds OR etaTimestamp
-        if (typeof data.etaSeconds === 'number'){
-          vEta.textContent = `${Math.ceil(data.etaSeconds/60)} min`;
-          startCountdown(data.etaSeconds);
-        } else if (typeof data.etaMinutes === 'number'){
-          vEta.textContent = `${data.etaMinutes} min`;
-          startCountdown(Math.max(0, data.etaMinutes*60));
-        } else if (data.etaTimestamp){
-          try {
-            const etaDate = data.etaTimestamp instanceof Timestamp ? data.etaTimestamp.toDate() : new Date(data.etaTimestamp);
-            const secs = Math.max(0, Math.floor((etaDate.getTime() - Date.now())/1000));
-            vEta.textContent = secs > 0 ? `${Math.ceil(secs/60)} min` : 'Now';
-            startCountdown(secs);
-          } catch { vEta.textContent = '—'; vCountdown.textContent = 'ETA not available'; }
-        } else {
-          vEta.textContent = '—';
-          vCountdown.textContent = 'ETA not available';
-        }
-      }, (err) => {
-        setLoading(false);
-        setError('Failed to subscribe to updates. Please retry.');
-        console.error(err);
-      });
-    }
-
+    }, (err) => {  
+    setLoading(false);  
+    setError('Failed to subscribe to updates. Please retry.');  
+    console.error(err);  
+  });  
+}  
     function setParam(orderId){
       const url = new URL(location.href);
       url.searchParams.set('orderId', orderId);
@@ -375,40 +344,14 @@ function buildTracker(currentKey, timestamps = {}) {
       catch { alert(url); }
     });
 
-    // Deep-link on load
-    const qp = getParam();
-    const sample = `${location.origin}${location.pathname}?orderId=OGB123456`;
+
+      // Deep-link on load
+    const id = getParam();
+    const sample = `${location.origin}${location.pathname}?orderId=${encodeURIComponent(id)}`;
     sampleLink.textContent = sample; sampleLink.href = sample; sampleLink.target = '_blank';
 
-    if (qp){ orderIdInput.value = qp; fetchAndListen(qp); }
-  </script>  <!--
-  ===================== FIRESTORE SHAPE (example) =====================
-  Collection: orders
-  Document ID: OGB2482011  (this is the Order ID users will enter)
-  Fields:
-    status: "pending"            // one of: received | preparing | Ontheway | delivered
-    createdAt: Timestamp             // Firestore Timestamp
-    currency: "GHS"                 // optional (defaults to GHS)
-    total: 250                       // number
-    paymentMethod: "Pay on Delivery"// or "Paystack"
-    customer: { name: "John Doe", phone: "+233555000111" }
-    items: [
-      { name: "Premium Wine", qty: 2, price: 80, total: 160 },
-      { name: "Fruit Juice",  qty: 1, price: 90, total: 90 }
-    ]
-    // Timestamps for steps (optional)
-    timestamps: {
-      received: Timestamp,
-      processing: Timestamp,
-      out_for_delivery: Timestamp,
-      delivered: Timestamp
-    }
-    // ETA (choose one style)
-    etaMinutes: 45
-    // or
-    etaSeconds: 2700
-    // or
-    etaTimestamp: Timestamp // estimated arrival time
-  =====================================================================
-  --></body>
+
+    if (id){ orderIdInput.value = id; fetchAndListen(id); }
+  </script>
+</body>
 </html>
