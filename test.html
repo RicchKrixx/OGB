@@ -346,36 +346,12 @@ button:hover { background: var(--brand-2); }
 
 
 
-  // Function to get URL parameter
-  function getParam(name) {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(name);
-  }
+      // Deep-link on load
+    const qp = getParam();
+    const sample = `${location.origin}${location.pathname}?orderId=OGB123456`;
+    sampleLink.textContent = sample; sampleLink.href = sample; sampleLink.target = '_blank';
 
-  // On load
-  window.addEventListener("DOMContentLoaded", () => {
-    const orderId = getParam("orderId"); // get ?orderId=xxx from URL
-    const sampleLink = document.getElementById("sampleLink"); // make sure this element exists
-
-    // If orderId is present, show the actual deep link
-    if (orderId) {
-      const link = `${location.origin}${location.pathname}?orderId=${orderId}`;
-      sampleLink.textContent = link;
-      sampleLink.href = link;
-      sampleLink.target = "_blank";
-    } else {
-      // fallback example link if no orderId in URL
-      const link = `${location.origin}${location.pathname}?orderId=123456`;
-      sampleLink.textContent = link;
-      sampleLink.href = link;
-      sampleLink.target = "_blank";
-    }
-  });
-
-if (orderId) {
-  orderIdInput.value = orderId;
-  fetchAndListen(orderId);
-}
+    if (qp){ orderIdInput.value = qp; fetchAndListen(qp); }
   </script>
 </body>
 </html>
