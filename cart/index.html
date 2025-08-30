@@ -276,13 +276,12 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 </div>
 
 <div class="menu" id="menu">
-  <a href="index.html">Home</a>
-  <a href="#">Shop</a>
-  <a href="#">About</a>
-  <a href="#">Contact</a>
+  <a href="/">Home</a>
+  <a href="about">About</a>
+  <a href="contact">Contact</a>
 </div>
 <div class="cart-icon">
-  <a href="cart.html" class="cart-btn">    
+  <a href="/cart/" class="cart-btn">    
     <i class="fas fa-shopping-bag"></i>
     <span id="cartCount">0</span>
   </a>
@@ -295,7 +294,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
   <div class="cart-list" id="cartList"></div>
   <div class="cart-footer" id="cartFooter">
   <div class="total"><span>Subtotal</span><span id="subtotal">GH₵ 0</span></div>
-  <a href="/OGB/checkout/" class="checkout-btn">Proceed to Checkout</a>
+  <a href="/checkout/" class="checkout-btn">Proceed to Checkout</a>
 </div>
 </section>
 <div class="suggested-products" id="suggestedProducts"></div>
@@ -426,7 +425,7 @@ function renderCart(){
         <i class="fas fa-shopping-cart"></i>
         <h2>Your cart is empty</h2>
         <p>Looks like you haven’t added anything yet.</p>
-        <a href="index.html">Continue Shopping</a>
+        <a href="/">Continue Shopping</a>
       </div>
     `;
     footer.style.display = "none";   // hide subtotal + checkout
