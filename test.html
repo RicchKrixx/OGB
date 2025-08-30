@@ -129,7 +129,7 @@ button:hover { background: var(--brand-2); }
             <input id="orderIdInput" type="text" placeholder="Enter your Order ID (e.g., OGB2482011)" />
             <button id="trackBtn">Track</button>
           </div>   
-<div id="sampleLink"></div>     
+<a id="sampleLink" class="hint" style="display:none"></a>    
           <div id="loading" class="loading"><span class="spin"></span> Fetching order…</div>
           <div id="error" class="error">Order not found. Please check your Order ID.</div>
         </div><div id="result" class="result-card">
@@ -344,27 +344,42 @@ button:hover { background: var(--brand-2); }
       catch { alert(url); }
     });
 
+// grab anchor (no change if you already have)
+const sampleLink = $("#sampleLink");
 
-<!--
-      // Deep-link on load
-    const id = getParam();
-    const sample = `${location.origin}${location.pathname}?orderId=${encodeURIComponent(id)}`;
-    sampleLink.textContent = sample; sampleLink.href = sample; sampleLink.target = '_blank';
--->
-function updateSampleLink(id) {
-  const id = `${location.origin}${location.pathname}?orderId=${encodeURIComponent(id)}`;
-  sampleLink.textContent = sample;
-  sampleLink.href = sample;
-  sampleLink.target = "_blank";
+// update / show / hide the sample link
+function updateSampleLink(orderId) {
+  if (!orderId) {
+    sampleLink.style.display = 'none';
+    sampleLink.textContent = '';
+    sampleLink.removeAttribute('href');
+    sampleLink.removeAttribute('target');
+    return;
+  }
+  const url = `${location.origin}${location.pathname}?orderId=${encodeURIComponent(orderId)}`;
+  sampleLink.style.display = 'inline-block';
+  sampleLink.href = url;
+  sampleLink.target = '_blank';
+  sampleLink.textContent = url;
 }
 
+// set URL param and update link
 function setParam(orderId){
   const url = new URL(location.href);
-  url.searchParams.set('id', id);
+  url.searchParams.set('orderId', orderId);
   history.replaceState(null, '', url);
-  updateSampleLink(id);   // 👈 update link at the same time
+  updateSampleLink(orderId);   // <--- update here
 }
-    if (id){ orderIdInput.value = id; fetchAndListen(id); }
+   // Deep-link on load
+const id = getParam();
+if (id) {
+  orderIdInput.value = id;
+  updateSampleLink(id);
+  fetchAndListen(id);
+} else {
+  updateSampleLink(null); // ensures link hidden and no '?orderId=null'
+}
+ if (id){ orderIdInput.value = id; fetchAndListen(id); }
   </script>
 </body>
 </html>
