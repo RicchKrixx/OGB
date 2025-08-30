@@ -197,8 +197,8 @@ starsDiv.addEventListener("click", e => {
 });
 
 // Show review section ONLY when status is Completed
-function showReviewSectionIfCompleted(status, orderId) {
-  if(status === "Completed"){
+function showReviewSectionIfComplete(status, orderId) {
+  if(status === "Complete"){
     document.getElementById("reviewSection").style.display = "block";
     document.getElementById("submitReview").onclick = async () => {
       const review = reviewText.value.trim();
