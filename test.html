@@ -345,12 +345,25 @@ button:hover { background: var(--brand-2); }
     });
 
 
-
+<!--
       // Deep-link on load
     const id = getParam();
     const sample = `${location.origin}${location.pathname}?orderId=${encodeURIComponent(id)}`;
     sampleLink.textContent = sample; sampleLink.href = sample; sampleLink.target = '_blank';
+-->
+function updateSampleLink(orderId) {
+  const url = `${location.origin}${location.pathname}?orderId=${encodeURIComponent(orderId)}`;
+  sampleLink.textContent = url;
+  sampleLink.href = url;
+  sampleLink.target = "_blank";
+}
 
+function setParam(orderId){
+  const url = new URL(location.href);
+  url.searchParams.set('orderId', orderId);
+  history.replaceState(null, '', url);
+  updateSampleLink(orderId);   // 👈 update link at the same time
+}
     if (id){ orderIdInput.value = id; fetchAndListen(id); }
   </script>
 </body>
