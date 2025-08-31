@@ -2,254 +2,112 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>OGB • Experience</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact Us • On God Bend</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;500&display=swap');
-
     :root {
-      --gold: #d4af37;
-      --gold-dark: #b8860b;
-      --bg: #0a0a0a;
-      --text: #f5f5f5;
+      --brand: #b8860b; /* OGB gold */
+      --brand-dark: #8b6508;
+      --bg: #111;
+      --text: #eee;
     }
-
     body {
       margin: 0;
       font-family: "Poppins", sans-serif;
       background: var(--bg);
       color: var(--text);
-      overflow-x: hidden;
-    }
-
-    header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(8px);
-      padding: 1rem 3rem;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 1000;
-    }
-    header h1 {
-      font-family: "Playfair Display", serif;
-      color: var(--gold);
-      font-size: 1.6rem;
-      margin: 0;
-    }
-    nav a {
-      margin: 0 1rem;
-      color: #ccc;
-      text-decoration: none;
-      transition: .3s;
-      font-weight: 500;
-    }
-    nav a:hover { color: var(--gold); }
-
-    .hero {
-      height: 100vh;
-      display: flex;
-      align-items: center;
       justify-content: center;
-      text-align: center;
-      background: url('https://images.unsplash.com/photo-1617854818583-09e3c0a0f9c0?auto=format&fit=crop&w=1400&q=80') no-repeat center/cover;
-      position: relative;
-    }
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-    }
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      color: #fff;
-      max-width: 700px;
-      animation: fadeIn 2s ease;
-    }
-    .hero-content h2 {
-      font-family: "Playfair Display", serif;
-      font-size: 2.5rem;
-      color: var(--gold);
-    }
-    .hero-content p {
-      font-size: 1.2rem;
-      margin-top: 1rem;
-      color: #ddd;
-    }
-
-    section {
-      max-width: 1100px;
-      margin: 5rem auto;
-      padding: 3rem;
-      border-radius: 1rem;
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      animation: fadeInUp 1s ease;
-    }
-    section h2 {
-      font-family: "Playfair Display", serif;
-      font-size: 2rem;
-      color: var(--gold);
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    section p {
-      color: #ccc;
-      line-height: 1.8;
-      text-align: center;
-    }
-
-    /* FAQ */
-    .faq {
-      margin-top: 2rem;
-    }
-    .faq-item {
-      margin: 1rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    .faq-item h3 {
-      font-size: 1rem;
-      cursor: pointer;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      transition: .3s;
+      min-height: 100vh;
+      padding: 20px;
     }
-    .faq-item h3:hover { color: var(--gold); }
-    .faq-item p {
-      display: none;
-      padding: 0 1rem 1rem;
-      color: #bbb;
+    .contact-container {
+      max-width: 600px;
+      width: 100%;
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }
-
-    /* Contact */
-    .contact-form {
-      display: grid;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-    .contact-form input, .contact-form textarea {
-      padding: 1rem;
-      border-radius: .6rem;
-      border: none;
-      background: rgba(255,255,255,0.1);
-      color: var(--text);
-      font-size: 1rem;
-      transition: .3s;
-    }
-    .contact-form input:focus, .contact-form textarea:focus {
-      outline: 2px solid var(--gold);
-    }
-    .contact-form button {
-      background: linear-gradient(135deg,var(--gold),var(--gold-dark));
-      border: none;
-      padding: 1rem;
-      border-radius: .6rem;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: transform .3s;
-      color: #000;
-    }
-    .contact-form button:hover {
-      transform: scale(1.05);
-    }
-    #formMsg { margin-top: .5rem; text-align:center; }
-
-    footer {
+    h1 {
       text-align: center;
-      padding: 2rem 1rem;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      color: #777;
-      font-size: .9rem;
+      color: var(--brand);
+      margin-bottom: 10px;
     }
-
-    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-    @keyframes fadeInUp { from{opacity:0; transform:translateY(40px);} to{opacity:1; transform:translateY(0);} }
+    p {
+      text-align: center;
+      font-size: 14px;
+      color: #bbb;
+      margin-bottom: 20px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    input, textarea {
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #222;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      transition: border 0.3s;
+    }
+    input:focus, textarea:focus {
+      border-color: var(--brand);
+    }
+    button {
+      background: var(--brand);
+      color: #fff;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: var(--brand-dark);
+    }
+    .success {
+      margin-top: 15px;
+      padding: 12px;
+      background: #0f5132;
+      color: #d1e7dd;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>OGB</h1>
-  <nav>
-    <a href="#about">About</a>
-    <a href="#help">Help</a>
-    <a href="#faq">FAQ</a>
-    <a href="#contact">Contact</a>
-  </nav>
-</header>
+  <div class="contact-container">
+    <h1><i class="fa-solid fa-envelope"></i> Contact Us</h1>
+    <p>We’d love to hear from you. Send us a message and we’ll respond as soon as possible.</p>
+    
+    <form id="contactForm">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="email" id="email" placeholder="Your Email" required>
+      <textarea id="message" rows="5" placeholder="Your Message..." required></textarea>
+      <button type="submit"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+    </form>
 
-<div class="hero">
-  <div class="hero-content">
-    <h2>Welcome to On God Bend</h2>
-    <p>Luxury wines, liquors & essentials — crafted for your lifestyle.</p>
-  </div>
-</div>
-
-<section id="about">
-  <h2>About Us</h2>
-  <p>
-    OGB is more than a marketplace — it's a brand built on luxury, trust, and lifestyle.  
-    From premium wines and spirits to curated everyday essentials, we make sure every product tells a story of quality.
-  </p>
-</section>
-
-<section id="help">
-  <h2>Help Center</h2>
-  <p>
-    Need assistance? Our dedicated support team is always ready to help.  
-    Whether it’s order tracking, payment issues, or delivery updates — OGB puts you first.
-  </p>
-</section>
-
-<section id="faq">
-  <h2>Frequently Asked Questions</h2>
-  <div class="faq">
-    <div class="faq-item">
-      <h3>How do I place an order? <i class="fas fa-chevron-down"></i></h3>
-      <p>Browse our catalog, add items to your cart, and checkout. You’ll get live tracking updates.</p>
-    </div>
-    <div class="faq-item">
-      <h3>Do you deliver nationwide? <i class="fas fa-chevron-down"></i></h3>
-      <p>Yes, OGB delivers across the country. Times depend on your location.</p>
-    </div>
-    <div class="faq-item">
-      <h3>What payment methods do you accept? <i class="fas fa-chevron-down"></i></h3>
-      <p>We accept Mobile Money, Paystack, and COD (in selected areas).</p>
+    <div class="success" id="successMsg">
+      ✅ Your message has been sent successfully!
     </div>
   </div>
-</section>
 
-<section id="contact">
-  <h2>Contact Us</h2>
-  <form id="contactForm" class="contact-form">
-    <input type="text" id="name" placeholder="Your Name" required>
-    <input type="email" id="email" placeholder="Your Email" required>
-    <textarea id="message" rows="5" placeholder="Your Message" required></textarea>
-    <button type="submit">Send Message</button>
-    <div id="formMsg"></div>
-  </form>
-</section>
-
-<footer>
-  © 2025 On God Bend • All Rights Reserved
-</footer>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script>
-  // TODO: Replace with your Firebase config
-   const firebaseConfig = {
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <script>
+    // Replace with your Firebase config
+     const firebaseConfig = {
   apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
   authDomain: "ongod-5073e.firebaseapp.com",
   projectId: "ongod-5073e",
@@ -258,39 +116,29 @@
   appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
   measurementId: "G-1TVP0X3J62"
 };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-  // FAQ toggle
-  document.querySelectorAll(".faq-item h3").forEach(h3=>{
-    h3.addEventListener("click",()=>{
-      const p=h3.nextElementSibling;
-      const icon=h3.querySelector("i");
-      if(p.style.display==="block"){
-        p.style.display="none"; icon.classList.replace("fa-chevron-up","fa-chevron-down");
-      } else {
-        p.style.display="block"; icon.classList.replace("fa-chevron-down","fa-chevron-up");
+    const form = document.getElementById("contactForm");
+    const successMsg = document.getElementById("successMsg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const message = document.getElementById("message").value;
+
+      try {
+        await db.collection("messages").add({
+          name, email, message,
+          timestamp: new Date()
+        });
+        successMsg.style.display = "block";
+        form.reset();
+      } catch (err) {
+        alert("Error sending message: " + err);
       }
     });
-  });
-
-  // Contact form
-  document.getElementById("contactForm").addEventListener("submit", async (e)=>{
-    e.preventDefault();
-    const name=document.getElementById("name").value;
-    const email=document.getElementById("email").value;
-    const message=document.getElementById("message").value;
-    const formMsg=document.getElementById("formMsg");
-
-    try {
-      await db.collection("contactMessages").add({ name,email,message,timestamp:new Date() });
-      formMsg.innerHTML = "<span style='color:lime'>Message sent ✅</span>";
-      document.getElementById("contactForm").reset();
-    } catch(err) {
-      formMsg.innerHTML = "<span style='color:red'>Error: "+err.message+"</span>";
-    }
-  });
-</script>
-
+  </script>
 </body>
 </html>
