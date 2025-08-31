@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>OGB • Admin Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --gold:#b8860b; --gold-dark:#8b6508; --bg:#0f0f0f; --panel:#141414; --ink:#eee; --muted:#aaa; }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Inter",system-ui,sans-serif;height:100vh;display:grid;grid-template-columns:300px 1fr}
+    aside{background:var(--panel);border-right:1px solid #1f1f1f;display:flex;flex-direction:column;min-height:0}
+    .brand{padding:16px;background:linear-gradient(90deg,var(--gold),var(--gold-dark));color:#111;font-weight:800}
+    .search{padding:10px;border-bottom:1px solid #1f1f1f}
+    .search input{width:100%;padding:10px;border-radius:10px;border:1px solid #2a2a2a;background:#1a1a1a;color:var(--ink)}
+    .list{overflow:auto}
+    .item{padding:12px 14px;border-bottom:1px solid #1f1f1f;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .item:hover{background:#171717}
+    .email{font-weight:600}
+    .badge{font-size:11px;border-radius:999px;padding:4px 8px;background:#333;color:#ddd}
+    .badge.active{background:#213d2b;color:#62d79b}
+    .badge.ended{background:#3b2224;color:#f08a8a}
+
+    main{display:grid;grid-template-rows:auto 1fr auto;min-width:0}
+    header{padding:14px 16px;border-bottom:1px solid #1f1f1f;display:flex;justify-content:space-between;align-items:center}
+    .title{font-weight:800}
+    .toolbar button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}
+    .tool{background:var(--gold);color:#111;margin-left:8px}
+    .tool.secondary{background:#262626;color:#ddd}
+
+    .msgs{padding:18px;overflow:auto;display:flex;flex-direction:column;gap:10px;background:radial-gradient(1200px 600px at 100% 0%,rgba(184,134,11,.07),transparent 40%)}
+    .bubble{max-width:72%;padding:10px 14px;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+    .from-user{align-self:flex-start;background:#222;border-bottom-left-radius:4px}
+    .from-admin{align-self:flex-end;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#111;border-bottom-right-radius:4px}
+    .meta{font-size:11px;color:var(--muted);margin-top:4px}
+
+    .composer{display:flex;gap:10px;padding:12px;border-top:1px solid #1f1f1f;background:#121212}
+    .composer input{flex:1;padding:12px 14px;border-radius:12px;border:1px solid #2a2a2a;background:#1a1a1a;color:var(--ink)}
+    .composer button{border:0;border-radius:12px;background:var(--gold);color:#111;font-weight:800;padding:12px 16px;cursor:pointer}
+    .empty{display:grid;place-items:center;color:#777}
+  </style>
+</head>
+<body>
+  <aside>
+    <div class="brand">OGB • Admin Chat</div>
+    <div class="search"><input id="search" placeholder="Search by email…"></div>
+    <div id="chatList" class="list"></div>
+  </aside>
+
+  <main>
+    <header>
+      <div class="title" id="threadTitle">Select a conversation</div>
+      <div class="toolbar">
+        <button id="reopenBtn" class="tool secondary" disabled>Reopen</button>
+        <button id="endBtn" class="tool secondary" disabled>End</button>
+      </div>
+    </header>
+
+    <div id="msgs" class="msgs empty">No conversation selected.</div>
+
+    <div class="composer">
+      <input id="messageBox" type="text" placeholder="Type a reply…" disabled />
+      <button id="sendBtn" disabled>Send</button>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+    import {
+      getFirestore, collection, doc, getDoc, setDoc, updateDoc,
+      query, orderBy, onSnapshot, serverTimestamp, addDoc, where
+    } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+    // ⚠️ Replace with your actual OGB Firebase config
+     const firebaseConfig = {
+  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+  authDomain: "ongod-5073e.firebaseapp.com",
+  projectId: "ongod-5073e",
+  storageBucket: "ongod-5073e.firebasestorage.app",
+  messagingSenderId: "439687837026",
+  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+  measurementId: "G-1TVP0X3J62"
+};
+
+    // 🔐 Admin allow-list (commercial use): put your staff emails here or fetch from server/claims.
+    const ADMIN_EMAILS = [
+      "you@ogb.com",
+      "support@ogb.com"
+    ];
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    const listEl = document.getElementById("chatList");
+    const msgsEl = document.getElementById("msgs");
+    const titleEl= document.getElementById("threadTitle");
+    const boxEl  = document.getElementById("messageBox");
+    const sendEl = document.getElementById("sendBtn");
+    const endEl  = document.getElementById("endBtn");
+    const reopenEl = document.getElementById("reopenBtn");
+    const searchEl = document.getElementById("search");
+
+    let selectedChatId = null;
+    let msgsUnsub = null;
+    let chatsUnsub = null;
+    let selectedStatus = "active";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { location.replace("/admin-login"); return; }
+      if (!ADMIN_EMAILS.includes(user.email)) {
+        alert("Access denied: admin only.");
+        location.replace("/");
+        return;
+      }
+      subscribeChats();
+    });
+
+    function subscribeChats(filter=""){
+      chatsUnsub?.();
+      const q = query(collection(db, "chats"), orderBy("updatedAt", "desc"));
+      chatsUnsub = onSnapshot(q, (snap)=>{
+        const items = [];
+        snap.forEach(d=>{
+          const c = d.data();
+          const email = c.userEmail || "(no email)";
+          if (filter && !email.toLowerCase().includes(filter.toLowerCase())) return;
+          items.push({ id:d.id, email, status:c.status || "active", updatedAt:c.updatedAt });
+        });
+        renderList(items);
+      });
+    }
+
+    function renderList(rows){
+      listEl.innerHTML = rows.map(r => `
+        <div class="item" data-id="${r.id}" data-status="${r.status}">
+          <div class="email">${r.email}</div>
+          <span class="badge ${r.status === "ended" ? "ended" : "active"}">${r.status}</span>
+        </div>
+      `).join("");
+      Array.from(listEl.querySelectorAll(".item")).forEach(el=>{
+        el.addEventListener("click",()=>openThread(el.dataset.id, el.dataset.status));
+      });
+    }
+
+    function openThread(chatId, status){
+      selectedChatId = chatId;
+      selectedStatus = status || "active";
+      titleEl.textContent = `Conversation • ${chatId}`;
+      msgsEl.classList.remove("empty");
+      boxEl.disabled = selectedStatus === "ended";
+      sendEl.disabled = selectedStatus === "ended";
+      endEl.disabled = selectedStatus === "ended";
+      reopenEl.disabled = selectedStatus !== "ended" ? true : false;
+
+      msgsUnsub?.();
+      const col = collection(doc(db, "chats", chatId), "messages");
+      const q = query(col, orderBy("timestamp"));
+      msgsUnsub = onSnapshot(q, (snap)=>{
+        msgsEl.innerHTML = "";
+        snap.forEach(s=>{
+          const m = s.data();
+          const b = document.createElement("div");
+          b.className = "bubble " + (m.sender === "admin" ? "from-admin" : "from-user");
+          b.innerHTML = `
+            <div>${escapeHtml(m.text || "")}</div>
+            <div class="meta">${formatTime(m.timestamp)}</div>
+          `;
+          msgsEl.appendChild(b);
+        });
+        msgsEl.scrollTop = msgsEl.scrollHeight;
+      });
+    }
+
+    sendEl.addEventListener("click", async ()=>{
+      if (!selectedChatId) return;
+      const text = (boxEl.value || "").trim();
+      if (!text) return;
+      const chatRef = doc(db, "chats", selectedChatId);
+      await addDoc(collection(chatRef, "messages"), {
+        sender: "admin",
+        text,
+        timestamp: serverTimestamp()
+      });
+      await setDoc(chatRef, { status:"active", updatedAt: serverTimestamp() }, { merge:true });
+      boxEl.value = "";
+    });
+
+    endEl.addEventListener("click", async ()=>{
+      if (!selectedChatId) return;
+      await updateDoc(doc(db, "chats", selectedChatId), { status:"ended", updatedAt: serverTimestamp() });
+      boxEl.disabled = true; sendEl.disabled = true; endEl.disabled = true; reopenEl.disabled = false;
+      selectedStatus = "ended";
+    });
+
+    reopenEl.addEventListener("click", async ()=>{
+      if (!selectedChatId) return;
+      await updateDoc(doc(db, "chats", selectedChatId), { status:"active", updatedAt: serverTimestamp() });
+      boxEl.disabled = false; sendEl.disabled = false; endEl.disabled = false; reopenEl.disabled = true;
+      selectedStatus = "active";
+    });
+
+    searchEl.addEventListener("input", (e)=> subscribeChats(e.target.value || ""));
+
+    function formatTime(ts){
+      try{
+        if (!ts) return "";
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleString();
+      }catch{return "";}
+    }
+    function escapeHtml(s){
+      return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    window.addEventListener("beforeunload", ()=>{ msgsUnsub?.(); chatsUnsub?.(); });
+  </script>
+</body>
+</html>
