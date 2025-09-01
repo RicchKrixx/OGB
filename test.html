@@ -1,144 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Contact Us • On God Bend</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products Edit - OGB</title>
   <style>
-    :root {
-      --brand: #b8860b; /* OGB gold */
-      --brand-dark: #8b6508;
-      --bg: #111;
-      --text: #eee;
-    }
     body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
       margin: 0;
-      font-family: "Poppins", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
       padding: 20px;
-    }
-    .contact-container {
-      max-width: 600px;
-      width: 100%;
-      background: #1a1a1a;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }
     h1 {
       text-align: center;
-      color: var(--brand);
-      margin-bottom: 10px;
-    }
-    p {
-      text-align: center;
-      font-size: 14px;
-      color: #bbb;
       margin-bottom: 20px;
     }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    input, textarea {
-      padding: 14px;
-      border-radius: 10px;
-      border: 1px solid #333;
-      background: #222;
-      color: var(--text);
-      font-size: 15px;
-      outline: none;
-      transition: border 0.3s;
-    }
-    input:focus, textarea:focus {
-      border-color: var(--brand);
-    }
-    button {
-      background: var(--brand);
-      color: #fff;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
+    .accordion {
+      background: #fff;
+      color: #333;
       cursor: pointer;
+      padding: 15px;
+      width: 100%;
+      border: none;
+      outline: none;
       transition: 0.3s;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    button:hover {
-      background: var(--brand-dark);
+    .accordion.active {
+      background: #0077ff;
+      color: #fff;
     }
-    .success {
-      margin-top: 15px;
-      padding: 12px;
-      background: #0f5132;
-      color: #d1e7dd;
-      border-radius: 8px;
-      font-size: 14px;
+    .panel {
+      padding: 15px;
+      background: #fff;
       display: none;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .product {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .product img {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      margin-right: 10px;
+      object-fit: cover;
+    }
+    .product-info {
+      flex: 1;
+    }
+    .product-actions button {
+      margin-left: 5px;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .edit-btn { background: #0077ff; color: #fff; }
+    .delete-btn { background: #ff3b3b; color: #fff; }
+    .add-form {
+      margin-top: 15px;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+    }
+    .add-form input {
+      padding: 6px;
+      margin: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .add-form button {
+      padding: 6px 12px;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .status {
+      font-size: 12px;
+      color: gray;
+      margin-left: 5px;
     }
   </style>
 </head>
 <body>
+  <h1>Products Editor</h1>
 
-  <div class="contact-container">
-    <h1><i class="fa-solid fa-envelope"></i> Contact Us</h1>
-    <p>We’d love to hear from you. Send us a message and we’ll respond as soon as possible.</p>
-    
-    <form id="contactForm">
-      <input type="text" id="name" placeholder="Your Name" required>
-      <input type="email" id="email" placeholder="Your Email" required>
-      <textarea id="message" rows="5" placeholder="Your Message..." required></textarea>
-      <button type="submit"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
-    </form>
+  <button class="accordion">🍷 Wines</button>
+  <div class="panel" id="wines"></div>
 
-    <div class="success" id="successMsg">
-      ✅ Your message has been sent successfully!
-    </div>
-  </div>
+  <button class="accordion">🥃 Liquors</button>
+  <div class="panel" id="liquors"></div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-  <script>
-    // Replace with your Firebase config
-     const firebaseConfig = {
-  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
-  authDomain: "ongod-5073e.firebaseapp.com",
-  projectId: "ongod-5073e",
-  storageBucket: "ongod-5073e.firebasestorage.app",
-  messagingSenderId: "439687837026",
-  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
-  measurementId: "G-1TVP0X3J62"
-};
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+  <button class="accordion">🛒 Everyday Essentials</button>
+  <div class="panel" id="essentials"></div>
 
-    const form = document.getElementById("contactForm");
-    const successMsg = document.getElementById("successMsg");
+  <!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+  import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } 
+    from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } 
+    from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const message = document.getElementById("message").value;
+  const firebaseConfig = {
+    apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+    authDomain: "ongod-5073e.firebaseapp.com",
+    projectId: "ongod-5073e",
+    storageBucket: "ongod-5073e.appspot.com", /* fixed bucket domain */
+    messagingSenderId: "439687837026",
+    appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+    measurementId: "G-1TVP0X3J62"
+  };
 
-      try {
-        await db.collection("messages").add({
-          name, email, message,
-          timestamp: new Date()
-        });
-        successMsg.style.display = "block";
-        form.reset();
-      } catch (err) {
-        alert("Error sending message: " + err);
-      }
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // Accordion toggle
+  document.querySelectorAll(".accordion").forEach(btn => {
+    btn.addEventListener("click", function() {
+      this.classList.toggle("active");
+      const panel = this.nextElementSibling;
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
     });
-  </script>
+  });
+
+  // Render products by category
+  async function loadProducts(category, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "<p>Loading...</p>";
+
+    const q = query(collection(db, "products"), where("category", "==", category));
+    const snapshot = await getDocs(q);
+
+    container.innerHTML = "";
+    snapshot.forEach(docSnap => {
+      const product = docSnap.data();
+      const div = document.createElement("div");
+      div.className = "product";
+      div.innerHTML = `
+        <img src="${product.image || 'https://via.placeholder.com/50'}" />
+        <div class="product-info">
+          <strong>${product.name}</strong><br>
+          ${product.originalPrice ? `<span style="text-decoration: line-through; color: gray;">GH₵${product.originalPrice}</span> ` : ""}
+          GH₵${product.price}
+        </div>
+        <div class="product-actions">
+          <button class="edit-btn">Edit</button>
+          <button class="delete-btn">Delete</button>
+        </div>
+      `;
+
+      // Delete
+      div.querySelector(".delete-btn").addEventListener("click", async () => {
+        await deleteDoc(doc(db, "products", docSnap.id));
+        loadProducts(category, containerId);
+      });
+
+      // Edit
+      div.querySelector(".edit-btn").addEventListener("click", async () => {
+        const newName = prompt("Enter new name", product.name);
+        const newPrice = prompt("Enter new price", product.price);
+        const newOriginal = prompt("Enter original price (optional)", product.originalPrice || "");
+        await updateDoc(doc(db, "products", docSnap.id), {
+          name: newName,
+          price: Number(newPrice),
+          originalPrice: newOriginal ? Number(newOriginal) : null
+        });
+        loadProducts(category, containerId);
+      });
+
+      container.appendChild(div);
+    });
+
+    // Add new product form
+    const form = document.createElement("div");
+    form.className = "add-form";
+    form.innerHTML = `
+      <h4>Add New ${category}</h4>
+      <input type="text" placeholder="Name" id="${containerId}-name" />
+      <input type="number" placeholder="Price" id="${containerId}-price" />
+      <input type="number" placeholder="Original Price (optional)" id="${containerId}-original" />
+      
+      <!-- File upload -->
+      <input type="file" id="${containerId}-file" accept="image/*" />
+      <input type="hidden" id="${containerId}-image" />
+      <span class="status" id="${containerId}-upload-status"></span>
+      
+      <button>Add</button>
+    `;
+
+    form.querySelector("button").addEventListener("click", async () => {
+      const name = document.getElementById(`${containerId}-name`).value;
+      const price = document.getElementById(`${containerId}-price`).value;
+      const original = document.getElementById(`${containerId}-original`).value;
+      const fileInput = document.getElementById(`${containerId}-file`);
+      const imageInput = document.getElementById(`${containerId}-image`);
+      const statusEl = document.getElementById(`${containerId}-upload-status`);
+
+      if (!name || !price) return alert("Please fill all required fields");
+
+      // Upload image if file selected
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
+        
+        statusEl.textContent = "Uploading...";
+        const snapshot = await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(snapshot.ref);
+        
+        imageInput.value = url;
+        statusEl.textContent = "Upload complete ✅";
+      }
+
+      const image = imageInput.value || "";
+
+      await addDoc(collection(db, "products"), {
+        name,
+        price: Number(price),
+        originalPrice: original ? Number(original) : null,
+        image,
+        category
+      });
+      loadProducts(category, containerId);
+    });
+
+    container.appendChild(form);
+  }
+
+  // Load all categories (must match Firestore category exactly)
+  loadProducts("Wines", "wines");
+  loadProducts("Liquors", "liquors");
+  loadProducts("Essentials", "essentials");
+</script>
 </body>
 </html>
