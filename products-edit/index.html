@@ -89,6 +89,14 @@
       border-radius: 6px;
       cursor: pointer;
     }
+    .upload-preview {
+      margin: 10px 5px;
+    }
+    .upload-preview img {
+      max-width: 120px;
+      border-radius: 6px;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -103,7 +111,7 @@
   <button class="accordion">🛒 Everyday Essentials</button>
   <div class="panel" id="essentials"></div>
 
-  <!-- Firebase -->
+  <!-- Firebase + Imgbb -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
   import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } 
@@ -122,6 +130,8 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  const IMGBB_API_KEY = "4778722b6cb7fffaf637e09bde8407ea"; // replace with your real key
+
   // Accordion toggle
   document.querySelectorAll(".accordion").forEach(btn => {
     btn.addEventListener("click", function() {
@@ -130,6 +140,24 @@
       panel.style.display = panel.style.display === "block" ? "none" : "block";
     });
   });
+
+  // Upload image to Imgbb
+  async function uploadToImgbb(file) {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      return data.data.url;
+    } else {
+      throw new Error(data.error.message);
+    }
+  }
 
   // Render products by category
   async function loadProducts(category, containerId) {
@@ -187,16 +215,35 @@
       <input type="text" placeholder="Name" id="${containerId}-name" />
       <input type="number" placeholder="Price" id="${containerId}-price" />
       <input type="number" placeholder="Original Price (optional)" id="${containerId}-original" />
-      <input type="text" placeholder="Image URL" id="${containerId}-image" />
+      <input type="file" id="${containerId}-file" accept="image/*" />
+      <div class="upload-preview" id="${containerId}-preview"></div>
+      <input type="hidden" id="${containerId}-image" />
       <button>Add</button>
     `;
 
+    // Handle image upload
+    const fileInput = form.querySelector(`#${containerId}-file`);
+    const preview = form.querySelector(`#${containerId}-preview`);
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      preview.innerHTML = "<p>Uploading...</p>";
+      try {
+        const url = await uploadToImgbb(file);
+        document.getElementById(`${containerId}-image`).value = url;
+        preview.innerHTML = `<img src="${url}" alt="Preview">`;
+      } catch (err) {
+        preview.innerHTML = `<p style="color:red;">Upload failed: ${err.message}</p>`;
+      }
+    });
+
+    // Add new product
     form.querySelector("button").addEventListener("click", async () => {
       const name = document.getElementById(`${containerId}-name`).value;
       const price = document.getElementById(`${containerId}-price`).value;
       const original = document.getElementById(`${containerId}-original`).value;
       const image = document.getElementById(`${containerId}-image`).value;
-      if(!name || !price) return alert("Please fill all required fields");
+      if(!name || !price || !image) return alert("Please fill all required fields and upload an image");
       await addDoc(collection(db, "products"), {
         name,
         price: Number(price),
@@ -210,7 +257,7 @@
     container.appendChild(form);
   }
 
-  // Load all categories (must match Firestore category exactly)
+  // Load all categories
   loadProducts("Wines", "wines");
   loadProducts("Liquors", "liquors");
   loadProducts("Essentials", "essentials");
