@@ -1,83 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>OGB • Support Chat</title>
   <style>
     :root {
       --brand: #b8860b;
       --brand-dark: #8b6508;
-      --light-bg: #f9f9f9;
+      --light-bg: #f2f2f2;
     }
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
       background: var(--light-bg);
       display: flex;
-      flex-direction: column;
       height: 100vh;
+      justify-content: center;
+      align-items: center;
     }
-    header {
+    .chat-wrapper {
+      width: 100%;
+      max-width: 900px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    .chat-header {
       background: var(--brand);
       color: white;
       padding: 1rem;
-      text-align: center;
-      font-weight: bold;
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    #chat-box {
+    .chat-box {
       flex: 1;
       overflow-y: auto;
       padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      background: #fafafa;
     }
     .msg {
-      margin-bottom: 10px;
-      padding: 8px 12px;
-      border-radius: 10px;
+      display: flex;
+      align-items: flex-end;
+      margin: 8px 0;
       max-width: 70%;
+    }
+    .msg .bubble {
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.4;
+      position: relative;
       word-wrap: break-word;
     }
+    /* Customer (right side) */
     .customer {
+      margin-left: auto;
+      justify-content: flex-end;
+    }
+    .customer .bubble {
       background: var(--brand);
       color: white;
-      margin-left: auto;
+      border-bottom-right-radius: 4px;
     }
+    /* OGB (left side) */
     .admin {
-      background: #ddd;
-      color: black;
       margin-right: auto;
+      justify-content: flex-start;
     }
-    #message-form {
+    .admin .bubble {
+      background: #e4e6eb;
+      color: black;
+      border-bottom-left-radius: 4px;
+    }
+    .timestamp {
+      font-size: 11px;
+      color: gray;
+      margin-top: 2px;
+    }
+    /* Input area */
+    .chat-input {
       display: flex;
-      padding: 10px;
-      background: white;
-      border-top: 1px solid #ccc;
+      padding: 12px;
+      border-top: 1px solid #ddd;
+      background: #fff;
     }
-    #message-input {
+    .chat-input input {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
       border: 1px solid #ccc;
-      border-radius: 8px;
+      border-radius: 20px;
       outline: none;
+      font-size: 15px;
     }
-    button {
+    .chat-input button {
       margin-left: 10px;
       background: var(--brand-dark);
-      color: white;
       border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
+      padding: 0 18px;
+      border-radius: 20px;
+      color: white;
+      font-size: 15px;
       cursor: pointer;
+      transition: 0.2s;
+    }
+    .chat-input button:hover {
+      background: var(--brand);
+    }
+    /* Scrollbar */
+    .chat-box::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chat-box::-webkit-scrollbar-thumb {
+      background: #bbb;
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
-  <header>OGB Customer Support</header>
-  <div id="chat-box"></div>
-  <form id="message-form">
-    <input id="message-input" type="text" placeholder="Type your message..." required />
-    <button type="submit">Send</button>
-  </form>
+  <div class="chat-wrapper">
+    <div class="chat-header">💬 OGB Customer Support</div>
+    <div id="chat-box" class="chat-box"></div>
+    <form id="message-form" class="chat-input">
+      <input id="message-input" type="text" placeholder="Type a message..." required />
+      <button type="submit">Send</button>
+    </form>
+  </div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js"></script>
@@ -101,15 +158,15 @@
 
     let currentUser;
 
-    // Require login before chat
+    // Ensure login
     firebase.onAuthStateChanged(auth, user => {
       if (user) {
         currentUser = user;
         loadMessages();
       } else {
         firebase.signInWithPopup(auth, new firebase.GoogleAuthProvider())
-          .then(result => {
-            currentUser = result.user;
+          .then(res => {
+            currentUser = res.user;
             loadMessages();
           });
       }
@@ -125,13 +182,23 @@
         firebase.orderBy("timestamp", "asc")
       );
 
-      firebase.onSnapshot(q, snapshot => {
+      firebase.onSnapshot(q, snap => {
         chatBox.innerHTML = "";
-        snapshot.forEach(doc => {
+        snap.forEach(doc => {
           const data = doc.data();
           const div = document.createElement("div");
           div.classList.add("msg", data.sender === "customer" ? "customer" : "admin");
-          div.textContent = data.text;
+
+          const bubble = document.createElement("div");
+          bubble.classList.add("bubble");
+          bubble.textContent = data.text;
+
+          const time = document.createElement("div");
+          time.classList.add("timestamp");
+          time.textContent = data.timestamp?.toDate().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) || "";
+
+          div.appendChild(bubble);
+          div.appendChild(time);
           chatBox.appendChild(div);
         });
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -148,7 +215,6 @@
         sender: "customer",
         timestamp: firebase.serverTimestamp()
       });
-
       input.value = "";
     });
   </script>
