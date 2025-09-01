@@ -662,12 +662,20 @@ flex-wrap: wrap;
   <!-- PRODUCTS -->
 <div class="sections" id="products">
   <section class="section" id="wines">
-    <h2>Wines</h2>
+    <h2>Wine</h2>
     <div class="grid" id="grid-wines"></div>
   </section>
-  <section class="section" id="liquors">
-    <h2>Liquors</h2>
-    <div class="grid" id="grid-liquors"></div>
+  <section class="section" id="whiskeys">
+    <h2>Whiskey</h2>
+    <div class="grid" id="grid-whiskeys"></div>
+  </section>
+<section class="section" id="vodkas">
+    <h2>Vodka</h2>
+    <div class="grid" id="grid-vodkas"></div>
+  </section>
+<section class="section" id="gins">
+    <h2>Gin</h2>
+    <div class="grid" id="grid-gins"></div>
   </section>
   <section class="section" id="essentials">
     <h2>Everyday Essentials</h2>
@@ -950,8 +958,10 @@ async function loadAllProducts() {
   showAllSkeletons(); // put skeletons first
 
   const categories = [
-    { name: "Wines", id: "grid-wines" },
-    { name: "Liquors", id: "grid-liquors" },
+    { name: "Wine", id: "grid-wines" },
+    { name: "Whiskey", id: "grid-whiskeys" },
+    { name: "Vodka", id: "grid-vodkas" },
+    { name: "Gin", id: "grid-gins" },
     { name: "Essentials", id: "grid-essentials" }
   ];
 
