@@ -946,7 +946,7 @@ function showToast(itemName) {
 
 // Show skeletons for all sections at once
 function showAllSkeletons() {
-  const categories = ["wines", "liquors", "essentials"];
+  const categories = ["wines", "whiskeys", "vodkas", "gins", "essentials"];
   categories.forEach(section => {
     const container = document.getElementById(`grid-${section}`);
     container.innerHTML = getSkeletons(4); // uniform skeletons everywhere
