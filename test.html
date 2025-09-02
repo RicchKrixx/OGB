@@ -1,266 +1,489 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Products Edit - OGB</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OGB • Live Support Chat</title>
+  <meta name="color-scheme" content="light" />
   <style>
+    :root {
+      --brand: #b8860b; /* OGB gold */
+      --ink: #121212;
+      --bg: #f8f8f7;
+      --bg-2: #ffffff;
+      --muted: #7a7a7a;
+      --line: #e8e7e5;
+      --danger: #d62f2f;
+      --success: #1aa053;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
       margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .accordion {
-      background: #fff;
-      color: #333;
-      cursor: pointer;
-      padding: 15px;
-      width: 100%;
-      border: none;
-      outline: none;
-      transition: 0.3s;
-      font-size: 18px;
-      font-weight: bold;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .accordion.active {
-      background: #0077ff;
-      color: #fff;
-    }
-    .panel {
-      padding: 15px;
-      background: #fff;
-      display: none;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .product {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f9f9f9;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-    .product img {
-      width: 50px;
-      height: 50px;
-      border-radius: 6px;
-      margin-right: 10px;
-      object-fit: cover;
-    }
-    .product-info {
-      flex: 1;
-    }
-    .product-actions button {
-      margin-left: 5px;
-      padding: 6px 10px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .edit-btn { background: #0077ff; color: #fff; }
-    .delete-btn { background: #ff3b3b; color: #fff; }
-    .add-form {
-      margin-top: 15px;
-      padding: 10px;
-      border-top: 1px solid #ddd;
-    }
-    .add-form input {
-      padding: 6px;
-      margin: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    .add-form button {
-      padding: 6px 12px;
-      background: #28a745;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .upload-preview {
-      margin: 10px 5px;
-    }
-    .upload-preview img {
-      max-width: 120px;
-      border-radius: 6px;
-      margin-top: 5px;
-    }
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--ink);
+    }/* Layout */
+.app { display: grid; grid-template-rows: auto 1fr auto; height: 100dvh; }
+header {
+  position: sticky; top: 0; z-index: 5;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; gap: .75rem; padding: .8rem 1rem;
+}
+header .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); }
+header h1 { font-size: 1rem; margin: 0; font-weight: 700; }
+header .meta { margin-left: auto; font-size: .85rem; color: var(--muted); }
+header .mode-chip { padding: .25rem .5rem; border: 1px solid var(--line); border-radius: 999px; font-size: .75rem; }
+
+.main { display: grid; grid-template-columns: 1fr; height: 100%; }
+
+/* Admin split layout on wide screens */
+.admin .main { grid-template-columns: 320px 1fr; }
+
+.pane { background: var(--bg-2); border-right: 1px solid var(--line); overflow: auto; }
+
+.chat-list { list-style: none; margin: 0; padding: 0; }
+.chat-item { padding: .85rem 1rem; border-bottom: 1px solid var(--line); cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: .25rem; }
+.chat-item:hover { background: #faf9f7; }
+.chat-item .name { font-weight: 600; }
+.chat-item .preview { font-size: .85rem; color: var(--muted); grid-column: 1 / -1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-item .badge { background: var(--brand); color: #fff; border-radius: 999px; padding: .1rem .5rem; font-size: .7rem; height: fit-content; align-self: start; }
+
+.messages { padding: 1rem; overflow-y: auto; background: linear-gradient(180deg, #fafaf9, #f6f6f4);
+  display: flex; flex-direction: column; gap: .5rem; }
+
+.sys { align-self: center; background: #fff7e6; color: #5d3b00; border: 1px dashed #e7c889; padding: .35rem .6rem; border-radius: 6px; font-size: .8rem; }
+
+.row { display: flex; gap: .4rem; }
+.row.left { justify-content: flex-start; }
+.row.right { justify-content: flex-end; }
+
+.bubble { max-width: 80%; padding: .6rem .8rem; border-radius: 14px; line-height: 1.35; background: #fff; border: 1px solid var(--line); }
+.left .bubble { border-top-left-radius: 4px; }
+.right .bubble { background: #0b6ef3; color: #fff; border-color: #0b6ef3; border-top-right-radius: 4px; }
+
+.time { font-size: .72rem; color: var(--muted); margin-top: .15rem; }
+
+.composer {
+  position: sticky; bottom: 0; z-index: 5;
+  background: var(--bg-2); border-top: 1px solid var(--line);
+  padding: .5rem; display: grid; grid-template-columns: auto 1fr auto; gap: .5rem; align-items: end;
+}
+.composer .attach { display: flex; gap: .25rem; }
+.icon-btn { appearance: none; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: .45rem; cursor: pointer; }
+.icon-btn:active { transform: translateY(1px); }
+textarea {
+  width: 100%; resize: none; min-height: 44px; max-height: 40dvh; border-radius: 12px; border: 1px solid var(--line);
+  padding: .7rem .8rem; font: inherit; outline: none; background: #fff;
+}
+.send-btn { appearance: none; border: none; background: var(--brand); color: #fff; padding: .75rem 1rem; border-radius: 12px; font-weight: 700; cursor: pointer; }
+.send-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.start-card { max-width: 680px; margin: 4dvh auto; background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; padding: 1.25rem; }
+.start-card h2 { margin: 0 0 .25rem; }
+.start-card p { color: var(--muted); margin: 0 0 1rem; }
+.start-btn { background: var(--brand); color: #fff; padding: .8rem 1rem; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; width: 100%; }
+
+.typing { font-size: .8rem; color: var(--muted); padding: 0 1rem .5rem; }
+
+.rating-card { padding: 1rem; border: 1px solid var(--line); border-radius: 12px; background: #fff; margin: .5rem 1rem; }
+.stars { display: flex; gap: .25rem; font-size: 1.4rem; cursor: pointer; }
+.end-btn { background: var(--danger); color: #fff; padding: .5rem .75rem; border-radius: 10px; border: none; cursor: pointer; }
+.join-btn { background: var(--success); color: #fff; padding: .4rem .6rem; border-radius: 10px; border: none; cursor: pointer; }
+
+.hidden { display: none !important; }
+
+/* Media in bubbles */
+.bubble img, .bubble video { max-width: 240px; border-radius: 8px; display: block; }
+
+@media (min-width: 1024px) {
+  .bubble img, .bubble video { max-width: 360px; }
+}
+
   </style>
 </head>
 <body>
-  <h1>Products Editor</h1>
+<div class="app" id="app">
+  <header>
+    <div class="dot" id="statusDot" title="Online"></div>
+    <h1 id="title">OGB Support</h1>
+    <span class="mode-chip" id="modeChip">Customer</span>
+    <div class="meta" id="userMeta">—</div>
+  </header>  <main class="main">
+    <!-- Admin list pane (only visible in admin mode) -->
+    <aside class="pane hidden" id="adminListPane">
+      <div style="padding:.75rem 1rem; display:flex; gap:.5rem; align-items:center; border-bottom:1px solid var(--line);">
+        <strong>Open Chats</strong>
+        <button class="icon-btn" id="refreshList" title="Refresh">⟳</button>
+      </div>
+      <ul class="chat-list" id="chatList"></ul>
+    </aside><!-- Chat area -->
+<section id="chatArea" style="display:flex; flex-direction:column;">
+  <div id="startView" class="start-card">
+    <h2>Start a chat</h2>
+    <p>You're signed in with your OGB account. Tap below to begin and we'll greet you instantly. An agent will join soon.</p>
+    <button class="start-btn" id="startBtn">Start Chat</button>
+  </div>
 
-  <button class="accordion">🍷 Wines</button>
-  <div class="panel" id="wines"></div>
+  <div id="chatView" class="hidden" style="display:flex; flex-direction:column; height:100%;">
+    <div class="messages" id="messages"></div>
+    <div id="typing" class="typing hidden">Typing…</div>
 
-  <button class="accordion">🥃 Liquors</button>
-  <div class="panel" id="liquors"></div>
+    <div id="ratingView" class="rating-card hidden">
+      <strong>Rate this chat</strong>
+      <div class="stars" id="stars" aria-label="Rate 1 to 5">★ ☆ ☆ ☆ ☆</div>
+      <textarea id="feedback" placeholder="Add a short comment (optional)" style="margin-top:.5rem"></textarea>
+      <button class="send-btn" id="submitRating" style="margin-top:.5rem">Submit Rating</button>
+    </div>
 
-  <button class="accordion">🛒 Everyday Essentials</button>
-  <div class="panel" id="essentials"></div>
+    <div class="composer" id="composer">
+      <div class="attach">
+        <label class="icon-btn" title="Attach image/video">
+          📎<input id="fileInput" type="file" accept="image/*,video/*" multiple style="display:none" />
+        </label>
+      </div>
+      <textarea id="input" placeholder="Write a message… 😊" rows="1"></textarea>
+      <div style="display:flex; gap:.5rem; align-items:center;">
+        <button class="end-btn hidden" id="endBtn" title="End chat">End</button>
+        <button class="send-btn" id="sendBtn">Send</button>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <!-- Firebase + Imgbb -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-  import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } 
-    from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+  </main>
+</div><!-- Firebase SDKs --><script type="module">
+  /*************************
+   * 🔧 SETUP FIREBASE HERE *
+   *************************/
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc, addDoc, collection, serverTimestamp, onSnapshot, query, where, orderBy, limit, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+  import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
-    authDomain: "ongod-5073e.firebaseapp.com",
-    projectId: "ongod-5073e",
-    storageBucket: "ongod-5073e.firebasestorage.app",
-    messagingSenderId: "439687837026",
-    appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
-    measurementId: "G-1TVP0X3J62"
-  };
+   const firebaseConfig = {
+  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+  authDomain: "ongod-5073e.firebaseapp.com",
+  projectId: "ongod-5073e",
+  storageBucket: "ongod-5073e.firebasestorage.app",
+  messagingSenderId: "439687837026",
+  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+  measurementId: "G-1TVP0X3J62"
+};
 
   const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
   const db = getFirestore(app);
+  const storage = getStorage(app);
+  setPersistence(auth, browserLocalPersistence);
 
-  const IMGBB_API_KEY = "4778722b6cb7fffaf637e09bde8407ea"; // replace with your real key
+  /********************
+   * 🧭 MODE DETECTION *
+   ********************/
+  const params = new URLSearchParams(location.search);
+  // Use ?admin=true in the URL for admin console
+  const isAdminMode = params.get('admin') === 'true';
+  // OPTIONAL: lock admin mode to specific emails
+  const ADMIN_EMAILS = [
+    // 'support@ongodbend.com',
+  ];
 
-  // Accordion toggle
-  document.querySelectorAll(".accordion").forEach(btn => {
-    btn.addEventListener("click", function() {
-      this.classList.toggle("active");
-      const panel = this.nextElementSibling;
-      panel.style.display = panel.style.display === "block" ? "none" : "block";
+  // UI refs
+  const appEl = document.getElementById('app');
+  const modeChip = document.getElementById('modeChip');
+  const userMeta = document.getElementById('userMeta');
+  const adminListPane = document.getElementById('adminListPane');
+  const chatListEl = document.getElementById('chatList');
+  const startView = document.getElementById('startView');
+  const chatView = document.getElementById('chatView');
+  const messagesEl = document.getElementById('messages');
+  const inputEl = document.getElementById('input');
+  const sendBtn = document.getElementById('sendBtn');
+  const endBtn = document.getElementById('endBtn');
+  const fileInput = document.getElementById('fileInput');
+  const typingEl = document.getElementById('typing');
+  const ratingView = document.getElementById('ratingView');
+  const starsEl = document.getElementById('stars');
+  const feedbackEl = document.getElementById('feedback');
+  const submitRatingBtn = document.getElementById('submitRating');
+  const startBtn = document.getElementById('startBtn');
+  const refreshListBtn = document.getElementById('refreshList');
+  const titleEl = document.getElementById('title');
+
+  let currentUser = null;
+  let activeChatId = null;
+  let msgUnsub = null;
+  let chatUnsub = null;
+
+  // Render helpers
+  function fmtTime(ts) {
+    try {
+      const d = ts?.toDate ? ts.toDate() : (ts instanceof Date ? ts : new Date());
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch { return ''; }
+  }
+  function scrollToBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+
+  function bubble({ side, text, mediaURL, mediaType, ts }) {
+    const row = document.createElement('div');
+    row.className = `row ${side}`;
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    if (mediaURL) {
+      if (mediaType?.startsWith('video')) {
+        const v = document.createElement('video');
+        v.src = mediaURL; v.controls = true; v.playsInline = true;
+        b.appendChild(v);
+      } else {
+        const img = document.createElement('img');
+        img.src = mediaURL; img.alt = 'attachment';
+        b.appendChild(img);
+      }
+    }
+    if (text) {
+      const t = document.createElement('div');
+      t.textContent = text;
+      b.appendChild(t);
+    }
+    const time = document.createElement('div');
+    time.className = 'time';
+    time.textContent = fmtTime(ts);
+    b.appendChild(time);
+    row.appendChild(b);
+    messagesEl.appendChild(row);
+  }
+
+  function sys(text) {
+    const s = document.createElement('div');
+    s.className = 'sys'; s.textContent = text;
+    messagesEl.appendChild(s);
+  }
+
+  function setTypingVisible(visible) { typingEl.classList.toggle('hidden', !visible); }
+
+  function showChatUI(show) {
+    startView.classList.toggle('hidden', show);
+    chatView.classList.toggle('hidden', !show);
+  }
+
+  function setComposerEnabled(enabled) {
+    inputEl.disabled = !enabled; sendBtn.disabled = !enabled; fileInput.disabled = !enabled; endBtn.classList.toggle('hidden', !enabled);
+  }
+
+  // Firestore paths
+  const chatDoc = (id) => doc(db, 'chats', id);
+  const msgsCol = (id) => collection(db, 'chats', id, 'messages');
+
+  async function createChat(user) {
+    const chatRef = doc(collection(db, 'chats'));
+    const data = {
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      status: 'active', // active | ended
+      customer: {
+        uid: user.uid,
+        email: user.email || null,
+        name: user.displayName || user.email?.split('@')[0] || 'Customer'
+      },
+      agent: null,
+      typing: { customer: false, agent: false },
+      lastMessage: null
+    };
+    await setDoc(chatRef, data);
+
+    // Two welcome messages
+    await addDoc(msgsCol(chatRef.id), {
+      type: 'text', text: 'Welcome to OGB Support! 👋', sender: 'system', createdAt: serverTimestamp()
     });
-  });
-
-  // Upload image to Imgbb
-  async function uploadToImgbb(file) {
-    const formData = new FormData();
-    formData.append("image", file);
-
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-      method: "POST",
-      body: formData
+    await addDoc(msgsCol(chatRef.id), {
+      type: 'text', text: 'An OGB support agent will join shortly. Tell us what you need and we\'ll be with you. 😊', sender: 'system', createdAt: serverTimestamp()
     });
 
-    const data = await res.json();
-    if (data.success) {
-      return data.data.url;
-    } else {
-      throw new Error(data.error.message);
+    return chatRef.id;
+  }
+
+  async function sendMessage({ chatId, text, files }) {
+    const isAgent = isAdminMode;
+    const batchAdds = [];
+
+    if (text && text.trim()) {
+      batchAdds.push(addDoc(msgsCol(chatId), {
+        type: 'text', text: text.trim(), sender: isAgent ? 'agent' : 'customer', createdAt: serverTimestamp()
+      }));
+    }
+
+    if (files?.length) {
+      for (const file of files) {
+        const path = `chat_uploads/${chatId}/${Date.now()}_${file.name}`;
+        const ref = sRef(storage, path);
+        await uploadBytes(ref, file);
+        const url = await getDownloadURL(ref);
+        const mediaType = file.type;
+        batchAdds.push(addDoc(msgsCol(chatId), {
+          type: 'media', mediaType, mediaURL: url, sender: isAgent ? 'agent' : 'customer', createdAt: serverTimestamp()
+        }));
+      }
+    }
+
+    if (batchAdds.length) {
+      await Promise.all(batchAdds);
+      await updateDoc(chatDoc(chatId), { updatedAt: serverTimestamp(), lastMessage: text?.slice(0, 140) || (files?.length ? 'Sent an attachment' : null) });
     }
   }
 
-  // Render products by category
-  async function loadProducts(category, containerId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = "<p>Loading...</p>";
-
-    const q = query(collection(db, "products"), where("category", "==", category));
-    const snapshot = await getDocs(q);
-
-    container.innerHTML = "";
-    snapshot.forEach(docSnap => {
-      const product = docSnap.data();
-      const div = document.createElement("div");
-      div.className = "product";
-      div.innerHTML = `
-        <img src="${product.image || 'https://via.placeholder.com/50'}" />
-        <div class="product-info">
-          <strong>${product.name}</strong><br>
-          ${product.originalPrice ? `<span style="text-decoration: line-through; color: gray;">GH₵${product.originalPrice}</span> ` : ""}
-          GH₵${product.price}
-        </div>
-        <div class="product-actions">
-          <button class="edit-btn">Edit</button>
-          <button class="delete-btn">Delete</button>
-        </div>
-      `;
-
-      // Delete
-      div.querySelector(".delete-btn").addEventListener("click", async () => {
-        await deleteDoc(doc(db, "products", docSnap.id));
-        loadProducts(category, containerId);
-      });
-
-      // Edit
-      div.querySelector(".edit-btn").addEventListener("click", async () => {
-        const newName = prompt("Enter new name", product.name);
-        const newPrice = prompt("Enter new price", product.price);
-        const newOriginal = prompt("Enter original price (optional)", product.originalPrice || "");
-        await updateDoc(doc(db, "products", docSnap.id), {
-          name: newName,
-          price: Number(newPrice),
-          originalPrice: newOriginal ? Number(newOriginal) : null
-        });
-        loadProducts(category, containerId);
-      });
-
-      container.appendChild(div);
+  async function joinAsAgent(chatId, agentUser) {
+    await updateDoc(chatDoc(chatId), {
+      agent: { uid: agentUser.uid, email: agentUser.email, name: agentUser.displayName || agentUser.email.split('@')[0] },
+      updatedAt: serverTimestamp()
     });
+    await addDoc(msgsCol(chatId), { type: 'text', text: `${agentUser.displayName || 'Agent'} joined the chat.`, sender: 'system', createdAt: serverTimestamp() });
+  }
 
-    // Add new product form
-    const form = document.createElement("div");
-    form.className = "add-form";
-    form.innerHTML = `
-      <h4>Add New ${category}</h4>
-      <input type="text" placeholder="Name" id="${containerId}-name" />
-      <input type="number" placeholder="Price" id="${containerId}-price" />
-      <input type="number" placeholder="Original Price (optional)" id="${containerId}-original" />
-      <input type="file" id="${containerId}-file" accept="image/*" />
-      <div class="upload-preview" id="${containerId}-preview"></div>
-      <input type="hidden" id="${containerId}-image" />
-      <button>Add</button>
-    `;
+  async function setTyping(chatId, role, value) {
+    try { await updateDoc(chatDoc(chatId), { [`typing.${role}`]: value }); } catch {}
+  }
 
-    // Handle image upload
-    const fileInput = form.querySelector(`#${containerId}-file`);
-    const preview = form.querySelector(`#${containerId}-preview`);
-    fileInput.addEventListener("change", async () => {
-      const file = fileInput.files[0];
-      if (!file) return;
-      preview.innerHTML = "<p>Uploading...</p>";
-      try {
-        const url = await uploadToImgbb(file);
-        document.getElementById(`${containerId}-image`).value = url;
-        preview.innerHTML = `<img src="${url}" alt="Preview">`;
-      } catch (err) {
-        preview.innerHTML = `<p style="color:red;">Upload failed: ${err.message}</p>`;
+  async function endChat(chatId, byRole) {
+    // Mark ended and inform system
+    await updateDoc(chatDoc(chatId), { status: 'ended', updatedAt: serverTimestamp() });
+    await addDoc(msgsCol(chatId), { type: 'text', text: `${byRole === 'agent' ? 'Agent' : 'Customer'} ended the chat.`, sender: 'system', createdAt: serverTimestamp() });
+  }
+
+  async function hardDeleteChat(chatId) {
+    // Move rating is already saved separately. Delete messages then chat doc.
+    const msgs = await getDocs(query(msgsCol(chatId)));
+    const deletions = [];
+    msgs.forEach(m => deletions.push(deleteDoc(m.ref)));
+    await Promise.allSettled(deletions);
+    await deleteDoc(chatDoc(chatId));
+  }
+
+  function renderMessages(role, snap) {
+    messagesEl.innerHTML = '';
+    snap.forEach(doc => {
+      const m = doc.data();
+      if (m.sender === 'system') { sys(m.text); return; }
+      const side = (role === 'customer')
+        ? (m.sender === 'agent' ? 'left' : 'right') // Customer view: admin left, customer right
+        : (m.sender === 'agent' ? 'right' : 'left'); // Admin view: customer left, admin right
+      bubble({ side, text: m.text, mediaURL: m.mediaURL, mediaType: m.mediaType, ts: m.createdAt });
+    });
+    scrollToBottom();
+  }
+
+  async function openChat(chatId, role) {
+    // Unsubscribe existing
+    msgUnsub?.(); chatUnsub?.();
+    activeChatId = chatId;
+
+    // Show UI
+    showChatUI(true);
+    setComposerEnabled(true);
+    if (role === 'agent') endBtn.classList.remove('hidden');
+
+    // Typing indicator listener + status
+    chatUnsub = onSnapshot(chatDoc(chatId), (d) => {
+      const data = d.data();
+      if (!data) return;
+      const otherTyping = role === 'customer' ? data.typing?.agent : data.typing?.customer;
+      setTypingVisible(!!otherTyping);
+
+      // Rating flow for customer when status ended
+      if (role === 'customer') {
+        const ended = data.status === 'ended';
+        ratingView.classList.toggle('hidden', !ended);
+        document.getElementById('composer').classList.toggle('hidden', ended);
       }
     });
 
-    // Add new product
-    form.querySelector("button").addEventListener("click", async () => {
-      const name = document.getElementById(`${containerId}-name`).value;
-      const price = document.getElementById(`${containerId}-price`).value;
-      const original = document.getElementById(`${containerId}-original`).value;
-      const image = document.getElementById(`${containerId}-image`).value;
-      if(!name || !price || !image) return alert("Please fill all required fields and upload an image");
-      await addDoc(collection(db, "products"), {
-        name,
-        price: Number(price),
-        originalPrice: original ? Number(original) : null,
-        image,
-        category
-      });
-      loadProducts(category, containerId);
-    });
+    // Messages listener
+    const qMsgs = query(msgsCol(chatId), orderBy('createdAt', 'asc'));
+    msgUnsub = onSnapshot(qMsgs, (snap) => renderMessages(role === 'agent' ? 'agent' : 'customer', snap));
 
-    container.appendChild(form);
+    // If agent joining, set join banner
+    if (role === 'agent') {
+      await joinAsAgent(chatId, currentUser);
+    }
   }
 
-  // Load all categories
-  loadProducts("Wines", "wines");
-  loadProducts("Liquors", "liquors");
-  loadProducts("Essentials", "essentials");
-</script>
-</body>
-</html>
+  async function loadAdminList() {
+    chatListEl.innerHTML = '';
+    const qOpen = query(collection(db, 'chats'), where('status', '==', 'active'), orderBy('updatedAt', 'desc'), limit(50));
+    const snap = await getDocs(qOpen);
+    if (snap.empty) {
+      chatListEl.innerHTML = '<li class="chat-item">No open chats</li>';
+      return;
+    }
+    snap.forEach(d => {
+      const data = d.data();
+      const li = document.createElement('li');
+      li.className = 'chat-item';
+      li.innerHTML = `
+        <div class="name">${data.customer?.name || 'Customer'}</div>
+        <span class="badge">Active</span>
+        <div class="preview">${data.lastMessage || '—'}</div>
+      `;
+      li.onclick = () => openChat(d.id, 'agent');
+      chatListEl.appendChild(li);
+    });
+  }
+
+  // STAR rating UI
+  let selectedStars = 0;
+  function drawStars(n) {
+    const stars = Array.from({ length: 5 }, (_, i) => i < n ? '★' : '☆').join(' ');
+    starsEl.textContent = stars;
+  }
+
+  starsEl.addEventListener('mousemove', (e) => {
+    const rect = starsEl.getBoundingClientRect();
+    const rel = e.clientX - rect.left;
+    const idx = Math.min(4, Math.max(0, Math.floor((rel / rect.width) * 5)));
+    drawStars(idx + 1);
+  });
+  starsEl.addEventListener('mouseleave', () => drawStars(selectedStars || 0));
+  starsEl.addEventListener('click', (e) => {
+    const rect = starsEl.getBoundingClientRect();
+    const rel = e.clientX - rect.left;
+    const idx = Math.min(4, Math.max(0, Math.floor((rel / rect.width) * 5)));
+    selectedStars = idx + 1; drawStars(selectedStars);
+  });
+
+  submitRatingBtn.addEventListener('click', async () => {
+    if (!activeChatId || !selectedStars) return alert('Please select a star rating');
+    await addDoc(collection(db, 'chat_ratings'), {
+      chatId: activeChatId,
+      stars: selectedStars,
+      feedback: feedbackEl.value?.trim() || null,
+      createdAt: serverTimestamp(),
+      customer: { uid: currentUser?.uid || null, email: currentUser?.email || null }
+    });
+    // After rating, hard-delete the chat
+    await hardDeleteChat(activeChatId);
+    alert('Thanks for the feedback! Chat ended.');
+    location.href = location.pathname + location.search; // reset
+  });
+
+  // Events
+  startBtn.addEventListener('click', async () => {
+    if (!currentUser) return alert('Sign in required');
+    const id = await createChat(currentUser);
+    await openChat(id, 'customer');
+  });
+
+  sendBtn.addEventListener('click', async () => {
+    if (!activeChatId) return;
+    const text = inputEl.value;
+    const files = Array.from(fileInput.files || []);
+    inputEl.value = '';
+    fileInput.value = '';
+    await sendMessage({ chatId: activeChatId, text, files });
+    setTyping(activeChatId, isAdminMode ? 'agent' : 'customer', false);
+  });
+
+  inputEl.addEventListener('input', () => {
+    if (!activeChatId) return;
+    setTyping(activeChatId, isAdminMode ? 'agent' : 'customer', !!inputEl.value);
+    // autoresize
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(300, inputEl.scrollHei
