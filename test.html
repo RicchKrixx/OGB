@@ -471,19 +471,4 @@ textarea {
     await openChat(id, 'customer');
   });
 
-  sendBtn.addEventListener('click', async () => {
-    if (!activeChatId) return;
-    const text = inputEl.value;
-    const files = Array.from(fileInput.files || []);
-    inputEl.value = '';
-    fileInput.value = '';
-    await sendMessage({ chatId: activeChatId, text, files });
-    setTyping(activeChatId, isAdminMode ? 'agent' : 'customer', false);
-  });
-
-  inputEl.addEventListener('input', () => {
-    if (!activeChatId) return;
-    setTyping(activeChatId, isAdminMode ? 'agent' : 'customer', !!inputEl.value);
-    // autoresize
-    inputEl.style.height = 'auto';
-    inputEl.style.height = Math.min(300, inputEl.scrollHei
+  sendBtn.addEventListener('click
