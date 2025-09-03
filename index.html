@@ -668,21 +668,9 @@ flex-wrap: wrap;
     <h2>Wines</h2>
     <div class="grid" id="grid-wines"></div>
   </section>
-  <section class="section" id="whiskeys">
-    <h2>Whiskeys</h2>
-    <div class="grid" id="grid-whiskeys"></div>
-  </section>
-<section class="section" id="vodkas">
-    <h2>Vodkas</h2>
-    <div class="grid" id="grid-vodkas"></div>
-  </section>
-<section class="section" id="gins">
-    <h2>Gins</h2>
-    <div class="grid" id="grid-gins"></div>
-  </section>
- <section class="section" id="champagnes">
-    <h2>Champagnes</h2>
-    <div class="grid" id="grid-champagnes"></div>
+  <section class="section" id="liquors">
+    <h2>Liquors</h2>
+    <div class="grid" id="grid-liquors"></div>
   </section>
   <section class="section" id="essentials">
     <h2>Everyday Essentials</h2>
@@ -953,7 +941,7 @@ function showToast(itemName) {
 
 // Show skeletons for all sections at once
 function showAllSkeletons() {
-  const categories = ["wines", "whiskeys", "vodkas", "gins", "champagnes", "essentials"];
+  const categories = ["wines", "liquors", "essentials"];
   categories.forEach(section => {
     const container = document.getElementById(`grid-${section}`);
     container.innerHTML = getSkeletons(4); // uniform skeletons everywhere
@@ -966,10 +954,7 @@ async function loadAllProducts() {
 
   const categories = [
     { name: "Wines", id: "grid-wines" },
-    { name: "Whiskey", id: "grid-whiskeys" },
-    { name: "Vodka", id: "grid-vodkas" },
-    { name: "Gin", id: "grid-gins" },
-    { name: "Champagne", id: "grid-champagnes" },
+    { name: "Liquors", id: "grid-liquors" },
     { name: "Essentials", id: "grid-essentials" }
   ];
 
