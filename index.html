@@ -647,9 +647,6 @@ flex-wrap: wrap;
 
 <div class="quick-sec">
 <a href="#wines" style="background-color: #bbb;border-radius: 20px; padding:10px 15px;">wine</a>
-<a href="#whiskeys" style="background-color: #bbb;border-radius: 20px; padding:10px 15px;">whiskey</a>
-<a href="#vodkas" style="background-color: #bbb;border-radius: 20px; padding:10px 15px;">vodka</a>
-<a href="#gins" style="background-color: #bbb;border-radius: 20px; padding:10px 15px;">gin</a>
 <a href="#champagnes" style="background-color: #bbb;border-radius: 20px; padding:10px 15px;">champagne</a>
 <a href="#essentials" style="background-color: #bbb;border-radius: 20px; padding:10px 15px;">everyday essentials</a>
 <a href="#shop" style="background-color: #bbb;border-radius: 20px; padding:10px 15px;">our shop</a>
@@ -671,6 +668,10 @@ flex-wrap: wrap;
   <section class="section" id="liquors">
     <h2>Liquors</h2>
     <div class="grid" id="grid-liquors"></div>
+  </section>
+<section class="section" id="champagne s">
+    <h2>Champagne</h2>
+    <div class="grid" id="grid-champagnes"></div>
   </section>
   <section class="section" id="essentials">
     <h2>Everyday Essentials</h2>
@@ -955,6 +956,7 @@ async function loadAllProducts() {
   const categories = [
     { name: "Wines", id: "grid-wines" },
     { name: "Liquors", id: "grid-liquors" },
+    { name: "Campaignes", id: "grid-champagnes" },
     { name: "Essentials", id: "grid-essentials" }
   ];
 
