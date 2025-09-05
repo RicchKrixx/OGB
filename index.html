@@ -128,6 +128,8 @@ border-radius:10px;
   position: absolute;
   top: 10px;
   left: 10px;
+  background:var(--brand);
+  color: white;
   font-size: 18px;
   padding: 4px 6px;
   border-radius: 6px;
@@ -953,7 +955,7 @@ function showToast(itemName) {
       : `<span style="font-weight:700; color:#222;font-size:14px;">GH₵${product.price.toFixed(2)}</span>`;
 
     div.innerHTML = `
-     <span class="badge">🔥</span>
+     <span class="badge">10% OFF</span>
       <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
       <h3>${product.name}</h3>
       <div class="price">${priceHTML}</div>
