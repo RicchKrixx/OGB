@@ -111,6 +111,12 @@ border-radius:10px;
 .add:hover {
  opacity:.9; 
 }
+.badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 18px;
+}
 /* About / Contact */
 .info {
  background:#bbb; border-radius:16px; 
@@ -931,6 +937,7 @@ function showToast(itemName) {
       : `<span style="font-weight:700; color:#222;font-size:14px;">GH₵${product.price.toFixed(2)}</span>`;
 
     div.innerHTML = `
+     <span class="badge">🔥</span>
       <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}">
       <h3>${product.name}</h3>
       <div class="price">${priceHTML}</div>
