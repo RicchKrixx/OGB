@@ -4,9 +4,9 @@ const PRECACHE_ASSETS = [
   '/index.html',
   '/offline.html',
   '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/styles.css',    // update these to match your actual asset names
+  '/icons/android-chrome-192×192.png',
+  '/icons/android-chrome-512×512.png'
+    // update these to match your actual asset names
   '/app.js'
 ];
 
