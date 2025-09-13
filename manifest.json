@@ -2,7 +2,7 @@
   "name": "On God Bend",
   "short_name": "OGB",
   "description": "Premium Wines, Liquors & Everyday Essentials.",
-  "start_url": "/?utm_source=homescreen",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
