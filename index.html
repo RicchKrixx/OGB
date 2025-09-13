@@ -1290,5 +1290,31 @@ s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
 <!--End of Tawk.to Script-->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => {
+        console.log('SW registered:', reg);
+
+        // Optional: listen for updates to SW and notify user
+        reg.addEventListener('updatefound', () => {
+          const newSW = reg.installing;
+          newSW.addEventListener('statechange', () => {
+            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+              // new content available
+              const toast = document.createElement('div');
+              toast.style = 'position:fixed;bottom:12px;left:12px;padding:10px 14px;background:#222;color:#fff;border-radius:8px;z-index:9999';
+              toast.innerHTML = 'New version available <button id="reload-btn" style="margin-left:8px">Refresh</button>';
+              document.body.appendChild(toast);
+              document.getElementById('reload-btn').addEventListener('click', () => location.reload());
+            }
+          });
+        });
+      })
+      .catch(err => console.error('SW register failed', err));
+  });
+}
+</script>
 </body>
 </html>
