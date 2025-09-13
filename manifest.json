@@ -1,0 +1,18 @@
+{
+  "name": "On God Bend",
+  "short_name": "OGB",
+  "description": "Premium Wines, Liquors & Everyday Essentials.",
+  "start_url": "/?utm_source=homescreen",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1220",
+  "theme_color": "#00b7d4",
+   "icons": [
+    {
+      "src": "/https://i.postimg.cc/m2py1Tz1/Screenshot-20250913-101220.jpg",
+      "sizes": "72x72 96x96 128x128 144x144 152x152 192x192 384x384 512x512",
+      "type": "image/png"
+    }
+  ]
+}
