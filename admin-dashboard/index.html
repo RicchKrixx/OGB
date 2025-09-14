@@ -4,16 +4,75 @@
   <meta charset="UTF-8">
   <title>OGB Admin Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-box {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 12px;
+      width: 320px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    h2 { margin-bottom: 20px; }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: cyan;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: lightblue;
+    }
+    .toggle {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 15px;
+    }
+    .toggle button {
+      width: 48%;
+      background: #334155;
+      color: white;
+    }
+    .toggle button.active {
+      background: cyan;
+      color: black;
+    }
+    #phone-box, #email-box { display: none; }
+  </style>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
     import { getAuth, 
-             signInWithEmailLink, 
              sendSignInLinkToEmail, 
+             signInWithEmailLink, 
              RecaptchaVerifier, 
              signInWithPhoneNumber } 
     from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
-    // Your Firebase config
+    // Firebase config
      const firebaseConfig = {
   apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
   authDomain: "ongod-5073e.firebaseapp.com",
@@ -27,91 +86,111 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // ---------------- EMAIL LOGIN ----------------
-    window.sendEmailLogin = async () => {
-      const email = document.getElementById("email").value;
+    // Allowed admin credentials
+    const ADMIN_EMAIL = "ydrill47@gmail.com";
+    const ADMIN_PHONE = "+233536345825";
 
+    // UI switching
+    window.showForm = (type) => {
+      document.getElementById("email-box").style.display = (type === 'email') ? "block" : "none";
+      document.getElementById("phone-box").style.display = (type === 'phone') ? "block" : "none";
+      document.getElementById("email-btn").classList.toggle("active", type === 'email');
+      document.getElementById("phone-btn").classList.toggle("active", type === 'phone');
+    };
+
+    // EMAIL LOGIN
+    window.sendEmailLogin = async () => {
+      const email = document.getElementById("email").value.trim();
+      if (email !== ADMIN_EMAIL) {
+        alert("Not authorized!");
+        return;
+      }
       const actionCodeSettings = {
-        url: window.location.href, // Redirect back to same page
+        url: window.location.href,
         handleCodeInApp: true,
       };
-
       try {
         await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-        window.localStorage.setItem("emailForSignIn", email);
+        localStorage.setItem("emailForSignIn", email);
         alert("Login link sent to your email!");
       } catch (err) {
-        console.error(err);
         alert(err.message);
       }
     };
 
-    // If user comes back via email link
     if (auth.isSignInWithEmailLink(window.location.href)) {
-      let email = window.localStorage.getItem("emailForSignIn");
+      let email = localStorage.getItem("emailForSignIn");
       if (!email) {
-        email = window.prompt("Please provide your email for confirmation");
+        email = window.prompt("Confirm your email");
       }
-      signInWithEmailLink(auth, email, window.location.href)
-        .then(() => {
-          localStorage.removeItem("emailForSignIn");
-          window.location.href = "/admin-dashboard/"; // Redirect
-        })
-        .catch((err) => alert(err.message));
+      if (email === ADMIN_EMAIL) {
+        signInWithEmailLink(auth, email, window.location.href)
+          .then(() => {
+            window.location.href = "/admin-dashboard/";
+          })
+          .catch((err) => alert(err.message));
+      }
     }
 
-    // ---------------- PHONE LOGIN ----------------
+    // PHONE LOGIN
     window.setupRecaptcha = () => {
       window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {}, auth);
       recaptchaVerifier.render();
     };
 
     window.sendPhoneOTP = async () => {
-      const phoneNumber = document.getElementById("phone").value;
+      const phone = document.getElementById("phone").value.trim();
+      if (phone !== ADMIN_PHONE) {
+        alert("Not authorized!");
+        return;
+      }
       try {
-        const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+        const confirmationResult = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
         window.confirmationResult = confirmationResult;
-        alert("OTP sent to phone!");
+        alert("OTP sent!");
       } catch (err) {
-        console.error(err);
         alert(err.message);
       }
     };
 
     window.verifyOTP = async () => {
-      const code = document.getElementById("otp").value;
+      const code = document.getElementById("otp").value.trim();
       try {
         await window.confirmationResult.confirm(code);
-        window.location.href = "/admin-dashboard/";
+        window.location.href = "admin-dashboard.html";
       } catch (err) {
         alert("Invalid OTP");
       }
     };
+
+    window.onload = () => {
+      showForm("email"); // default
+      setupRecaptcha();
+    };
   </script>
 </head>
-<body onload="setupRecaptcha()">
+<body>
+  <div class="login-box">
+    <h2>Admin Login</h2>
+    <div class="toggle">
+      <button id="email-btn" onclick="showForm('email')">Email</button>
+      <button id="phone-btn" onclick="showForm('phone')">Phone</button>
+    </div>
 
-  <h2>Admin Login</h2>
+    <!-- Email Login -->
+    <div id="email-box">
+      <input type="email" id="email" placeholder="Enter email">
+      <button onclick="sendEmailLogin()">Send Login Link</button>
+    </div>
 
-  <!-- Email Login -->
-  <div>
-    <h3>Login with Email</h3>
-    <input type="email" id="email" placeholder="Enter email">
-    <button onclick="sendEmailLogin()">Send Email Login Link</button>
+    <!-- Phone Login -->
+    <div id="phone-box">
+      <input type="text" id="phone" placeholder="+233XXXXXXXXX">
+      <div id="recaptcha-container"></div>
+      <button onclick="sendPhoneOTP()">Send OTP</button>
+      <input type="text" id="otp" placeholder="Enter OTP">
+      <button onclick="verifyOTP()">Verify OTP</button>
+    </div>
   </div>
-
-  <hr>
-
-  <!-- Phone Login -->
-  <div>
-    <h3>Login with Phone</h3>
-    <input type="text" id="phone" placeholder="+233536345825">
-    <div id="recaptcha-container"></div>
-    <button onclick="sendPhoneOTP()">Send OTP</button>
-    <br><br>
-    <input type="text" id="otp" placeholder="Enter OTP">
-    <button onclick="verifyOTP()">Verify OTP</button>
-  </div>
-
 </body>
 </html>
