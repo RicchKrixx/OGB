@@ -1,46 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OGB Support Chat</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#f7f7f7; margin:0; padding:0; }
-    header { background:#b8860b; color:white; padding:12px; text-align:center; font-size:18px; }
-    #chat-container { display:flex; height:90vh; }
-    #chat-list { width:30%; border-right:1px solid #ddd; overflow-y:auto; display:none; }
-    #chat-window { flex:1; display:flex; flex-direction:column; }
-    #messages { flex:1; padding:10px; overflow-y:auto; }
-    .msg { margin:8px 0; padding:10px; border-radius:10px; max-width:70%; word-wrap:break-word; }
-    .msg.customer { background:#d1ecf1; margin-left:auto; text-align:right; }
-    .msg.admin { background:#f8d7da; margin-right:auto; text-align:left; }
-    #input-area { display:flex; padding:10px; border-top:1px solid #ddd; }
-    #input-area input { flex:1; padding:8px; border:1px solid #ccc; border-radius:5px; }
-    #input-area button { margin-left:6px; padding:8px 12px; border:none; background:#b8860b; color:white; border-radius:5px; }
-    .chat-item { padding:10px; border-bottom:1px solid #eee; cursor:pointer; }
-    .chat-item:hover { background:#f0f0f0; }
-  </style>
-</head>
-<body>
-  <header>OGB Support Chat</header>
-  <div id="chat-container">
-    <div id="chat-list"></div>
-    <div id="chat-window">
-      <div id="messages"></div>
-      <div id="input-area">
-        <input id="messageInput" type="text" placeholder="Type your message..." />
-        <button onclick="sendMessage()">Send</button>
-      </div>
-    </div>
-  </div>
+  <meta charset="UTF-8">
+  <title>OGB Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } 
+      from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"></script>
-
-  <script>
-    // TODO: Replace with your Firebase config
      const firebaseConfig = {
   apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
   authDomain: "ongod-5073e.firebaseapp.com",
@@ -50,74 +18,88 @@
   appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
   measurementId: "G-1TVP0X3J62"
 };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    const ALLOWED_NUMBERS = ["+233536345825"]; // whitelist
 
-    let currentUser, currentChatId, isAdmin=false;
+    let confirmationResult;
 
-    auth.onAuthStateChanged(async (user)=>{
-      if(user){
-        currentUser=user;
-        // check admin
-        const adminEmails=["admin@ogb.com"]; // put your admin emails here
-        isAdmin=adminEmails.includes(user.email);
-        if(isAdmin){
-          document.getElementById("chat-list").style.display="block";
-          loadChatsForAdmin();
-        }else{
-          currentChatId=user.uid;
-          openChat(currentChatId);
-        }
-      }else{
-        alert("Please login with OGB auth first.");
+    window.onload = () => {
+      document.getElementById("sendOtp").onclick = sendOtp;
+      document.getElementById("verifyOtp").onclick = verifyOtp;
+
+      // init reCAPTCHA
+      window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+        size: 'invisible'
+      }, auth);
+    };
+
+    async function sendOtp() {
+      const phone = document.getElementById("phone").value.trim();
+      const appVerifier = window.recaptchaVerifier;
+
+      try {
+        confirmationResult = await signInWithPhoneNumber(auth, phone, appVerifier);
+        alert("OTP sent to " + phone);
+        document.getElementById("otpBox").style.display = "block";
+      } catch (err) {
+        alert(err.message);
       }
-    });
-
-    function loadChatsForAdmin(){
-      db.collection("chats").onSnapshot(snapshot=>{
-        let chatList=document.getElementById("chat-list");
-        chatList.innerHTML="";
-        snapshot.forEach(doc=>{
-          let div=document.createElement("div");
-          div.className="chat-item";
-          div.innerText=doc.id;
-          div.onclick=()=>openChat(doc.id);
-          chatList.appendChild(div);
-        });
-      });
     }
 
-    function openChat(chatId){
-      currentChatId=chatId;
-      document.getElementById("messages").innerHTML="";
-      db.collection("chats").doc(chatId).collection("messages")
-        .orderBy("timestamp")
-        .onSnapshot(snapshot=>{
-          let msgBox=document.getElementById("messages");
-          msgBox.innerHTML="";
-          snapshot.forEach(doc=>{
-            let msg=doc.data();
-            let div=document.createElement("div");
-            div.className="msg " + (msg.senderId===currentUser.uid?"customer":"admin");
-            div.innerText=msg.text;
-            msgBox.appendChild(div);
-          });
-          msgBox.scrollTop=msgBox.scrollHeight;
-        });
-    }
+    async function verifyOtp() {
+      const code = document.getElementById("otp").value;
+      try {
+        const result = await confirmationResult.confirm(code);
+        const phone = result.user.phoneNumber;
 
-    function sendMessage(){
-      let input=document.getElementById("messageInput");
-      if(!input.value.trim()) return;
-      db.collection("chats").doc(currentChatId).collection("messages").add({
-        text:input.value,
-        senderId:currentUser.uid,
-        senderEmail:currentUser.email,
-        timestamp:firebase.firestore.FieldValue.serverTimestamp()
-      });
-      input.value="";
+        if (ALLOWED_NUMBERS.includes(phone)) {
+          document.getElementById("loginBox").style.display = "none";
+          document.getElementById("dashboard").style.display = "block";
+        } else {
+          alert("Unauthorized number");
+          auth.signOut();
+        }
+      } catch (err) {
+        alert("Invalid OTP");
+      }
+    }
+  </script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .hidden { display: none; }
+    nav { margin-bottom: 15px; }
+    nav button { margin-right: 10px; }
+    iframe { width: 100%; height: 80vh; border: none; }
+  </style>
+</head>
+<body>
+  <!-- Login UI -->
+  <div id="loginBox">
+    <h2>Admin Login</h2>
+    <input id="phone" placeholder="Enter phone number" />
+    <button id="sendOtp">Send OTP</button>
+    <div id="otpBox" class="hidden">
+      <input id="otp" placeholder="Enter OTP" />
+      <button id="verifyOtp">Verify OTP</button>
+    </div>
+    <div id="recaptcha-container"></div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="hidden">
+    <h2>OGB Admin Dashboard</h2>
+    <nav>
+      <button onclick="loadPage('/orders/')">Orders</button>
+      <button onclick="loadPage('/products-edit/')">Products Edit</button>
+    </nav>
+    <iframe id="adminFrame" src="/orders/"></iframe>
+  </div>
+
+  <script>
+    function loadPage(page) {
+      document.getElementById("adminFrame").src = page;
     }
   </script>
 </body>
