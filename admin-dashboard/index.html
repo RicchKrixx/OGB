@@ -2,13 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>OGB Admin Dashboard</title>
+  <title>OGB Admin Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-    import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } 
-      from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+    import { getAuth, 
+             signInWithEmailLink, 
+             sendSignInLinkToEmail, 
+             RecaptchaVerifier, 
+             signInWithPhoneNumber } 
+    from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
+    // Your Firebase config
      const firebaseConfig = {
   apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
   authDomain: "ongod-5073e.firebaseapp.com",
@@ -18,87 +23,95 @@
   appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
   measurementId: "G-1TVP0X3J62"
 };
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // whitelist of allowed admin emails
-    const ALLOWED_EMAILS = ["ydrill47@gmail.com", "boss@ogb.com"];
+    // ---------------- EMAIL LOGIN ----------------
+    window.sendEmailLogin = async () => {
+      const email = document.getElementById("email").value;
 
-    // configure link settings
-    const actionCodeSettings = {
-      url: window.location.href,  // redirect back to this page
-      handleCodeInApp: true
-    };
+      const actionCodeSettings = {
+        url: window.location.href, // Redirect back to same page
+        handleCodeInApp: true,
+      };
 
-    window.onload = async () => {
-      // check if link opened from email
-      if (isSignInWithEmailLink(auth, window.location.href)) {
-        let email = window.localStorage.getItem("emailForSignIn");
-        if (!email) {
-          email = window.prompt("Please enter your email again for confirmation");
-        }
-        try {
-          const result = await signInWithEmailLink(auth, email, window.location.href);
-          if (ALLOWED_EMAILS.includes(result.user.email)) {
-            showDashboard();
-          } else {
-            alert("Unauthorized email");
-          }
-        } catch (err) {
-          alert("Login failed: " + err.message);
-        }
-      }
-
-      document.getElementById("sendLink").onclick = sendLoginLink;
-    };
-
-    async function sendLoginLink() {
-      const email = document.getElementById("email").value.trim();
-      if (!ALLOWED_EMAILS.includes(email)) {
-        alert("Unauthorized email");
-        return;
-      }
       try {
         await sendSignInLinkToEmail(auth, email, actionCodeSettings);
         window.localStorage.setItem("emailForSignIn", email);
-        alert("Login link sent to " + email);
+        alert("Login link sent to your email!");
       } catch (err) {
-        alert("Error: " + err.message);
+        console.error(err);
+        alert(err.message);
       }
+    };
+
+    // If user comes back via email link
+    if (auth.isSignInWithEmailLink(window.location.href)) {
+      let email = window.localStorage.getItem("emailForSignIn");
+      if (!email) {
+        email = window.prompt("Please provide your email for confirmation");
+      }
+      signInWithEmailLink(auth, email, window.location.href)
+        .then(() => {
+          localStorage.removeItem("emailForSignIn");
+          window.location.href = "/admin-dashboard/"; // Redirect
+        })
+        .catch((err) => alert(err.message));
     }
 
-    function showDashboard() {
-      document.getElementById("loginBox").style.display = "none";
-      document.getElementById("dashboard").style.display = "block";
-    }
+    // ---------------- PHONE LOGIN ----------------
+    window.setupRecaptcha = () => {
+      window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {}, auth);
+      recaptchaVerifier.render();
+    };
 
-    window.loadPage = function(page) {
-      document.getElementById("adminFrame").src = page;
+    window.sendPhoneOTP = async () => {
+      const phoneNumber = document.getElementById("phone").value;
+      try {
+        const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+        window.confirmationResult = confirmationResult;
+        alert("OTP sent to phone!");
+      } catch (err) {
+        console.error(err);
+        alert(err.message);
+      }
+    };
+
+    window.verifyOTP = async () => {
+      const code = document.getElementById("otp").value;
+      try {
+        await window.confirmationResult.confirm(code);
+        window.location.href = "/admin-dashboard/";
+      } catch (err) {
+        alert("Invalid OTP");
+      }
     };
   </script>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    nav { margin-bottom: 15px; }
-    nav button { margin-right: 10px; }
-    iframe { width: 100%; height: 80vh; border: none; }
-  </style>
 </head>
-<body>
-  <!-- Login UI -->
-  <div id="loginBox">
-    <h2>Admin Email Login</h2>
-    <input id="email" type="email" placeholder="Enter admin email" />
-    <button id="sendLink">Send Login Link</button>
+<body onload="setupRecaptcha()">
+
+  <h2>Admin Login</h2>
+
+  <!-- Email Login -->
+  <div>
+    <h3>Login with Email</h3>
+    <input type="email" id="email" placeholder="Enter email">
+    <button onclick="sendEmailLogin()">Send Email Login Link</button>
   </div>
 
-  <!-- Dashboard -->
-  <div id="dashboard" style="display:none;">
-    <h2>OGB Admin Dashboard</h2>
-    <nav>
-      <button onclick="loadPage('/orders/')">Orders</button>
-      <button onclick="loadPage('/products-edit/')">Products Edit</button>
-    </nav>
-    <iframe id="adminFrame" src="/orders/"></iframe>
+  <hr>
+
+  <!-- Phone Login -->
+  <div>
+    <h3>Login with Phone</h3>
+    <input type="text" id="phone" placeholder="+233536345825">
+    <div id="recaptcha-container"></div>
+    <button onclick="sendPhoneOTP()">Send OTP</button>
+    <br><br>
+    <input type="text" id="otp" placeholder="Enter OTP">
+    <button onclick="verifyOTP()">Verify OTP</button>
   </div>
+
 </body>
 </html>
