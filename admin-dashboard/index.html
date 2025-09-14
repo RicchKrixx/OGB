@@ -15,11 +15,11 @@
       height: 100vh;
       margin: 0;
     }
-    .login-box {
+    .login-box, .dashboard {
       background: #1e293b;
       padding: 30px;
       border-radius: 12px;
-      width: 320px;
+      width: 340px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
       text-align: center;
     }
@@ -60,33 +60,51 @@
       background: cyan;
       color: black;
     }
-    #phone-box, #email-box { display: none; }
+    #phone-box, #email-box, #otp-box { display: none; }
+    /* Dashboard */
+    .dashboard {
+      display: none;
+    }
+    .links {
+      display: grid;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .links a {
+      display: block;
+      padding: 25px;
+      border-radius: 12px;
+      background: #0ea5e9;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    .links a:hover {
+      background: #38bdf8;
+      transform: scale(1.05);
+    }
   </style>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-    import { getAuth, 
-             sendSignInLinkToEmail, 
-             signInWithEmailLink, 
-             RecaptchaVerifier, 
-             signInWithPhoneNumber } 
+    import { getAuth, sendSignInLinkToEmail, signInWithEmailLink, RecaptchaVerifier, signInWithPhoneNumber } 
     from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
-    // Firebase config
-     const firebaseConfig = {
-  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
-  authDomain: "ongod-5073e.firebaseapp.com",
-  projectId: "ongod-5073e",
-  storageBucket: "ongod-5073e.firebasestorage.app",
-  messagingSenderId: "439687837026",
-  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
-  measurementId: "G-1TVP0X3J62"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+      authDomain: "ongod-5073e.firebaseapp.com",
+      projectId: "ongod-5073e",
+      storageBucket: "ongod-5073e.firebasestorage.app",
+      messagingSenderId: "439687837026",
+      appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+      measurementId: "G-1TVP0X3J62"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Allowed admin credentials
     const ADMIN_EMAIL = "ydrill47@gmail.com";
     const ADMIN_PHONE = "+233536345825";
 
@@ -98,6 +116,12 @@
       document.getElementById("phone-btn").classList.toggle("active", type === 'phone');
     };
 
+    // Show dashboard after login
+    function showDashboard() {
+      document.querySelector(".login-box").style.display = "none";
+      document.querySelector(".dashboard").style.display = "block";
+    }
+
     // EMAIL LOGIN
     window.sendEmailLogin = async () => {
       const email = document.getElementById("email").value.trim();
@@ -105,10 +129,7 @@
         alert("Not authorized!");
         return;
       }
-      const actionCodeSettings = {
-        url: window.location.href,
-        handleCodeInApp: true,
-      };
+      const actionCodeSettings = { url: window.location.href, handleCodeInApp: true };
       try {
         await sendSignInLinkToEmail(auth, email, actionCodeSettings);
         localStorage.setItem("emailForSignIn", email);
@@ -118,16 +139,12 @@
       }
     };
 
-    if (auth.isSignInWithEmailLink(window.location.href)) {
+    if (window.location.href.includes("oobCode")) {
       let email = localStorage.getItem("emailForSignIn");
-      if (!email) {
-        email = window.prompt("Confirm your email");
-      }
+      if (!email) email = window.prompt("Confirm your email");
       if (email === ADMIN_EMAIL) {
         signInWithEmailLink(auth, email, window.location.href)
-          .then(() => {
-            window.location.href = "/admin-dashboard/";
-          })
+          .then(() => showDashboard())
           .catch((err) => alert(err.message));
       }
     }
@@ -148,6 +165,7 @@
         const confirmationResult = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
         window.confirmationResult = confirmationResult;
         alert("OTP sent!");
+        document.getElementById("otp-box").style.display = "block"; // show OTP input only now
       } catch (err) {
         alert(err.message);
       }
@@ -157,14 +175,14 @@
       const code = document.getElementById("otp").value.trim();
       try {
         await window.confirmationResult.confirm(code);
-        window.location.href = "admin-dashboard.html";
+        showDashboard();
       } catch (err) {
         alert("Invalid OTP");
       }
     };
 
     window.onload = () => {
-      showForm("email"); // default
+      showForm("email"); 
       setupRecaptcha();
     };
   </script>
@@ -188,8 +206,20 @@
       <input type="text" id="phone" placeholder="+233XXXXXXXXX">
       <div id="recaptcha-container"></div>
       <button onclick="sendPhoneOTP()">Send OTP</button>
-      <input type="text" id="otp" placeholder="Enter OTP">
-      <button onclick="verifyOTP()">Verify OTP</button>
+
+      <div id="otp-box">
+        <input type="text" id="otp" placeholder="Enter OTP">
+        <button onclick="verifyOTP()">Verify OTP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div class="dashboard">
+    <h2>Admin Dashboard</h2>
+    <div class="links">
+      <a href="/orders/">📦 Orders</a>
+      <a href="/products-edit/">🛒 Products Edit</a>
     </div>
   </div>
 </body>
