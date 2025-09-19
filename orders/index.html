@@ -144,42 +144,7 @@ footer{padding:24px 16px;text-align:center;background:#111;color:#bbb;margin-top
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <!-- Firebase Auth -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script>
-// ✅ Allowed credentials
-const allowedEmail = "ydrill47@gmail.com";   // put your admin email
-const allowedPhone = "+233536345825";         // put your admin phone with country code
 
-const auth = firebase.auth();
-
-// Replace whole page with unauthorized message
-function showUnauthorized() {
-  document.body.innerHTML = `
-    <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;text-align:center;background:#f7f7f9;color:#333;">
-      <h1 style="font-size:2rem;margin-bottom:1rem;">🚫 Not Authorized</h1>
-      <p>You must login as admin to view this page.</p>
-      <a href="/admin-dashboard/" style="margin-top:1.5rem;padding:12px 24px;background:#b8860b;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold;">Login</a>
-    </div>
-  `;
-}
-
-// Watch auth state
-auth.onAuthStateChanged(user=>{
-  if(!user){
-    showUnauthorized();
-    return;
-  }
-
-  const emailOk = user.email === allowedEmail;
-  const phoneOk = user.phoneNumber === allowedPhone;
-
-  if(emailOk || phoneOk){
-    console.log("✅ Authorized admin logged in:", user.email || user.phoneNumber);
-    // continue showing orders
-  } else {
-    showUnauthorized();
-  }
-});
-</script>
 <script>
 // Firebase config
 const firebaseConfig = {
@@ -194,6 +159,17 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+const auth = firebase.auth();
+
+// Replace with your admin email
+const ADMIN_EMAIL = "support@ongodbend.com";
+
+auth.onAuthStateChanged(user => {
+  if (!user || user.email !== ADMIN_EMAIL) {
+    // If not logged in OR not the admin → send back to dashboard login
+    window.location.href = "/admin-dashboard/"; 
+  }
+});
 const sound = document.getElementById("orderSound");
 let soundEnabled = false;
 let allOrders = []; // 🔧 moved global so search works
