@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin • Contact Messages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f7f7f9;
+      color: #1f1f1f;
+    }
+
+    header {
+      background: #b8860b;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 15px;
+    }
+
+    .message {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .message h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #8b6508;
+    }
+
+    .message p {
+      margin: 8px 0;
+    }
+
+    .time {
+      font-size: 0.85rem;
+      color: gray;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header>OGB Admin • Contact Messages</header>
+  <div class="container" id="messagesContainer">
+    <p>Loading messages...</p>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
+    // TODO: replace with your Firebase config
+     const firebaseConfig = {
+  apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
+  authDomain: "ongod-5073e.firebaseapp.com",
+  projectId: "ongod-5073e",
+  storageBucket: "ongod-5073e.firebasestorage.app",
+  messagingSenderId: "439687837026",
+  appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
+  measurementId: "G-1TVP0X3J62"
+};
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const messagesContainer = document.getElementById("messagesContainer");
+
+    // Protect with admin login
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        // redirect if not logged in
+        window.location.href = "/admin-dashboard/"; 
+      } else {
+        // load messages
+        const q = query(collection(db, "contactMessages"), orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+          if (snapshot.empty) {
+            messagesContainer.innerHTML = "<p>No messages yet.</p>";
+            return;
+          }
+
+          messagesContainer.innerHTML = "";
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const msgDiv = document.createElement("div");
+            msgDiv.className = "message";
+
+            msgDiv.innerHTML = `
+              <h3>${data.name} (${data.email})</h3>
+              <p>${data.message}</p>
+              <div class="time">${data.createdAt?.toDate ? data.createdAt.toDate().toLocaleString() : ""}</div>
+            `;
+
+            messagesContainer.appendChild(msgDiv);
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>
