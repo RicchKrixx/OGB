@@ -161,15 +161,25 @@ const db = firebase.firestore();
 
 const auth = firebase.auth();
 
-// Replace with your admin email
-const ADMIN_EMAIL = "support@ongodbend.com";
+// List of allowed admins
+const ADMIN_EMAILS = ["support@ongodbend.com", "ydrill47@gmail.com"];
+const ADMIN_PHONES = ["+233536345825", "+233530149667"]; // E.164 format
 
 auth.onAuthStateChanged(user => {
-  if (!user || user.email !== ADMIN_EMAIL) {
-    // If not logged in OR not the admin → send back to dashboard login
-    window.location.href = "/admin-dashboard/"; 
+  if (!user) {
+    window.location.href = "/admin-dashboard/";
+    return;
+  }
+
+  const emailAllowed = ADMIN_EMAILS.includes(user.email);
+  const phoneAllowed = user.phoneNumber && ADMIN_PHONES.includes(user.phoneNumber);
+
+  if (!emailAllowed && !phoneAllowed) {
+    // Not in the allowed list
+    window.location.href = "/admin-dashboard/";
   }
 });
+
 const sound = document.getElementById("orderSound");
 let soundEnabled = false;
 let allOrders = []; // 🔧 moved global so search works
