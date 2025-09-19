@@ -2,13 +2,147 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>OGB Admin Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } 
-      from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact • OGB</title>
+  <style>
+    :root {
+      --brand: #b8860b;
+      --brand-dark: #8b6508;
+      --ink: #1f1f1f;
+      --bg: #f7f7f9;
+      --card: #fff;
+    }
 
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .contact-container {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 420px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+      color: var(--brand-dark);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--brand);
+    }
+
+    textarea {
+      resize: none;
+      min-height: 100px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: var(--brand);
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: var(--brand-dark);
+    }
+
+    .info {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .success {
+      margin-top: 10px;
+      text-align: center;
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="contact-container">
+    <h1>Contact OGB</h1>
+    <form id="contactForm">
+      <div class="form-group">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" placeholder="Enter your name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Your Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Your Message</label>
+        <textarea id="message" placeholder="Write your message..." required></textarea>
+      </div>
+
+      <button type="submit">Send Message</button>
+      <div class="success" id="successMsg" style="display:none;">
+        ✅ Message sent!
+      </div>
+    </form>
+
+    <div class="info">
+      📍 Accra, Ghana <br>
+      📞 +233 55 123 4567 <br>
+      ✉️ info@ongodbend.com
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+    // TODO: replace with your Firebase config
      const firebaseConfig = {
   apiKey: "AIzaSyAwzdua-29Bp19C5_OfXX4PWuCGHsOKfag",
   authDomain: "ongod-5073e.firebaseapp.com",
@@ -18,89 +152,42 @@
   appId: "1:439687837026:web:1f752fc79a41e9f5bd283b",
   measurementId: "G-1TVP0X3J62"
 };
+
+    // Init Firebase
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    const ALLOWED_NUMBERS = ["+233536345825"]; // whitelist
+    // Form submit
+    const contactForm = document.getElementById("contactForm");
+    const successMsg = document.getElementById("successMsg");
 
-    let confirmationResult;
+    contactForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    window.onload = () => {
-      document.getElementById("sendOtp").onclick = sendOtp;
-      document.getElementById("verifyOtp").onclick = verifyOtp;
-
-      // init reCAPTCHA
-      window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-        size: 'invisible'
-      }, auth);
-    };
-
-    async function sendOtp() {
-      const phone = document.getElementById("phone").value.trim();
-      const appVerifier = window.recaptchaVerifier;
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const message = document.getElementById("message").value.trim();
 
       try {
-        confirmationResult = await signInWithPhoneNumber(auth, phone, appVerifier);
-        alert("OTP sent to " + phone);
-        document.getElementById("otpBox").style.display = "block";
-      } catch (err) {
-        alert(err.message);
+        await addDoc(collection(db, "contactMessages"), {
+          name,
+          email,
+          message,
+          createdAt: serverTimestamp()
+        });
+
+        successMsg.style.display = "block";
+        contactForm.reset();
+
+        setTimeout(() => {
+          successMsg.style.display = "none";
+        }, 3000);
+
+      } catch (error) {
+        alert("Error sending message: " + error.message);
       }
-    }
-
-    async function verifyOtp() {
-      const code = document.getElementById("otp").value;
-      try {
-        const result = await confirmationResult.confirm(code);
-        const phone = result.user.phoneNumber;
-
-        if (ALLOWED_NUMBERS.includes(phone)) {
-          document.getElementById("loginBox").style.display = "none";
-          document.getElementById("dashboard").style.display = "block";
-        } else {
-          alert("Unauthorized number");
-          auth.signOut();
-        }
-      } catch (err) {
-        alert("Invalid OTP");
-      }
-    }
+    });
   </script>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .hidden { display: none; }
-    nav { margin-bottom: 15px; }
-    nav button { margin-right: 10px; }
-    iframe { width: 100%; height: 80vh; border: none; }
-  </style>
-</head>
-<body>
-  <!-- Login UI -->
-  <div id="loginBox">
-    <h2>Admin Login</h2>
-    <input id="phone" placeholder="Enter phone number" />
-    <button id="sendOtp">Send OTP</button>
-    <div id="otpBox" class="hidden">
-      <input id="otp" placeholder="Enter OTP" />
-      <button id="verifyOtp">Verify OTP</button>
-    </div>
-    <div id="recaptcha-container"></div>
-  </div>
 
-  <!-- Dashboard -->
-  <div id="dashboard" class="hidden">
-    <h2>OGB Admin Dashboard</h2>
-    <nav>
-      <button onclick="loadPage('/orders/')">Orders</button>
-      <button onclick="loadPage('/products-edit/')">Products Edit</button>
-    </nav>
-    <iframe id="adminFrame" src="/orders/"></iframe>
-  </div>
-
-  <script>
-    function loadPage(page) {
-      document.getElementById("adminFrame").src = page;
-    }
-  </script>
 </body>
 </html>
