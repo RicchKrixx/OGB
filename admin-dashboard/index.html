@@ -48,11 +48,12 @@
     }
     .toggle {
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
       margin-bottom: 15px;
+      gap: 10px;
     }
     .toggle button {
-      width: 48%;
+      flex: 1;
       background: #334155;
       color: white;
     }
@@ -120,6 +121,7 @@
     function showDashboard() {
       document.querySelector(".login-box").style.display = "none";
       document.querySelector(".dashboard").style.display = "block";
+      localStorage.setItem("isAdminLoggedIn", "true");
     }
 
     // EMAIL LOGIN
@@ -181,9 +183,14 @@
       }
     };
 
+    // Auto login check
     window.onload = () => {
-      showForm("email"); 
-      setupRecaptcha();
+      if (localStorage.getItem("isAdminLoggedIn") === "true") {
+        showDashboard();
+      } else {
+        showForm("email"); 
+        setupRecaptcha();
+      }
     };
   </script>
 </head>
@@ -218,9 +225,9 @@
   <div class="dashboard">
     <h2>Admin Dashboard</h2>
     <div class="links">
-      <a href="/orders/">📦 Orders</a>
-      <a href="/products-edit/">🛒 Products Edit</a>
-      <a href="/admin-msg/">📩 Contact Msg</a>
+      <a href="orders/index.html">📦 Orders</a>
+      <a href="products-edit/index.html">🛒 Products Edit</a>
+      <a href="admin-msg/index.html">📩 Contact Msg</a>
     </div>
   </div>
 </body>
