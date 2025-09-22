@@ -948,7 +948,34 @@ function showToast(itemName) {
     // Load products by category from Firestore
     async function loadProducts(category, containerId) {
   const container = document.getElementById(containerId);
-  container.innerHTML = getSkeletons(4); // Show skeletons while loading
+  container.innerHTML = getSkeletons(10); // Show skeletons while loading
+
+
+function renderProductCard(product) {
+  const card = document.createElement("div");
+  card.className = "product-card";
+
+  // Skeleton wrapper for the image
+  card.innerHTML = `
+    <div class="image-wrapper">
+      <div class="skeleton skeleton-img"></div>
+      <img src="${product.image}" alt="${product.name}" style="display:none;" />
+    </div>
+    <h3>${product.name}</h3>
+    <p>${product.price}</p>
+  `;
+
+  const img = card.querySelector("img");
+  const skeleton = card.querySelector(".skeleton-img");
+
+  img.onload = () => {
+    skeleton.style.display = "none"; // remove skeleton
+    img.style.display = "block";     // show real image
+  };
+
+  return card;
+}
+
 
   const q = query(collection(db, "products"), where("category", "==", category));
   const snapshot = await getDocs(q);
