@@ -978,12 +978,12 @@ function renderProducts(products, container) {
 
     div.innerHTML = `
       <span class="badge">10% OFF</span>
-      <div class="image-wrapper">
-        <div class="skeleton skeleton-img"></div>
-        <img src="${product.image || 'https://via.placeholder.com/150'}"
-             alt="${product.name}"
-             style="display:none;" loading="lazy"/>
-      </div>
+     <div class="image-wrapper">
+  <div class="skeleton skeleton-img"></div>
+  <img src="${product.image || 'https://via.placeholder.com/150'}"
+       alt="${product.name}"
+       style="display:none;" loading="lazy"/>
+</div>
       <h3>${product.name}</h3>
       <div class="price">${priceHTML}</div>
       <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">
@@ -992,11 +992,18 @@ function renderProducts(products, container) {
     `;
 
     const img = div.querySelector("img");
-    const skeleton = div.querySelector(".skeleton-img");
-    img.onload = () => {
-      skeleton.style.display = "none";
-      img.style.display = "block";
-    };
+const skeleton = div.querySelector(".skeleton-img");
+
+img.onload = () => {
+  skeleton.style.display = "none";   // hide skeleton
+  img.style.display = "block";       // show image only when ready
+};
+
+img.onerror = () => {
+  skeleton.style.display = "none";   // hide skeleton even if error
+  img.style.display = "block";       // fallback
+  img.src = "https://via.placeholder.com/150"; // backup image
+};
 
     container.appendChild(div);
   });
