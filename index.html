@@ -976,44 +976,40 @@ function renderProducts(products, container) {
          <span style="font-weight:600; color:#222;font-size:14px;">GH₵${product.price.toFixed(2)}</span>`
       : `<span style="font-weight:700; color:#222;font-size:14px;">GH₵${product.price.toFixed(2)}</span>`;
 
-    div.innerHTML = `
-      <span class="badge">10% OFF</span>
-     <div class="image-wrapper">
-  <div class="skeleton skeleton-img"></div>
-  <img src="${product.image || 'https://via.placeholder.com/150'}"
-     alt="${product.name}"
-     style="display:none;opacity:0;" loading="lazy"/>
-</div>
-      <h3>${product.name}</h3>
-      <div class="price">${priceHTML}</div>
-      <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${product.image || 'https://via.placeholder.com/150'}')">
-        Add to Cart
-      </button>
-    `;
+   const imgSrc = product.image && product.image.startsWith("http")
+  ? product.image
+  : "https://via.placeholder.com/150";
+
+div.innerHTML = `
+  <span class="badge">10% OFF</span>
+  <div class="image-wrapper">
+    <div class="skeleton skeleton-img"></div>
+    <img src="${imgSrc}"
+         alt="${product.name}"
+         style="opacity:0;" loading="lazy"/>
+  </div>
+  <h3>${product.name}</h3>
+  <div class="price">${priceHTML}</div>
+  <button class="add" onclick="addToCart('${product.name}', ${product.price}, '${imgSrc}')">
+    Add to Cart
+  </button>
+`;
+
 
     const img = div.querySelector("img");
 const skeleton = div.querySelector(".skeleton-img");
 
 img.onload = () => {
-  // fade in image
-  img.style.display = "block";
-  img.style.opacity = "0";
-  img.style.transition = "opacity 0.4s ease";
-  
-  requestAnimationFrame(() => {
-    img.style.opacity = "1";   // smooth fade
-  });
-
-  // now remove skeleton
   skeleton.remove();
+  img.style.transition = "opacity 0.4s ease";
+  img.style.opacity = "1"; // fade in smoothly
 };
 
 img.onerror = () => {
   skeleton.remove();
-  img.style.display = "block";
-  img.src = "https://via.placeholder.com/150";
+  img.style.opacity = "1";
+  img.src = "https://via.placeholder.com/150"; // fallback
 };
-
     container.appendChild(div);
   });
 }
