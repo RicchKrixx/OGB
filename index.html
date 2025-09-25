@@ -981,8 +981,8 @@ function renderProducts(products, container) {
      <div class="image-wrapper">
   <div class="skeleton skeleton-img"></div>
   <img src="${product.image || 'https://via.placeholder.com/150'}"
-       alt="${product.name}"
-       style="display:none;" loading="lazy"/>
+     alt="${product.name}"
+     style="display:none;opacity:0;" loading="lazy"/>
 </div>
       <h3>${product.name}</h3>
       <div class="price">${priceHTML}</div>
