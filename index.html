@@ -995,14 +995,23 @@ function renderProducts(products, container) {
 const skeleton = div.querySelector(".skeleton-img");
 
 img.onload = () => {
-  skeleton.style.display = "none";   // hide skeleton
-  img.style.display = "block";       // show image only when ready
+  // fade in image
+  img.style.display = "block";
+  img.style.opacity = "0";
+  img.style.transition = "opacity 0.4s ease";
+  
+  requestAnimationFrame(() => {
+    img.style.opacity = "1";   // smooth fade
+  });
+
+  // now remove skeleton
+  skeleton.remove();
 };
 
 img.onerror = () => {
-  skeleton.style.display = "none";   // hide skeleton even if error
-  img.style.display = "block";       // fallback
-  img.src = "https://via.placeholder.com/150"; // backup image
+  skeleton.remove();
+  img.style.display = "block";
+  img.src = "https://via.placeholder.com/150";
 };
 
     container.appendChild(div);
