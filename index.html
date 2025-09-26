@@ -1267,19 +1267,22 @@ function markOrderComplete(orderId) {
     localStorage.setItem("orders", JSON.stringify(orders));
   }
 }
+
 window.addEventListener("load", () => {
   const orders = JSON.parse(localStorage.getItem("orders")) || {};
-  
+
   Object.keys(orders).forEach(orderId => {
     const order = orders[orderId];
-    
-    // Only if order is complete and review not yet given
-    if (order.status === "Complete" && !order.reviewGiven) {
+
+    // Only if order is complete, no review, and popup not shown
+    if (order.status === "Complete" && !order.reviewGiven && !order.popupShown) {
       const now = Date.now();
       const completedAt = order.completeTime || 0;
-      const mins1 = 10000;
-      
-      if (now - completedAt >= mins1) {
+
+      // Delay before showing popup (10s for testing)
+      const delay = 10 * 1000;
+
+      if (now - completedAt >= delay) {
         showReviewPopup(orderId);
       }
     }
@@ -1316,13 +1319,20 @@ function showReviewPopup(orderId) {
     });
   });
 
+  // Submit review
   overlay.querySelector("#submit-review").addEventListener("click", () => {
     const feedback = overlay.querySelector("textarea").value;
     saveReview(orderId, rating, feedback);
     document.body.removeChild(overlay);
   });
 
+  // Close without review → mark popupShown so it won’t show again
   overlay.querySelector("#close-review").addEventListener("click", () => {
+    const orders = JSON.parse(localStorage.getItem("orders")) || {};
+    if (orders[orderId]) {
+      orders[orderId].popupShown = true;
+      localStorage.setItem("orders", JSON.stringify(orders));
+    }
     document.body.removeChild(overlay);
   });
 }
