@@ -953,7 +953,7 @@ function saveProductsToCache(category, products) {
   }));
 }
 
-function getProductsFromCache(category, maxAge = 5 * 60 * 1000) { // 5 mins default
+function getProductsFromCache(category, maxAge = 7 * 24 * 60 * 60 * 1000) { // 7 days default
   const cache = localStorage.getItem("products_" + category);
   if (!cache) return null;
 
@@ -1277,9 +1277,9 @@ window.addEventListener("load", () => {
     if (order.status === "Complete" && !order.reviewGiven) {
       const now = Date.now();
       const completedAt = order.completeTime || 0;
-      const hours24 = 10 * 1000;
+      const mins1 = 10000;
       
-      if (now - completedAt >= hours24) {
+      if (now - completedAt >= mins1) {
         showReviewPopup(orderId);
       }
     }
