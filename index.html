@@ -1257,40 +1257,28 @@ showToast(name);
     }
   });
 });
-// Example when marking an order complete
-function markOrderComplete(orderId) {
-  const orders = JSON.parse(localStorage.getItem("orders")) || {};
-  if (orders[orderId]) {
-    orders[orderId].status = "Complete";
-    // Save timestamp of completion
-    orders[orderId].completeTime = Date.now();
-    localStorage.setItem("orders", JSON.stringify(orders));
-  }
-}
 
-window.addEventListener("load", () => {
-  const orders = JSON.parse(localStorage.getItem("orders")) || {};
 
-  Object.keys(orders).forEach(orderId => {
-    const order = orders[orderId];
+// Runs when homepage loads
+window.addEventListener("load", async () => {
+  const userId = localStorage.getItem("userId"); // or however you store user
+  if (!userId) return;
 
-    // Only if order is complete, no review, and popup not shown
-    if (order.status === "Complete" && !order.reviewGiven && !order.popupShown) {
-      const now = Date.now();
-      const completedAt = order.completeTime || 0;
+  const q = query(collection(db, "orders"), where("userId", "==", userId));
+  const snap = await getDocs(q);
 
-      // Delay before showing popup (10s for testing)
-      const delay = 10 * 1000;
+  snap.forEach(docSnap => {
+    const order = docSnap.data();
+    const orderId = docSnap.id;
 
-      if (now - completedAt >= delay) {
-        showReviewPopup(orderId);
-      }
+    // Only if order is complete, no review yet
+    if (order.status === "Complete" && !order.reviewGiven) {
+      showReviewPopup(orderId);
     }
   });
 });
 
-function showReviewPopup(orderId) {
-  // Create overlay
+async function showReviewPopup(orderId) {
   const overlay = document.createElement("div");
   overlay.id = "review-overlay";
   overlay.innerHTML = `
@@ -1310,8 +1298,8 @@ function showReviewPopup(orderId) {
   `;
   document.body.appendChild(overlay);
 
-  const stars = overlay.querySelectorAll(".stars span");
   let rating = 0;
+  const stars = overlay.querySelectorAll(".stars span");
   stars.forEach(star => {
     star.addEventListener("click", () => {
       rating = star.dataset.star;
@@ -1319,35 +1307,23 @@ function showReviewPopup(orderId) {
     });
   });
 
-  // Submit review
-  overlay.querySelector("#submit-review").addEventListener("click", () => {
+  // ✅ Submit review → update Firestore
+  overlay.querySelector("#submit-review").addEventListener("click", async () => {
     const feedback = overlay.querySelector("textarea").value;
-    saveReview(orderId, rating, feedback);
-    document.body.removeChild(overlay);
-  });
-
-  // Close without review → mark popupShown so it won’t show again
-  overlay.querySelector("#close-review").addEventListener("click", () => {
-    const orders = JSON.parse(localStorage.getItem("orders")) || {};
-    if (orders[orderId]) {
-      orders[orderId].popupShown = true;
-      localStorage.setItem("orders", JSON.stringify(orders));
-    }
-    document.body.removeChild(overlay);
-  });
-}
-
-// Save review in localStorage
-function saveReview(orderId, rating, feedback) {
-  const orders = JSON.parse(localStorage.getItem("orders")) || {};
-  if (orders[orderId]) {
-    orders[orderId].reviewGiven = true;
-    orders[orderId].review = { rating, feedback };
-    localStorage.setItem("orders", JSON.stringify(orders));
+    await updateDoc(doc(db, "orders", orderId), {
+      reviewGiven: true,
+      review: { rating, feedback, timestamp: Date.now() }
+    });
     alert("Thank you for your review!");
-  }
-}
+    document.body.removeChild(overlay);
+  });
 
+  // ✅ Close without review → still mark reviewGiven true (so it won’t nag again)
+  overlay.querySelector("#close-review").addEventListener("click", async () => {
+    await updateDoc(doc(db, "orders", orderId), { reviewGiven: true });
+    document.body.removeChild(overlay);
+  });
+}
 </script>
 <!--Start of Tawk.to Script-->
 <script type="text/javascript">
