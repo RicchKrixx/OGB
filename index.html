@@ -1153,40 +1153,6 @@ showToast(name);
 };
     updateBadge();
 
-    // Auth and dropdown
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        localStorage.setItem("user", JSON.stringify({
-          email: user.email,
-          displayName: user.displayName || user.email.split("@")[0]
-        }));
-      } else {
-        localStorage.removeItem("user");
-      }
-      renderDropdown();
-    });
-
-    window.signOutUser = async function() {
-      await signOut(auth);
-      alert("Logged out!");
-    };
-
-    function renderDropdown() {
-      const dropdown = document.getElementById("userDropdown");
-      dropdown.innerHTML = "";
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (user) {
-        dropdown.innerHTML = `
-          <a href="#">Hello, ${user.displayName}</a>
-          <a href="/dashboard/">Dashboard</a>
-          <a href="#" onclick="signOutUser()">Logout</a>
-        `;
-      } else {
-        dropdown.innerHTML = `<a href="/auth/">Login/Register</a>`;
-      }
-    }
-
-
     // Hamburger menu
     const hamburger = document.getElementById('hamburger');
     const menu = document.getElementById('menu');
@@ -1223,20 +1189,55 @@ showToast(name);
     if (e.target === this) this.style.display = "none";
   };
 
- document.addEventListener("DOMContentLoaded", () => {
+ // Auth and dropdown
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    localStorage.setItem("user", JSON.stringify({
+      email: user.email,
+      displayName: user.displayName || user.email.split("@")[0]
+    }));
+  } else {
+    localStorage.removeItem("user");
+  }
+  renderDropdown();
+});
+
+window.signOutUser = async function() {
+  await signOut(auth);
+  alert("Logged out!");
+};
+
+// Render dropdown content
+function renderDropdown() {
+  const dropdown = document.getElementById("userDropdown");
+  dropdown.innerHTML = "";
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (user) {
+    dropdown.innerHTML = `
+      <a href="#">Hello, ${user.displayName}</a>
+      <a href="/dashboard/">Dashboard</a>
+      <a href="#" onclick="signOutUser()">Logout</a>
+    `;
+  } else {
+    dropdown.innerHTML = `<a href="/auth/">Login/Register</a>`;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
   const profilePic = localStorage.getItem("profilePic");
   const avatar = document.getElementById("userAvatar");
   const icon = document.getElementById("userIcon");
-  const dropdown = document.getElementById("userDropdown"); 
-  const trigger = document.getElementById("userTrigger"); 
+  const dropdown = document.getElementById("userDropdown");
+  const trigger = document.getElementById("userTrigger");
 
-  if (profilePic) {  
-    avatar.src = profilePic;  
-    avatar.style.display = "block";  
-    icon.style.display = "none";  
-  } else {  
-    avatar.style.display = "none";  
-    icon.style.display = "block";  
+  // Profile pic / fallback icon
+  if (profilePic) {
+    avatar.src = profilePic;
+    avatar.style.display = "block";
+    icon.style.display = "none";
+  } else {
+    avatar.style.display = "none";
+    icon.style.display = "block";
   }
 
   // Toggle dropdown
