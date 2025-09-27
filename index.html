@@ -1153,43 +1153,7 @@ showToast(name);
 };
     updateBadge();
 
-    // Hamburger menu
-    const hamburger = document.getElementById('hamburger');
-    const menu = document.getElementById('menu');
-    hamburger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      hamburger.classList.toggle('active');
-      menu.classList.toggle('active');
-    });
-    document.addEventListener('click', (e) => {
-      if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
-        menu.classList.remove('active');
-        hamburger.classList.remove('active');
-      }
-    });
-  
-
-  // Open preview when any product image is clicked
-  document.addEventListener("click", function(e) {
-    if (e.target.tagName === "IMG" && e.target.closest(".card")) {
-      const modal = document.getElementById("imgPreview");
-      const modalImg = document.getElementById("previewImg");
-      modal.style.display = "flex";
-      modalImg.src = e.target.src;
-    }
-  });
-
-  // Close preview
-  document.querySelector("#imgPreview .close").onclick = function() {
-    document.getElementById("imgPreview").style.display = "none";
-  };
-
-  // Close if clicked outside image
-  document.getElementById("imgPreview").onclick = function(e) {
-    if (e.target === this) this.style.display = "none";
-  };
-
- // Auth and dropdown
+// Auth and dropdown
 onAuthStateChanged(auth, (user) => {
   if (user) {
     localStorage.setItem("user", JSON.stringify({
@@ -1207,7 +1171,6 @@ window.signOutUser = async function() {
   alert("Logged out!");
 };
 
-// Render dropdown content
 function renderDropdown() {
   const dropdown = document.getElementById("userDropdown");
   dropdown.innerHTML = "";
@@ -1223,21 +1186,55 @@ function renderDropdown() {
   }
 }
 
+// Hamburger menu
+const hamburger = document.getElementById('hamburger');
+const menu = document.getElementById('menu');
+hamburger.addEventListener('click', (e) => {
+  e.stopPropagation();
+  hamburger.classList.toggle('active');
+  menu.classList.toggle('active');
+});
+document.addEventListener('click', (e) => {
+  if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+    menu.classList.remove('active');
+    hamburger.classList.remove('active');
+  }
+});
+
+// Open preview when any product image is clicked
+document.addEventListener("click", function(e) {
+  if (e.target.tagName === "IMG" && e.target.closest(".card")) {
+    const modal = document.getElementById("imgPreview");
+    const modalImg = document.getElementById("previewImg");
+    modal.style.display = "flex";
+    modalImg.src = e.target.src;
+  }
+});
+
+// Close preview
+document.querySelector("#imgPreview .close").onclick = function() {
+  document.getElementById("imgPreview").style.display = "none";
+};
+
+// Close if clicked outside image
+document.getElementById("imgPreview").onclick = function(e) {
+  if (e.target === this) this.style.display = "none";
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   const profilePic = localStorage.getItem("profilePic");
   const avatar = document.getElementById("userAvatar");
   const icon = document.getElementById("userIcon");
-  const dropdown = document.getElementById("userDropdown");
-  const trigger = document.getElementById("userTrigger");
+  const dropdown = document.getElementById("userDropdown"); 
+  const trigger = document.getElementById("userTrigger"); 
 
-  // Profile pic / fallback icon
-  if (profilePic) {
-    avatar.src = profilePic;
-    avatar.style.display = "block";
-    icon.style.display = "none";
-  } else {
-    avatar.style.display = "none";
-    icon.style.display = "block";
+  if (profilePic) {  
+    avatar.src = profilePic;  
+    avatar.style.display = "block";  
+    icon.style.display = "none";  
+  } else {  
+    avatar.style.display = "none";  
+    icon.style.display = "block";  
   }
 
   // Toggle dropdown
