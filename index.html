@@ -1261,7 +1261,7 @@ window.addEventListener("load", async () => {
   try {
     const q = query(
       collection(db, "orders"),
-      where("userId", "==", userId) // 👈 use same field as dashboard
+      where("userId", "==", user.uid) // 👈 use same field as dashboard
     );
     const snap = await getDocs(q);
 
